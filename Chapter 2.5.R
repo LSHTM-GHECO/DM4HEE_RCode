@@ -53,22 +53,24 @@ cycles<-20
 
 state.names<-c("A.AsympHIV","B.SympHIV","C.AIDS","D.Death")
 n.states<-length(state.names)
+
 A.AsympHIV.AZT<-c(tpA2A,tpA2B,tpA2C,tpA2D)
 B.SympHIV.AZT<-c(0,tpB2B,tpB2C,tpB2D)
 C.AIDS.AZT<-c(0,0,tpC2C,tpC2D)
 D.Death<-c(0,0,0,1)
 tm.AZT<-matrix(data=rbind(A.AsympHIV.AZT,B.SympHIV.AZT,C.AIDS.AZT,D.Death),nrow=n.states,ncol=n.states)
+
 rownames(tm.AZT)<-state.names
 colnames(tm.AZT)<-state.names
 tm.AZT
 
 #  Create a trace for the AZT arm
 
-trace.AZT<-matrix(data=NA,nrow=cycles,ncol=n.states)
+trace.AZT<-matrix(data=NA,nrow=cycles,ncol=n.states) 
 colnames(trace.AZT)<-state.names
 trace.AZT[1,]<-seed%*%tm.AZT
 
-for (i in 1:(cycles-1)) {
+for (i in 1:(cycles-1)) {  ## cycles minus 1 as there is no 21st row
   trace.AZT[i+1,]<-trace.AZT[i,]%*%tm.AZT
 }
 trace.AZT
@@ -91,7 +93,7 @@ colnames(trace.comb)<-state.names
 trace.comb[1,]<-seed%*%tm.comb
 trace.comb[2,]<-trace.comb[1,]%*%tm.comb
 
-for (i in 2:cycles) {
+for (i in 2:(cycles-1)) {
   trace.comb[i+1,]<-trace.comb[i,]%*%tm.AZT
 }
 trace.comb
@@ -104,6 +106,7 @@ LYs.AZT<-trace.AZT%*%LYs
 LYs.AZT
 LYs.comb<-trace.comb%*%LYs
 LYs.comb
+
 undisc.LYs.AZT<-colSums(LYs.AZT)
 undisc.LYs.AZT
 undisc.LYs.comb<-colSums(LYs.comb)
@@ -114,6 +117,11 @@ for (i in 1:cycles) {
   O.discount.factor[1,i]<-1/(1+oDR)^i
 }
 O.discount.factor
+
+## JW alternative 
+O.discount.factor <- matrix(1/(1+oDR) ^ c(1:cycles), nrow = 1, ncol = cycles)
+
+
 
 disc.LYs.AZT<-O.discount.factor%*%LYs.AZT
 disc.LYs.comb<-O.discount.factor%*%LYs.comb
@@ -139,6 +147,10 @@ for (i in 1:cycles) {
 }
 C.discount.factor
 
+## JW alternative 
+C.discount.factor <- matrix(1/(1+cDR) ^ c(1:cycles), nrow = 1, ncol = cycles)
+
+
 disc.cost.AZT<-C.discount.factor%*%cost.AZT
 disc.cost.comb<-C.discount.factor%*%cost.comb
 disc.cost.AZT
@@ -149,6 +161,14 @@ disc.cost.comb
 inc.cost<-disc.cost.comb-disc.cost.AZT
 inc.LYs<-disc.LYs.comb-disc.LYs.AZT
 icer<-inc.cost/inc.LYs
-inc.cost
-inc.LYs
-icer
+# do we need to account for dominant interventions? or maybe in a later version
+#inc.cost
+#inc.LYs
+#icer
+
+
+# alternative way to present overall results? 
+ce.results <- c(inc.cost = inc.cost, inc.LYs = inc.LYs, icer = icer)
+ce.results
+
+
