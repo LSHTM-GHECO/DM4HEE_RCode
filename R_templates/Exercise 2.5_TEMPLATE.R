@@ -1,15 +1,17 @@
 #  DM4HEE 
 #  Exercise 2.5 - Replication of the HIV/AIDS model
+# TEMPLATE VERSION ####
 #  Author: Andrew Briggs
 #  Date created: 19 February 2021
-#  Date last edit: 08/03/2021
+#  Date last edit: 20 February 2021
 
 #  Start by defining parameters
 
-####*** Transition probabilities ****#####
-tpA2A<-1251/1734 ## transitions A to A
-tpA2B<-350/1734 ## transitions A to B and so on
-tpA2C<-116/1734  
+#  Transition probabilities
+
+tpA2A<-1251/1734
+tpA2B<-350/1734
+tpA2C<-116/1734
 tpA2D<-17/1734
 tpB2B<-731/1258
 tpB2C<-512/1258
@@ -17,12 +19,9 @@ tpB2D<-15/1258
 tpC2C<-1312/1749
 tpC2D<-437/1749
 
-## NN alternative
-## could even define events, complements, totals etc. like in excel
+#  Costs
 
-
-####**** Costs ****#####
-dmca<-1701  
+dmca<-1701
 dmcb<-1774
 dmcc<-6948
 dmc<-c(dmca, dmcb, dmcc,0)
@@ -117,10 +116,6 @@ for (i in 1:cycles) {
 }
 O.discount.factor
 
-## JW alternative 
-O.discount.factor <- matrix(1/(1+oDR) ^ c(1:cycles), nrow = 1, ncol = cycles)
-
-
 disc.LYs.AZT<-O.discount.factor%*%LYs.AZT
 disc.LYs.comb<-O.discount.factor%*%LYs.comb
 disc.LYs.AZT
@@ -145,16 +140,13 @@ for (i in 1:cycles) {
 }
 C.discount.factor
 
-## JW alternative 
-## C.discount.factor <- matrix(1/(1+cDR) ^ c(1:cycles), nrow = 1, ncol = cycles)
-
 disc.cost.AZT<-C.discount.factor%*%cost.AZT
 disc.cost.comb<-C.discount.factor%*%cost.comb
 disc.cost.AZT
 disc.cost.comb
 
 #  Cost-effectiveness results
-###!! NN suggestion - store as a data.frame/table output?
+
 inc.cost<-disc.cost.comb-disc.cost.AZT
 inc.LYs<-disc.LYs.comb-disc.LYs.AZT
 icer<-inc.cost/inc.LYs

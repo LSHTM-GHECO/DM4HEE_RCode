@@ -4,7 +4,14 @@
 #  Date created: 20 February 2021
 #  Date last edit: 21 February 2021
 
-setwd("/Users/lshab10/Documents/R-files")
+# Need to consider a relative working directory 
+# setwd("/Users/lshab10/Documents/R-files")
+
+## these are the packages that I think are needed to run the following code...
+
+library(data.table)
+library(tidyr)
+library(dplyr)
 
 #  Start by defining parameters
 
@@ -47,7 +54,9 @@ state.utilities<-c(0,uSuccessP,uRevision,uSuccessR,0)
 
 #  Read in the life table
 
-life.table <- read.csv("life-table.csv")
+#life.table <- read.csv("life-table.csv")
+# this is how i've saved on my computer - but need to discuss how to set the files / folders to ensure this are appropriate 
+life.table <- read.csv("../inputs/life-table.csv")
 life.table<-data.table(life.table)
 
 #  Other parameters
@@ -76,6 +85,8 @@ setkey(death.risk,"current.age")
 death.risk<-life.table[death.risk, roll=TRUE]
 revision.risk.sp0<-1-exp(exp(sp0.LP)*((cycle-1)^exp(lngamma)-cycle^exp(lngamma)))
 revision.risk.np1<-1-exp(exp(np1.LP)*((cycle-1)^exp(lngamma)-cycle^exp(lngamma)))
+
+# these are all merged into a data table but then causes problems below adding to matrix - why not just use the main sources
 tdtps<-data.table(death.risk,revision.risk.sp0,revision.risk.np1)
 tdtps
 mr<-3-male
@@ -88,22 +99,28 @@ mr<-3-male
 SP0.tm<-array(data=0,dim=c(5,5,60))
 #  provideDimnames(SP.tm,sep="-",base=list(state.names,state.names,"time"))
 
+# why not just collect the correct revision risk without using pull function? 
 
 for (i in 1:60) {
-SP0.tm[1,2,i]<-1-omrPTHR
-SP0.tm[1,5,i]<-omrPTHR
-SP0.tm[2,2,i]<-1-pull(tdtps[i,4])-pull(tdtps[i,..mr])
-SP0.tm[2,3,i]<-pull(tdtps[i,4])
-SP0.tm[2,5,i]<-pull(tdtps[i,..mr])
-SP0.tm[3,4,i]<-1-omrRTHR-pull(tdtps[i,..mr])
-SP0.tm[3,5,i]<-omrRTHR+pull(tdtps[i,..mr])
-SP0.tm[4,3,i]<-rrr
-SP0.tm[4,4,i]<-1-rrr-pull(tdtps[i,..mr])
-SP0.tm[4,5,i]<-pull(tdtps[i,..mr])
-SP0.tm[5,5,i]<-1
+  
+  mortality <- pull(tdtps[i,..mr]) ## this makes it ~5x faster - this pull function is very slow so perhaps other ways to do this. 
+  
+  # istead of using the tdtps data frame, easier just to use what went into it (revision risk vectors)
+  
+  SP0.tm[1,2,i]<-1-omrPTHR
+  SP0.tm[1,5,i]<-omrPTHR
+  SP0.tm[2,2,i]<-1-revision.risk.sp0[i]-mortality
+  SP0.tm[2,3,i]<-revision.risk.sp0[i]
+  SP0.tm[2,5,i]<-mortality
+  SP0.tm[3,4,i]<-1-omrRTHR-mortality
+  SP0.tm[3,5,i]<-omrRTHR+mortality
+  SP0.tm[4,3,i]<-rrr
+  SP0.tm[4,4,i]<-1-rrr-mortality
+  SP0.tm[4,5,i]<-mortality
+  SP0.tm[5,5,i]<-1
 }
 
-
+SP0.tm
 
 #  Now create a transition matrix for the new prosthesis arm
 #  We start with a three dimensional array in order to capture the time dependencies
@@ -112,7 +129,7 @@ SP0.tm[5,5,i]<-1
 NP1.tm<-array(data=0,dim=c(5,5,60))
 #  provideDimnames(SP.tm,sep="-",base=list(state.names,state.names,"time"))
 
-
+# to be edited based on decision on matrix
 for (i in 1:60) {
   NP1.tm[1,2,i]<-1-omrPTHR
   NP1.tm[1,5,i]<-omrPTHR
@@ -128,13 +145,14 @@ for (i in 1:60) {
 }
 
 
+
 #  Create a trace for the standard prosthesis arm
 
 trace.SP0<-matrix(data=NA,nrow=cycles,ncol=n.states)
 colnames(trace.SP0)<-state.names
 trace.SP0[1,]<-seed%*%SP0.tm[,,1]
 
-for (i in 1:cycles) {
+for (i in 1:(cycles-1)) {
   trace.SP0[i+1,]<-trace.SP0[i,]%*%SP0.tm[,,i+1]
 }
 trace.SP0
@@ -145,8 +163,8 @@ trace.NP1<-matrix(data=NA,nrow=cycles,ncol=n.states)
 colnames(trace.NP1)<-state.names
 trace.NP1[1,]<-seed%*%NP1.tm[,,1]
 
-for (i in 1:cycles) {
-  trace.NP1[i+1,]<-trace.NP1[i,]%*%NP1.tm[,,i]
+for (i in 1:(cycles-1)) {
+  trace.NP1[i+1,]<-trace.NP1[i,]%*%NP1.tm[,,i+1] ## error here
 }
 trace.NP1
 
@@ -165,6 +183,9 @@ O.discount.factor<-matrix(data=NA,nrow=1,ncol=cycles)
 for (i in 1:cycles) {
   O.discount.factor[1,i]<-1/(1+oDR)^i
 }
+
+# a much simpler alternative here (also doesnt need to be a matrix)
+O.discount.factor <- 1/(1+oDR)^cycle
 O.discount.factor
 
 disc.QALYs.SP0<-O.discount.factor%*%QALYs.SP0
@@ -189,6 +210,9 @@ C.discount.factor<-matrix(data=NA,nrow=1,ncol=cycles)
 for (i in 1:cycles) {
   C.discount.factor[1,i]<-1/(1+cDR)^i
 }
+
+# alternative 
+C.discount.factor <- 1/(1+cDR)^cycle
 C.discount.factor
 
 disc.cost.SP0<-C.discount.factor%*%cost.SP0+cSP0
