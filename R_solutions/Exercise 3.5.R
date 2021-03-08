@@ -4,15 +4,13 @@
 #  Date created: 20 February 2021
 #  Date last edit: 21 February 2021
 
-# Need to consider a relative working directory 
-# setwd("/Users/lshab10/Documents/R-files")
-
 ## these are the packages that I think are needed to run the following code...
 
 library(data.table)
 library(tidyr)
 library(dplyr)
 
+#########**** PARAMETERS *****######
 #  Start by defining parameters
 
 #  Demographics
@@ -35,6 +33,10 @@ NP1<--1.344474
 lngamma<-0.3740968
 sp0.LP<-cons+age*ageC+male*maleC
 np1.LP<-cons+age*ageC+male*maleC+NP1
+
+# ## NN suggestion
+# hazards <- as.data.table(read.csv("inputs/hazardfunction.csv"))
+# ## need to add in code to select the various variables 
 
 #  Costs
 
@@ -228,3 +230,9 @@ icer<-inc.cost/inc.QALYs
 inc.cost
 inc.QALYs
 icer
+
+# ### NN suggestion - store as a data.frame output?
+# output <- data.frame(inc.cost=disc.cost.comb-disc.cost.AZT,
+#                     inc.LYs=disc.LYs.comb-disc.LYs.AZT,
+#                     icer =inc.cost/inc.LYs)
+# output
