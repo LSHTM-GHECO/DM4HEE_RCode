@@ -87,6 +87,29 @@ SP0.tm.new <- SP0.tm
 stop3 <- Sys.time()
 
 
+start4 <- Sys.time()
+
+SP0.tm<-array(data=0,dim=c(5,5,60))
+
+for (i in 1:60) {
+  mortality <- as.numeric(tdtps[i,..mr])
+  
+  SP0.tm[1,2,i]<-1-omrPTHR
+  SP0.tm[1,5,i]<-omrPTHR
+  SP0.tm[2,2,i]<-1-revision.risk.sp0[i]-mortality
+  SP0.tm[2,3,i]<-revision.risk.sp0[i]
+  SP0.tm[2,5,i]<-mortality
+  SP0.tm[3,4,i]<-1-omrRTHR-mortality
+  SP0.tm[3,5,i]<-omrRTHR+mortality
+  SP0.tm[4,3,i]<-rrr
+  SP0.tm[4,4,i]<-1-rrr-mortality
+  SP0.tm[4,5,i]<-mortality
+  SP0.tm[5,5,i]<-1
+}
+
+SP0.tm.orig <- SP0.tm
+
+stop4 <- Sys.time()
 
 
 SP0.tm.orig
@@ -98,3 +121,5 @@ apply(check, 3, sum)
 stop1-start1
 stop2-start2
 stop3-start3
+stop4-start4
+
