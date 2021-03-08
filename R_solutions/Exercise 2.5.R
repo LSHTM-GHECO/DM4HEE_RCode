@@ -6,7 +6,9 @@
 
 #  Start by defining parameters
 
-####*** Transition probabilities ****#####
+####*** Parameters ****#####
+
+### TRANSITION PROBABILITIES
 tpA2A<-1251/1734 ## transitions A to A
 tpA2B<-350/1734 ## transitions A to B and so on
 tpA2C<-116/1734  
@@ -17,11 +19,14 @@ tpB2D<-15/1258
 tpC2C<-1312/1749
 tpC2D<-437/1749
 
-## NN alternative
-## could even define events, complements, totals etc. like in excel
+# # NN alternative
+# # could even define events, complements, totals etc. like in excel
+# A_sum <- 1734
+# A_alpha <- 1251
+# A_beta <- A_sum-A_alpha
+# tpA2A <- A_alpha/A_sum
 
-
-####**** Costs ****#####
+### COSTS
 dmca<-1701  
 dmcb<-1774
 dmcc<-6948
@@ -39,7 +44,7 @@ cLam<-2086.5
 azt<-c(cAZT,cAZT,cAZT,0)
 Lam<-c(cLam,cLam,cLam,0)
 
-#  Other parameters
+### OTHER PARAMETERS
 
 RR<-0.509
 cDR<-0.06
@@ -51,6 +56,8 @@ seed<-c(1,0,0,0)
 #  Set the total number of cycles to run
 cycles<-20
 
+
+####**** MARKOV MODEL ****######
 #  Now create a transition matrix for the AZT arm
 
 state.names<-c("A.AsympHIV","B.SympHIV","C.AIDS","D.Death")
@@ -70,13 +77,15 @@ trace.AZT<-matrix(data=NA,nrow=cycles,ncol=n.states)
 colnames(trace.AZT)<-state.names
 trace.AZT[1,]<-seed%*%tm.AZT
 
+## NN could add som more code which helps them check/see whats happening
+# head(trace.AZT)
+
 for (i in 1:cycles) {
   trace.AZT[i+1,]<-trace.AZT[i,]%*%tm.AZT
 }
 trace.AZT
 
 #  Create a transition matrix for the combination therapy arm
-
 A.AsympHIV.comb<-c(1-(tpA2B+tpA2C+tpA2D)*RR,tpA2B*RR,tpA2C*RR,tpA2D*RR)
 B.SympHIV.comb<-c(0,1-(tpB2C+tpB2D)*RR,tpB2C*RR,tpB2D*RR)
 C.AIDS.comb<-c(0,0,1-tpC2D*RR,tpC2D*RR)
@@ -118,7 +127,7 @@ for (i in 1:cycles) {
 O.discount.factor
 
 ## JW alternative 
-O.discount.factor <- matrix(1/(1+oDR) ^ c(1:cycles), nrow = 1, ncol = cycles)
+# O.discount.factor <- matrix(1/(1+oDR) ^ c(1:cycles), nrow = 1, ncol = cycles)
 
 
 disc.LYs.AZT<-O.discount.factor%*%LYs.AZT
@@ -146,18 +155,24 @@ for (i in 1:cycles) {
 C.discount.factor
 
 ## JW alternative 
-## C.discount.factor <- matrix(1/(1+cDR) ^ c(1:cycles), nrow = 1, ncol = cycles)
+# C.discount.factor <- matrix(1/(1+cDR) ^ c(1:cycles), nrow = 1, ncol = cycles)
 
 disc.cost.AZT<-C.discount.factor%*%cost.AZT
 disc.cost.comb<-C.discount.factor%*%cost.comb
 disc.cost.AZT
 disc.cost.comb
 
+#######**** ANALYSIS *****#####
 #  Cost-effectiveness results
-###!! NN suggestion - store as a data.frame/table output?
 inc.cost<-disc.cost.comb-disc.cost.AZT
 inc.LYs<-disc.LYs.comb-disc.LYs.AZT
 icer<-inc.cost/inc.LYs
 inc.cost
 inc.LYs
 icer
+
+# ### NN suggestion - store as a data.frame output?
+# output <- data.frame(inc.cost=disc.cost.comb-disc.cost.AZT,
+#                     inc.LYs=disc.LYs.comb-disc.LYs.AZT,
+#                     icer =inc.cost/inc.LYs)
+# output
