@@ -79,7 +79,7 @@ trace.AZT[1,]<-seed%*%tm.AZT
 ## NN could add som more code which helps them check/see whats happening
 # head(trace.AZT)
 
-for (i in 1:cycles) {
+for (i in 1:(cycles-1)) {
   trace.AZT[i+1,]<-trace.AZT[i,]%*%tm.AZT
 }
 trace.AZT
@@ -101,7 +101,7 @@ colnames(trace.comb)<-state.names
 trace.comb[1,]<-seed%*%tm.comb
 trace.comb[2,]<-trace.comb[1,]%*%tm.comb
 
-for (i in 2:cycles) {
+for (i in 2:(cycles-1)) {
   trace.comb[i+1,]<-trace.comb[i,]%*%tm.AZT
 }
 trace.comb
@@ -175,3 +175,9 @@ icer
 #                     icer =inc.cost/inc.LYs)
 # output
 ## but need to check if slows down excerise 4 and come back to
+
+## or perhaps easier to have a named vector? 
+# output <- c(inc.cost=disc.cost.comb-disc.cost.AZT,
+#                     inc.LYs=disc.LYs.comb-disc.LYs.AZT,
+#                     icer =inc.cost/inc.LYs)
+# output
