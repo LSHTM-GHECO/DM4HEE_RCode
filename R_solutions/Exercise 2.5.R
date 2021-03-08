@@ -2,11 +2,10 @@
 #  Exercise 2.5 - Replication of the HIV/AIDS model
 #  Author: Andrew Briggs
 #  Date created: 19 February 2021
-#  Date last edit: 08/03/2021
+#  Date last edit: 08 March 2021
 
+####****PARAMETERS****#####
 #  Start by defining parameters
-
-####*** Parameters ****#####
 
 ### TRANSITION PROBABILITIES
 tpA2A<-1251/1734 ## transitions A to A
@@ -21,10 +20,10 @@ tpC2D<-437/1749
 
 # # NN alternative
 # # could even define events, complements, totals etc. like in excel
-# A_sum <- 1734
-# A_alpha <- 1251
-# A_beta <- A_sum-A_alpha
-# tpA2A <- A_alpha/A_sum
+# A.sum <- 1734
+# A.alpha <- 1251
+# A.beta <- A.sum-A.alpha
+# tpA2A <- A.alpha/A.sum
 
 ### COSTS
 dmca<-1701  
@@ -129,7 +128,6 @@ O.discount.factor
 ## JW alternative 
 # O.discount.factor <- matrix(1/(1+oDR) ^ c(1:cycles), nrow = 1, ncol = cycles)
 
-
 disc.LYs.AZT<-O.discount.factor%*%LYs.AZT
 disc.LYs.comb<-O.discount.factor%*%LYs.comb
 disc.LYs.AZT
@@ -176,3 +174,4 @@ icer
 #                     inc.LYs=disc.LYs.comb-disc.LYs.AZT,
 #                     icer =inc.cost/inc.LYs)
 # output
+## but need to check if slows down excerise 4 and come back to
