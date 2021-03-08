@@ -1,0 +1,6 @@
+explanatory variables,coefficient,se,hazard ratio
+lngamma,0.37,0.05,1.454
+cons,-5.49,0.21,0.004
+age,-0.04,0.01,0.964
+male,0.77,0.11,2.157
+NP1,-1.34,0.38,0.261
