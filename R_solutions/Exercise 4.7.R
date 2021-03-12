@@ -2,7 +2,7 @@
 #  Exercise 4.7 - Making the HIV/AIDS model probabilistic
 #  Author: Andrew Briggs
 #  Date created: 21 February 2021
-#  Date last edit: 21 February 2021
+#  Date last edit: 12 March 2021
 
 #  Start by defining parameters
 
@@ -119,7 +119,7 @@ trace.AZT<-matrix(data=NA,nrow=cycles,ncol=n.states)
 colnames(trace.AZT)<-state.names
 trace.AZT[1,]<-seed%*%tm.AZT
 
-for (i in 1:cycles) {
+for (i in 1:(cycles-1)) {
   trace.AZT[i+1,]<-trace.AZT[i,]%*%tm.AZT
 }
 trace.AZT
@@ -142,7 +142,7 @@ colnames(trace.comb)<-state.names
 trace.comb[1,]<-seed%*%tm.comb
 trace.comb[2,]<-trace.comb[1,]%*%tm.comb
 
-for (i in 2:cycles) {
+for (i in 2:(cycles-1)) {
   trace.comb[i+1,]<-trace.comb[i,]%*%tm.AZT
 }
 trace.comb
@@ -160,10 +160,12 @@ undisc.LYs.AZT
 undisc.LYs.comb<-colSums(LYs.comb)
 undisc.LYs.comb
 
-O.discount.factor<-matrix(data=NA,nrow=1,ncol=cycles)
-for (i in 1:cycles) {
-  O.discount.factor[1,i]<-1/(1+oDR)^i
-}
+# O.discount.factor<-matrix(data=NA,nrow=1,ncol=cycles)
+# for (i in 1:cycles) {
+#   O.discount.factor[1,i]<-1/(1+oDR)^i
+# }
+# O.discount.factor
+O.discount.factor <- matrix(1/(1+oDR) ^ c(1:cycles), nrow = 1, ncol = cycles)
 O.discount.factor
 
 disc.LYs.AZT<-O.discount.factor%*%LYs.AZT
@@ -184,10 +186,12 @@ cost.comb[1,1]<-cost.comb[1,1]+(trace.comb[1,1]+trace.comb[1,2]+trace.comb[1,3])
 cost.comb[2,1]<-cost.comb[2,1]+(trace.comb[2,1]+trace.comb[2,2]+trace.comb[2,3])*cLam
 cost.comb
 
-C.discount.factor<-matrix(data=NA,nrow=1,ncol=cycles)
-for (i in 1:cycles) {
-  C.discount.factor[1,i]<-1/(1+cDR)^i
-}
+# C.discount.factor<-matrix(data=NA,nrow=1,ncol=cycles)
+# for (i in 1:cycles) {
+#   C.discount.factor[1,i]<-1/(1+cDR)^i
+# }
+# C.discount.factor
+C.discount.factor <- matrix(1/(1+cDR) ^ c(1:cycles), nrow = 1, ncol = cycles)
 C.discount.factor
 
 disc.cost.AZT<-C.discount.factor%*%cost.AZT

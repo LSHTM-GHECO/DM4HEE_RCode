@@ -2,17 +2,18 @@
 #  Exercise 4.8 - Making the THR model probabilistic
 #  Author: Andrew Briggs
 #  Date created: 22 February 2021
-#  Date last edit: 22 February 2021
+#  Date last edit: 12 March 2021
 
-setwd("/Users/lshab10/Documents/R-files")
+# setwd("/Users/lshab10/Documents/R-files")
 library(dplyr)
 library(data.table)
 
 #  Read in the life table and covariance table
 
-life.table <- read.csv("life-table.csv")
+life.table <- read.csv("inputs/life-table.csv")
 life.table<-data.table(life.table)
-cov.55<-read.csv("cov55.csv",header=FALSE)
+cov.55<-read.csv("inputs/cov55.csv",header=FALSE)
+
 
 #  Defining parameters
 
@@ -104,7 +105,7 @@ n.states<-length(state.names)
 
 #  Create revision and death risk as function of age
 
-
+mr<-3-male
 cycle<-1:cycles
 current.age<-age+cycle
 current.age
@@ -112,11 +113,13 @@ death.risk<-data.table(current.age)
 setkey(life.table,"Index")
 setkey(death.risk,"current.age")
 death.risk<-life.table[death.risk, roll=TRUE]
+death.risk.vector <- as.vector(as.matrix(death.risk[,..mr]))
+
 revision.risk.sp0<-1-exp(exp(sp0.LP)*((cycle-1)^exp(lngamma)-cycle^exp(lngamma)))
 revision.risk.np1<-1-exp(exp(np1.LP)*((cycle-1)^exp(lngamma)-cycle^exp(lngamma)))
 tdtps<-data.table(death.risk,revision.risk.sp0,revision.risk.np1)
 tdtps
-mr<-3-male
+
 
 
 #  Now create a transition matrix for the standard prosthesis arm
@@ -130,14 +133,14 @@ SP0.tm<-array(data=0,dim=c(5,5,60))
 for (i in 1:60) {
 SP0.tm[1,2,i]<-1-omrPTHR
 SP0.tm[1,5,i]<-omrPTHR
-SP0.tm[2,2,i]<-1-pull(tdtps[i,4])-pull(tdtps[i,..mr])
-SP0.tm[2,3,i]<-pull(tdtps[i,4])
-SP0.tm[2,5,i]<-pull(tdtps[i,..mr])
-SP0.tm[3,4,i]<-1-omrRTHR-pull(tdtps[i,..mr])
-SP0.tm[3,5,i]<-omrRTHR+pull(tdtps[i,..mr])
+SP0.tm[2,2,i]<-1-revision.risk.sp0[i]-death.risk.vector[i]
+SP0.tm[2,3,i]<-revision.risk.sp0[i]
+SP0.tm[2,5,i]<-death.risk.vector[i]
+SP0.tm[3,4,i]<-1-omrRTHR-death.risk.vector[i]
+SP0.tm[3,5,i]<-omrRTHR+death.risk.vector[i]
 SP0.tm[4,3,i]<-rrr
-SP0.tm[4,4,i]<-1-rrr-pull(tdtps[i,..mr])
-SP0.tm[4,5,i]<-pull(tdtps[i,..mr])
+SP0.tm[4,4,i]<-1-rrr-death.risk.vector[i]
+SP0.tm[4,5,i]<-death.risk.vector[i]
 SP0.tm[5,5,i]<-1
 }
 
@@ -154,14 +157,14 @@ NP1.tm<-array(data=0,dim=c(5,5,60))
 for (i in 1:60) {
   NP1.tm[1,2,i]<-1-omrPTHR
   NP1.tm[1,5,i]<-omrPTHR
-  NP1.tm[2,2,i]<-1-pull(tdtps[i,5])-pull(tdtps[i,..mr])
-  NP1.tm[2,3,i]<-pull(tdtps[i,5])
-  NP1.tm[2,5,i]<-pull(tdtps[i,..mr])
-  NP1.tm[3,4,i]<-1-omrRTHR-pull(tdtps[i,..mr])
-  NP1.tm[3,5,i]<-omrRTHR+pull(tdtps[i,..mr])
+  NP1.tm[2,2,i]<-1-revision.risk.np1[i]-death.risk.vector[i]
+  NP1.tm[2,3,i]<-revision.risk.np1[i]
+  NP1.tm[2,5,i]<-death.risk.vector[i]
+  NP1.tm[3,4,i]<-1-omrRTHR-death.risk.vector[i]
+  NP1.tm[3,5,i]<-omrRTHR+death.risk.vector[i]
   NP1.tm[4,3,i]<-rrr
-  NP1.tm[4,4,i]<-1-rrr-pull(tdtps[i,..mr])
-  NP1.tm[4,5,i]<-pull(tdtps[i,..mr])
+  NP1.tm[4,4,i]<-1-rrr-death.risk.vector[i]
+  NP1.tm[4,5,i]<-death.risk.vector[i]
   NP1.tm[5,5,i]<-1
 }
 
@@ -199,10 +202,12 @@ undisc.QALYs.SP0
 undisc.QALYs.NP1<-colSums(QALYs.NP1)
 undisc.QALYs.NP1
 
-O.discount.factor<-matrix(data=NA,nrow=1,ncol=cycles)
-for (i in 1:cycles) {
-  O.discount.factor[1,i]<-1/(1+oDR)^i
-}
+# O.discount.factor<-matrix(data=NA,nrow=1,ncol=cycles)
+# for (i in 1:cycles) {
+#   O.discount.factor[1,i]<-1/(1+oDR)^i
+# }
+# O.discount.factor
+O.discount.factor <- matrix(1/(1+oDR) ^ c(1:cycles), nrow = 1, ncol = cycles)
 O.discount.factor
 
 disc.QALYs.SP0<-O.discount.factor%*%QALYs.SP0
@@ -223,10 +228,12 @@ cost.NP1
 undisc.cost.NP1<-colSums(cost.NP1)+cNP1
 undisc.cost.NP1
 
-C.discount.factor<-matrix(data=NA,nrow=1,ncol=cycles)
-for (i in 1:cycles) {
-  C.discount.factor[1,i]<-1/(1+cDR)^i
-}
+# C.discount.factor<-matrix(data=NA,nrow=1,ncol=cycles)
+# for (i in 1:cycles) {
+#   C.discount.factor[1,i]<-1/(1+cDR)^i
+# }
+# C.discount.factor
+C.discount.factor <- matrix(1/(1+cDR) ^ c(1:cycles), nrow = 1, ncol = cycles)
 C.discount.factor
 
 disc.cost.SP0<-C.discount.factor%*%cost.SP0+cSP0
