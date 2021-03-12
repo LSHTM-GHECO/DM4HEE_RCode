@@ -7,8 +7,40 @@
 library(plyr)
 library(ggplot2)
 
+
+# Define fixed values prior to running the model, to avoid repition
+
+#  Drug costs
+
+cAZT<-2278
+cLam<-2086.5
+azt<-c(cAZT,cAZT,cAZT,0)
+Lam<-c(cLam,cLam,cLam,0)
+
+#  Seed the starting states of the model
+seed<-c(1,0,0,0)
+
+#  Set the total number of cycles to run
+cycles<-20
+
+
+O.discount.factor<-matrix(data=NA,nrow=1,ncol=cycles)
+for (i in 1:cycles) {
+  O.discount.factor[1,i]<-1/(1+oDR)^i
+}
+O.discount.factor
+
+
+C.discount.factor<-matrix(data=NA,nrow=1,ncol=cycles)
+for (i in 1:cycles) {
+  C.discount.factor[1,i]<-1/(1+cDR)^i
+}
+C.discount.factor
+
+
 model.HIV<-function() {
-#  Start by defining parameters
+
+# Start by defining probabilistic parameters
 
 #  Transition probabilities
 
@@ -81,12 +113,7 @@ ccc<-c(ccca,cccb,cccc,0)
 dmc
 ccc
 
-#  Drug costs
 
-cAZT<-2278
-cLam<-2086.5
-azt<-c(cAZT,cAZT,cAZT,0)
-Lam<-c(cLam,cLam,cLam,0)
 
 #  Other parameters
 
@@ -98,11 +125,7 @@ RR
 cDR<-0.06
 oDR<-0
 
-#  Seed the starting states of the model
-seed<-c(1,0,0,0)
 
-#  Set the total number of cycles to run
-cycles<-20
 
 #  Now create a transition matrix for the AZT arm
 
@@ -164,11 +187,6 @@ undisc.LYs.AZT
 undisc.LYs.comb<-colSums(LYs.comb)
 undisc.LYs.comb
 
-O.discount.factor<-matrix(data=NA,nrow=1,ncol=cycles)
-for (i in 1:cycles) {
-  O.discount.factor[1,i]<-1/(1+oDR)^i
-}
-O.discount.factor
 
 disc.LYs.AZT<-O.discount.factor%*%LYs.AZT
 disc.LYs.comb<-O.discount.factor%*%LYs.comb
@@ -188,11 +206,6 @@ cost.comb[1,1]<-cost.comb[1,1]+(trace.comb[1,1]+trace.comb[1,2]+trace.comb[1,3])
 cost.comb[2,1]<-cost.comb[2,1]+(trace.comb[2,1]+trace.comb[2,2]+trace.comb[2,3])*cLam
 cost.comb
 
-C.discount.factor<-matrix(data=NA,nrow=1,ncol=cycles)
-for (i in 1:cycles) {
-  C.discount.factor[1,i]<-1/(1+cDR)^i
-}
-C.discount.factor
 
 disc.cost.AZT<-C.discount.factor%*%cost.AZT
 disc.cost.comb<-C.discount.factor%*%cost.comb
@@ -217,5 +230,24 @@ replicate(1000,model.HIV())
 simulation.results<-rdply(1000,model.HIV(),.id=NULL)
 colnames(simulation.results)<-c("inc.LYs","inc.costs")
 plot(simulation.results$inc.LYs,simulation.results$inc.cost)
+
+
+
+# Alternative approaches (quicker and avoids plyr package)
+
+t0 <- Sys.time()
+
+replicate(1000,model.HIV())
+simulation.results<-rdply(1000,model.HIV(),.id=NULL)
+
+t1 <- Sys.time()
+
+simulation.results <- matrix(0, 1000, 2)
+for(i in 1:1000) simulation.results[i,] <- model.HIV() 
+
+t2 <- Sys.time()
+
+t1 - t0
+t2 - t1
 
 
