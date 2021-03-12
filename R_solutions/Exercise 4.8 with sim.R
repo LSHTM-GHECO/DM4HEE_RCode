@@ -4,15 +4,15 @@
 #  Date created: 22 February 2021
 #  Date last edit: 22 February 2021
 
-setwd("/Users/lshab10/Documents/R-files")
+#setwd("/Users/lshab10/Documents/R-files")
 library(dplyr)
 library(data.table)
 
 #  Read in the life table and covariance table
 
-life.table <- read.csv("life-table.csv")
+life.table <- read.csv("inputs/life-table.csv")
 life.table<-data.table(life.table)
-cov.55<-read.csv("cov55.csv",header=FALSE)
+cov.55<-read.csv("inputs/cov55.csv",header=FALSE)
 
 
 model.THR<-function(age, male) {
