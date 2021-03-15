@@ -12,9 +12,7 @@ library(data.table)
 
 life.table <- read.csv("inputs/life-table.csv")
 life.table<-data.table(life.table)
-cov.55<-read.csv("inputs/cov55.csv",header=FALSE)
-
-
+cov.55<-read.csv("inputs/cov55.csv",row.names=1,header=TRUE) ## 1st col and row as labels
 # Define fixed parameters outside of the model to avoid repition
 
 cDR<-0.06
@@ -71,7 +69,9 @@ mn.maleC<-0.768536
 mn.NP1<--1.344474
 mn.lngamma<-0.3740968
 mn<-c(mn.lngamma, mn.cons,mn.ageC,mn.maleC,mn.NP1)
-T<-chol(cov.55)
+T<-chol(cov.55) ## would not use T as it's part of logical base notation for TRUE
+# suggested change e.g. Tchol <- xxx etc. and change throughout
+
 z<-rnorm(5,0,1)
 x<-mn+T%*%z
 
