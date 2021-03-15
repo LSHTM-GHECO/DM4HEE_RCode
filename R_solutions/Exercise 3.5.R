@@ -53,7 +53,6 @@ cNP1<-579
 state.costs<-c(cPrimary, cSuccess, cRevision,cSuccess,0)
 
 #  Utilities
-
 uSuccessP<-0.85
 uSuccessR<-0.75
 uRevision<-0.30
@@ -106,7 +105,6 @@ mr<-3-male
 #  Now create a transition matrix for the standard prosthesis arm
 #  We start with a three dimensional array in order to capture the time dependencies
 #  The 'pull' command gives the value of that element without the indexing (without pull the indexing gets messed up in the array)
-
 SP0.tm<-array(data=0,dim=c(5,5,60))
 
 ## updates 
