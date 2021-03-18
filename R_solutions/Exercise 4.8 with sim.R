@@ -4,8 +4,7 @@
 #  Date created: 22 February 2021
 #  Date last edit: 12 March 2021
 
-#setwd("/Users/lshab10/Documents/R-files")
-library(dplyr)
+
 library(data.table)
 
 #  Read in the life table and covariance table
