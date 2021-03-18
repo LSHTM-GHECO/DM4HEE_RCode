@@ -1,67 +1,66 @@
 #  DM4HEE 
 #  Exercise 2.5 - Replication of the HIV/AIDS model
 #  Author: Andrew Briggs
+#  Edited by: Nichola Naylor & Jack Williams 
 #  Date created: 19 February 2021
-#  Date last edit: 08 March 2021
+#  Date last edit: 18 March 2021
 
 ####****PARAMETERS****#####
 #  Start by defining parameters
+state.names<-c("A.AsympHIV","B.SympHIV","C.AIDS","D.Death") 
+              ## the ordering is important here, you will see why as we go 
 
-### TRANSITION PROBABILITIES
-tpA2A<-1251/1734 ## transitions A to A
-tpA2B<-350/1734 ## transitions A to B and so on
-tpA2C<-116/1734  
-tpA2D<-17/1734
-tpB2B<-731/1258
-tpB2C<-512/1258
-tpB2D<-15/1258
-tpC2C<-1312/1749
-tpC2D<-437/1749
+### TRANSITION PROBABILITIES ############
+A.sum <- 1734 ## total counts of transitions out of A
+B.sum <- 1258 ## total counts of transitions out of B
+C.sum <- 1749 ## total counts of transitions out of C
+  
+tpA2A<-1251/A.sum ## transitions A to A
+tpA2B<-350/A.sum ## transitions A to B and so on
+tpA2C<-116/A.sum  
+tpA2D<-17/A.sum
+tpB2B<-731/B.sum
+tpB2C<-512/B.sum
+tpB2D<-15/B.sum
+tpC2C<-1312/C.sum 
+tpC2D<-437/C.sum 
 
-# # NN alternative
-# # could even define events, complements, totals etc. like in excel
-# A.sum <- 1734
-# A.alpha <- 1251
-# A.beta <- A.sum-A.alpha
-# tpA2A <- A.alpha/A.sum
-
-### COSTS
-dmca<-1701  
-dmcb<-1774
-dmcc<-6948
-dmc<-c(dmca, dmcb, dmcc,0)
-
-ccca<-1055
-cccb<-1278
-cccc<-2059
-ccc<-c(ccca,cccb,cccc,0)
+### COSTS ####################
+dmca<-1701  ## Direct medical costs associated with state A
+dmcb<-1774 ##Direct medical costs associated with state B
+dmcc<-6948  ## Direct medical costs associated with stateC
+dmc<-c(dmca, dmcb, dmcc,0) ## A vector storing the direct costs associated with each state
+                          ## the order is important as these will be multiplied according to 
+                          ## matrix multiplication 
+                          ## (e.g. first value in dmc - direct medical cost of A - will be multiplied by 
+                          ## first value in a matrix that represents number of cases in state A) 
+ccca<-1055 ## Community care costs associated with state A
+cccb<-1278 ## Community care costs associated with state B
+cccc<-2059 ## Community care costs associated with state C
+ccc<-c(ccca,cccb,cccc,0) ## A vector storing the community costs associated with each state
 
 #  Drug costs
+cAZT<-2278  ### Zidovudine drug cost
+cLam<-2086.5 ## Lamivudine drug cost 
+azt<-c(cAZT,cAZT,cAZT,0) ## A vector of Lamivudine drug costs per state
+Lam<-c(cLam,cLam,cLam,0) ## A vector of Lamivudine drug costs per state
 
-cAZT<-2278
-cLam<-2086.5
-azt<-c(cAZT,cAZT,cAZT,0)
-Lam<-c(cLam,cLam,cLam,0)
-
-### OTHER PARAMETERS
-
-RR<-0.509
-cDR<-0.06
-oDR<-0
+### OTHER PARAMETERS #######
+RR<-0.509 ## Treatment effect (RR)
+cDR<-0.06 ## Annual discount rate - costs (%)
+oDR<-0  ## Annual discount rate - benefits (%) 
 
 #  Seed the starting states of the model
-seed<-c(1,0,0,0)
+seed<-c(1,0,0,0) ## i.e. everyone starts in State A
 
 #  Set the total number of cycles to run
 cycles<-20
 
-
 ####**** MARKOV MODEL ****######
 #  Now create a transition matrix for the AZT arm
 
-state.names<-c("A.AsympHIV","B.SympHIV","C.AIDS","D.Death")
 n.states<-length(state.names)
-A.AsympHIV.AZT<-c(tpA2A,tpA2B,tpA2C,tpA2D)
+A.AsympHIV.AZT<-c(tpA2A,tpA2B,tpA2C,tpA2D) ## all of the transitions out of A
 B.SympHIV.AZT<-c(0,tpB2B,tpB2C,tpB2D)
 C.AIDS.AZT<-c(0,0,tpC2C,tpC2D)
 D.Death<-c(0,0,0,1)
@@ -169,15 +168,8 @@ inc.cost
 inc.LYs
 icer
 
-# ### NN suggestion - store as a data.frame output?
-# output <- data.frame(inc.cost=disc.cost.comb-disc.cost.AZT,
-#                     inc.LYs=disc.LYs.comb-disc.LYs.AZT,
-#                     icer =inc.cost/inc.LYs)
-# output
-## but need to check if slows down excerise 4 and come back to
-
-# ### JW suggestion - for this one may be easier as vector/matrix? i.e. 
-# output <- c(inc.cost=disc.cost.comb-disc.cost.AZT,
-#             inc.LYs=disc.LYs.comb-disc.LYs.AZT,
-#             icer =inc.cost/inc.LYs)
-# output
+### JW suggestion - for this one may be easier as vector/matrix? i.e.
+output <- c(inc.cost=disc.cost.comb-disc.cost.AZT,
+            inc.LYs=disc.LYs.comb-disc.LYs.AZT,
+            icer =inc.cost/inc.LYs)
+output
