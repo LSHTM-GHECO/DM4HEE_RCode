@@ -12,7 +12,7 @@ library(data.table)
 
 life.table <- read.csv("inputs/life-table.csv")
 life.table<-data.table(life.table)
-cov.55<-read.csv("inputs/cov55.csv",header=FALSE)
+cov.55<-read.csv("inputs/cov55.csv",row.names=1,header=TRUE)
 
 
 #  Defining parameters
@@ -175,8 +175,8 @@ trace.SP0<-matrix(data=NA,nrow=cycles,ncol=n.states)
 colnames(trace.SP0)<-state.names
 trace.SP0[1,]<-seed%*%SP0.tm[,,1]
 
-for (i in 1:(cycles-1)) {
-  trace.SP0[i+1,]<-trace.SP0[i,]%*%SP0.tm[,,i+1]
+for (i in 2:cycles) {
+  trace.SP0[i,]<-trace.SP0[i-1,]%*%SP0.tm[,,i]
 }
 trace.SP0
 
@@ -186,8 +186,8 @@ trace.NP1<-matrix(data=NA,nrow=cycles,ncol=n.states)
 colnames(trace.NP1)<-state.names
 trace.NP1[1,]<-seed%*%NP1.tm[,,1]
 
-for (i in 1:(cycles-1)) {
-  trace.NP1[i+1,]<-trace.NP1[i,]%*%NP1.tm[,,i]
+for (i in 2:cycles) {
+  trace.NP1[i,]<-trace.NP1[i-1,]%*%NP1.tm[,,i]
 }
 trace.NP1
 
