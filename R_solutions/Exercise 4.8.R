@@ -12,7 +12,7 @@ library(data.table)
 
 life.table <- read.csv("inputs/life-table.csv")
 life.table<-data.table(life.table)
-cov.55<-read.csv("inputs/cov55.csv",header=FALSE)
+cov.55<-read.csv("inputs/cov55.csv",row.names=1,header=TRUE)
 
 
 #  Defining parameters
