@@ -1,0 +1,24 @@
+---
+title: "R Stream of Decision Modelling for Health Economic Evaluation Reader"
+author: "Nichola Naylor"
+date: "18/03/2021"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Course Reader 
+Text about the course generally & R resouces:
+
+## Exercise layout
+
+You can also embed plots, for example:
+
+```{r pressure, echo=TRUE}
+print("something here about course")
+```
+
