@@ -1,6 +1,6 @@
 #  DM4HEE 
 #  Exercise 5.8 - Introducing a third prosthesis into the THR model
-#  Author: Jack Williams
+#  Author: Jack Williams / Nichola Naylor
 #  Date created: 15 March 2021
 #  Date last edit: 15 March 2021
 

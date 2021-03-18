@@ -236,17 +236,21 @@ return(increments)
 
 # Use a loop to run simulations
 
-# Set the number of simulations to run 
+# Set the number of simulations to run and create a data frame to store results 
 sim.runs <- 1000
 simulation.results <- data.frame(matrix(0, sim.runs, 2))
 colnames(simulation.results)<-c("inc.LYs","inc.costs")
 
+# Loop through iterations of the model and store results 
 for(i in 1:sim.runs) simulation.results[i,] <- model.HIV() 
 
+# Mean results (across all simulations)
+colMeans(simulation.results)
+
+# Cost-effectiveness plane
 plot(simulation.results$inc.LYs,simulation.results$inc.cost)
 
-# Mean results
-colMeans(simulation.results)
+
 
 
 #### NN agree loop easier
