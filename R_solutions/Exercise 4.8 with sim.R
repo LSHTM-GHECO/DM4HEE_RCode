@@ -262,19 +262,14 @@ return(increments)
 
 }
 
-# simulation.results<-rdply(100,model.THR(60,0),.id=NULL,.progress="text")
 
-plot(simulation.results$inc.QALYs,simulation.results$inc.cost)
+# Use a loop to run simulations
 
-
-
-# Alternative approaches (similar speeds, no need for package)
-sim.runs <-  1000 
-
+# Set the number of simulations to run 
+sim.runs <- 1000
 
 simulation.results <- data.frame(matrix(0, sim.runs, 2))
 colnames(simulation.results)<-c("inc.QALYs","inc.costs")
-
 pb = txtProgressBar(min = 0, max = sim.runs, initial = 0, style = 3)
 
 for(i in 1:sim.runs) {

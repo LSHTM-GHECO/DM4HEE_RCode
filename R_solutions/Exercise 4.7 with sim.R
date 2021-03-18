@@ -229,29 +229,25 @@ return(increments)
 
 }
 
-replicate(1000,model.HIV())
-simulation.results<-rdply(1000,model.HIV(),.id=NULL)
+
+
+
+
+
+# Use a loop to run simulations
+
+# Set the number of simulations to run 
+sim.runs <- 1000
+simulation.results <- data.frame(matrix(0, sim.runs, 2))
 colnames(simulation.results)<-c("inc.LYs","inc.costs")
+
+for(i in 1:sim.runs) simulation.results[i,] <- model.HIV() 
+
 plot(simulation.results$inc.LYs,simulation.results$inc.cost)
 
+# Mean results
+colMeans(simulation.results)
 
-
-# Alternative approaches (quicker and avoids plyr package)
-
-t0 <- Sys.time()
-
-replicate(1000,model.HIV())
-simulation.results<-rdply(1000,model.HIV(),.id=NULL)
-
-t1 <- Sys.time()
-
-simulation.results <- matrix(0, 1000, 2)
-for(i in 1:1000) simulation.results[i,] <- model.HIV() 
-
-t2 <- Sys.time()
-
-t1 - t0
-t2 - t1
 
 #### NN agree loop easier
 

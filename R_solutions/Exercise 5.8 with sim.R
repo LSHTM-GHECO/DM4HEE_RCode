@@ -325,7 +325,6 @@ for(i in 1:sim.runs) {
 }
 
 
-head(simulation.results)
 
-# mean results across simulations
+# Mean results across simulations
 apply(simulation.results, 2, mean)
