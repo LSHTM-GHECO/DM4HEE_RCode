@@ -119,8 +119,8 @@ trace.AZT<-matrix(data=NA,nrow=cycles,ncol=n.states)
 colnames(trace.AZT)<-state.names
 trace.AZT[1,]<-seed%*%tm.AZT
 
-for (i in 1:(cycles-1)) {
-  trace.AZT[i+1,]<-trace.AZT[i,]%*%tm.AZT
+for (i in 2:cycles) {
+  trace.AZT[i,]<-trace.AZT[i-1,]%*%tm.AZT
 }
 trace.AZT
 
@@ -142,8 +142,8 @@ colnames(trace.comb)<-state.names
 trace.comb[1,]<-seed%*%tm.comb
 trace.comb[2,]<-trace.comb[1,]%*%tm.comb
 
-for (i in 2:(cycles-1)) {
-  trace.comb[i+1,]<-trace.comb[i,]%*%tm.AZT
+for (i in 3:cycles) {
+  trace.comb[i,]<-trace.comb[i-1,]%*%tm.AZT
 }
 trace.comb
 

@@ -4,8 +4,7 @@
 #  Date created: 22 February 2021
 #  Date last edit: 12 March 2021
 
-#setwd("/Users/lshab10/Documents/R-files")
-library(dplyr)
+
 library(data.table)
 
 #  Read in the life table and covariance table
@@ -197,8 +196,8 @@ trace.SP0<-matrix(data=NA,nrow=cycles,ncol=n.states)
 colnames(trace.SP0)<-state.names
 trace.SP0[1,]<-seed%*%SP0.tm[,,1]
 
-for (i in 1:(cycles-1)) {
-  trace.SP0[i+1,]<-trace.SP0[i,]%*%SP0.tm[,,i+1]
+for (i in 2:cycles) {
+  trace.SP0[i,]<-trace.SP0[i-1,]%*%SP0.tm[,,i]
 }
 #trace.SP0
 
@@ -208,8 +207,8 @@ trace.NP1<-matrix(data=NA,nrow=cycles,ncol=n.states)
 colnames(trace.NP1)<-state.names
 trace.NP1[1,]<-seed%*%NP1.tm[,,1]
 
-for (i in 1:(cycles-1)) {
-  trace.NP1[i+1,]<-trace.NP1[i,]%*%NP1.tm[,,i]
+for (i in 2:cycles) {
+  trace.NP1[i,]<-trace.NP1[i-1,]%*%NP1.tm[,,i]
 }
 #trace.NP1
 
@@ -263,30 +262,23 @@ return(increments)
 
 }
 
-simulation.results<-rdply(100,model.THR(60,0),.id=NULL,.progress="text")
+
+# Use a loop to run simulations
+
+# Set the number of simulations to run 
+sim.runs <- 1000
+
+simulation.results <- data.frame(matrix(0, sim.runs, 2))
 colnames(simulation.results)<-c("inc.QALYs","inc.costs")
-plot(simulation.results$inc.QALYs,simulation.results$inc.cost)
+pb = txtProgressBar(min = 0, max = sim.runs, initial = 0, style = 3)
 
-
-
-# Alternative approaches (similar speeds, no need for package)
-sims <-  500 
-t0 <- Sys.time()
-
-simulation.results<-rdply(sims,model.THR(60,0),.id=NULL,.progress="text")
-colnames(simulation.results)<-c("inc.QALYs","inc.costs")
-
-t1 <- Sys.time()
-
-simulation.results <- matrix(0, sims, 2)
-pb = txtProgressBar(min = 0, max = sims, initial = 0, style = 3)
-
-for(i in 1:sims) {
+for(i in 1:sim.runs) {
   setTxtProgressBar(pb,i)  
   simulation.results[i,] <- model.THR(60,0)
-
 }
-t2 <- Sys.time()
 
-t1 - t0
-t2 - t1
+plot(simulation.results$inc.QALYs,simulation.results$inc.cost)
+
+# Mean results
+colMeans(simulation.results)
+

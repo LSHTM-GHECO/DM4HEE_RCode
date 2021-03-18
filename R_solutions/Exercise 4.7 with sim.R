@@ -149,8 +149,8 @@ trace.AZT<-matrix(data=NA,nrow=cycles,ncol=n.states)
 colnames(trace.AZT)<-state.names
 trace.AZT[1,]<-seed%*%tm.AZT
 
-for (i in 1:(cycles-1)) {
-  trace.AZT[i+1,]<-trace.AZT[i,]%*%tm.AZT
+for (i in 2:cycles) {
+  trace.AZT[i,]<-trace.AZT[i-1,]%*%tm.AZT
 }
 #trace.AZT
 
@@ -172,8 +172,8 @@ colnames(trace.comb)<-state.names
 trace.comb[1,]<-seed%*%tm.comb
 trace.comb[2,]<-trace.comb[1,]%*%tm.comb
 
-for (i in 2:(cycles-1)) {
-  trace.comb[i+1,]<-trace.comb[i,]%*%tm.AZT
+for (i in 3:cycles) {
+  trace.comb[i,]<-trace.comb[i-1,]%*%tm.AZT
 }
 #trace.comb
 
@@ -229,29 +229,29 @@ return(increments)
 
 }
 
-replicate(1000,model.HIV())
-simulation.results<-rdply(1000,model.HIV(),.id=NULL)
+
+
+
+
+
+# Use a loop to run simulations
+
+# Set the number of simulations to run and create a data frame to store results 
+sim.runs <- 1000
+simulation.results <- data.frame(matrix(0, sim.runs, 2))
 colnames(simulation.results)<-c("inc.LYs","inc.costs")
+
+# Loop through iterations of the model and store results 
+for(i in 1:sim.runs) simulation.results[i,] <- model.HIV() 
+
+# Mean results (across all simulations)
+colMeans(simulation.results)
+
+# Cost-effectiveness plane
 plot(simulation.results$inc.LYs,simulation.results$inc.cost)
 
 
 
-# Alternative approaches (quicker and avoids plyr package)
-
-t0 <- Sys.time()
-
-replicate(1000,model.HIV())
-simulation.results<-rdply(1000,model.HIV(),.id=NULL)
-
-t1 <- Sys.time()
-
-simulation.results <- matrix(0, 1000, 2)
-for(i in 1:1000) simulation.results[i,] <- model.HIV() 
-
-t2 <- Sys.time()
-
-t1 - t0
-t2 - t1
 
 #### NN agree loop easier
 

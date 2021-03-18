@@ -1,6 +1,6 @@
 #  DM4HEE 
 #  Exercise 5.8 - Introducing a third prosthesis into the THR model
-#  Author: Jack Williams
+#  Author: Jack Williams / Nichola Naylor
 #  Date created: 15 March 2021
 #  Date last edit: 15 March 2021
 
@@ -220,8 +220,8 @@ model.THR<-function(age, male) {
   colnames(trace.SP0)<-state.names
   trace.SP0[1,]<-seed%*%SP0.tm[,,1]
   
-  for (i in 1:(cycles-1)) {
-    trace.SP0[i+1,]<-trace.SP0[i,]%*%SP0.tm[,,i+1]
+  for (i in 2:cycles) {
+    trace.SP0[i,]<-trace.SP0[i-1,]%*%SP0.tm[,,i]
   }
   #trace.SP0
   
@@ -231,8 +231,8 @@ model.THR<-function(age, male) {
   colnames(trace.NP1)<-state.names
   trace.NP1[1,]<-seed%*%NP1.tm[,,1]
   
-  for (i in 1:(cycles-1)) {
-    trace.NP1[i+1,]<-trace.NP1[i,]%*%NP1.tm[,,i]
+  for (i in 2:cycles) {
+    trace.NP1[i,]<-trace.NP1[i-1,]%*%NP1.tm[,,i]
   }
   #trace.NP1
   
@@ -325,7 +325,6 @@ for(i in 1:sim.runs) {
 }
 
 
-head(simulation.results)
 
-# mean results across simulations
+# Mean results across simulations
 apply(simulation.results, 2, mean)
