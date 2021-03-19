@@ -40,13 +40,13 @@ ce.plane <- function(results, transparency = 0.75){
 
 
 
+# unfinished 
 
-
-ce.plane.all <- function(results){
+ce.plane.all <- function(results,  transparency = 0.75){
   
   xlabel = "Incremental QALYs"
   ylabel = "Incremental costs"
-  colnames(results) <- c("outcomes", "costs")
+  # colnames(results) <- c("outcomes", "costs")
   
   plot = ggplot(results) + 
     geom_point(shape = 21, size = 2, colour = "black", fill = NA, alpha = 0.5, aes(x=outcomes, y=costs, colour = group)) + 
