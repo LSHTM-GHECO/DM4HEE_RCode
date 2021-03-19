@@ -220,8 +220,8 @@ model.THR<-function(age, male) {
   colnames(trace.SP0)<-state.names
   trace.SP0[1,]<-seed%*%SP0.tm[,,1]
   
-  for (i in 2:cycles) {
-    trace.SP0[i,]<-trace.SP0[i-1,]%*%SP0.tm[,,i]
+  for (i in 1:(cycles-1)) {
+    trace.SP0[i+1,]<-trace.SP0[i,]%*%SP0.tm[,,i+1]
   }
   #trace.SP0
   
@@ -243,8 +243,8 @@ model.THR<-function(age, male) {
   colnames(trace.NP2)<-state.names
   trace.NP2[1,]<-seed%*%NP2.tm[,,1]
   
-  for (i in 1:(cycles-1)) {
-    trace.NP2[i+1,]<-trace.NP2[i,]%*%NP2.tm[,,i]
+  for (i in 2:cycles) {
+    trace.NP2[i,]<-trace.NP2[i-1,]%*%NP2.tm[,,i]
   }
   #trace.NP2
   
@@ -313,7 +313,7 @@ model.THR<-function(age, male) {
   
 }
 
-sim.runs <- 100
+sim.runs <- 1000
 
 simulation.results <- data.frame(matrix(0, sim.runs, 6))
 colnames(simulation.results)<-c("QALY SP0","Cost SP0", "QALY NP1","Cost NP1", "QALY NP2","Cost NP2")
@@ -325,6 +325,7 @@ for(i in 1:sim.runs) {
 }
 
 
+head(simulation.results)
 
-# Mean results across simulations
+# mean results across simulations
 apply(simulation.results, 2, mean)
