@@ -70,9 +70,9 @@ model.THR<-function(age, male) {
   mn.NP2 <- -1.6687 # added comparator  
   mn.lngamma<-0.3740968
   mn<-c(mn.lngamma, mn.cons,mn.ageC,mn.maleC,mn.NP1,mn.NP2)
-  Tchol <-chol(cov.55)
+  cholm <- t(chol(t(cov.55))) 
   z<-rnorm(6,0,1)
-  x<-mn + Tchol %*%z
+  x<-mn + cholm %*%z
   
   lngamma<-x[1,1]
   cons<-x[2,1]

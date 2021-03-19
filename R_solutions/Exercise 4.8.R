@@ -36,9 +36,9 @@ mn.maleC<-0.768536
 mn.NP1<--1.344474
 mn.lngamma<-0.3740968
 mn<-c(mn.lngamma, mn.cons,mn.ageC,mn.maleC,mn.NP1)
-T<-chol(cov.55)
+cholm <- t(chol(t(cov.55))) 
 z<-rnorm(5,0,1)
-x<-mn+T%*%z
+x<-mn+cholm%*%z
 
 lngamma<-x[1,1]
 cons<-x[2,1]
