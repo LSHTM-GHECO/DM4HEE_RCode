@@ -44,9 +44,8 @@ O.discount.factor
 C.discount.factor <- matrix(1/(1+cDR) ^ c(1:cycles), nrow = 1, ncol = cycles)
 C.discount.factor
 
+ model.THR<-function(age, male) {
 
-model.THR<-function(age, male) {
-  
 #  Defining parameters
 
 #  Demographics
@@ -68,11 +67,43 @@ mn.maleC<-0.768536
 mn.NP1<--1.344474
 mn.lngamma<-0.3740968
 mn<-c(mn.lngamma, mn.cons,mn.ageC,mn.maleC,mn.NP1)
-T<-chol(cov.55) ## would not use T as it's part of logical base notation for TRUE
+cholcomp <-chol(cov.55) ## would not use T as it's part of logical base notation for TRUE
 # suggested change e.g. Tchol <- xxx etc. and change throughout
+var.names <- c("lngamma","cons","age","male","NP1")
+n.var <- length(var.names)
+cholm <-  matrix(data=0, nrow=n.var, ncol=n.var,
+                 dimnames = list(var.names, var.names))
+
+cholm[1,1] <- sqrt(cov.55[1,1])
+cholm[2,1] <- cov.55[2,1]/cholm[1,1]
+cholm[3,1] <- cov.55[3,1]/cholm[1,1]
+cholm[4,1] <- cov.55[4,1]/cholm[1,1]
+cholm[5,1] <- cov.55[5,1]/cholm[1,1]
+
+cholm[2,2] <- sqrt(cov.55[2,2]-(cholm[2,1]^2))
+cholm[3,2] <- (cov.55[3,2]-cholm[2,1]*cholm[3,1])/cholm[2,2]
+cholm[4,2] <- (cov.55[4,2]-cholm[2,1]*cholm[4,1])/cholm[2,2]
+cholm[5,2] <- (cov.55[5,2]-cholm[2,1]*cholm[5,1])/cholm[2,2]
+
+cholm[3,3] <- sqrt(cov.55[3,3]-(cholm[3,1]^2)-(cholm[3,2]^2))
+cholm[4,3] <- (cov.55[4,3]-cholm[3,1]*cholm[4,1]-cholm[3,2]*cholm[4,2])/cholm[3,3]
+cholm[5,3] <- (cov.55[5,3]-cholm[3,1]*cholm[5,1]-cholm[3,2]*cholm[5,2])/cholm[3,3]
+
+cholm[4,4] <- sqrt(cov.55[4,4]-(cholm[4,1]^2)-(cholm[4,2]^2)-(cholm[4,3]^2))
+cholm[5,4] <- (cov.55[5,4]-cholm[4,1]*cholm[5,1]-cholm[4,2]*cholm[5,2]-cholm[4,3]*cholm[5,3])/cholm[4,4]
+
+cholm[5,5] <- sqrt(cov.55[5,5]-(cholm[5,1]^2)-(cholm[5,2]^2)-
+                     (cholm[5,3]^2)-(cholm[5,4]^2))
+
+# ### efficient way
+# cholm[1,1] <- sqrt(cov.55[1,1])
+# cholm[2:5,1] <- cov.55[2:5,1]/cholm[1,1]
+# cholm[2,2] <- sqrt(cov.55[2,2]-(cholm[2,1]^2))
+# cholm[3:5,2] <- (cov.55[3:5,2]-cholm[2,1]*cholm[3:5,1])/cholm[2,2]
+# ### can be expanded
 
 z<-rnorm(5,0,1)
-x<-mn+T%*%z
+x<-mn+cholm%*%z
 
 lngamma<-x[1,1]
 cons<-x[2,1]
@@ -265,7 +296,7 @@ return(increments)
 
 # Use a loop to run simulations
 
-# Set the number of simulations to run 
+# Set the number of simulations to run
 sim.runs <- 1000
 
 simulation.results <- data.frame(matrix(0, sim.runs, 2))
@@ -273,7 +304,7 @@ colnames(simulation.results)<-c("inc.QALYs","inc.costs")
 pb = txtProgressBar(min = 0, max = sim.runs, initial = 0, style = 3)
 
 for(i in 1:sim.runs) {
-  setTxtProgressBar(pb,i)  
+  setTxtProgressBar(pb,i)
   simulation.results[i,] <- model.THR(60,0)
 }
 
