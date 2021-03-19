@@ -9,59 +9,79 @@
 #  Start by defining parameters
 state.names<-c("A.AsympHIV","B.SympHIV","C.AIDS","D.Death") 
               ## the ordering is important here, you will see why as we go 
-
+              ## but this is stating the first value in the vector is "A.AsympHIV"
+state.names
 ### TRANSITION PROBABILITIES ############
+
+alpha.A2A<-1251 ## Counts of transitions from A to A (see Table 2.5)
+alpha.A2B<-350 ## Counts of transitions from A  to B
+alpha.A2C<-116 ## Counts of transitions from A to C
+alpha.A2D<-17 ## Counts of transitions from A to D
+alpha.B2B<-731 ## Counts of transitions from B to B
+alpha.B2C<-512
+alpha.B2D<-15
+alpha.C2C<-1312
+alpha.C2D<-437
+
 A.sum <- 1734 ## total counts of transitions out of A
 B.sum <- 1258 ## total counts of transitions out of B
-C.sum <- 1749 ## total counts of transitions out of C
-  
-tpA2A<-1251/A.sum ## transitions A to A
-tpA2B<-350/A.sum ## transitions A to B and so on
-tpA2C<-116/A.sum  
-tpA2D<-17/A.sum
-tpB2B<-731/B.sum
-tpB2C<-512/B.sum
-tpB2D<-15/B.sum
-tpC2C<-1312/C.sum 
-tpC2D<-437/C.sum 
+C.sum <- 1749 ## total counts of transitions out of C  
+
+tp.A2A<-alpha.A2A/A.sum ## transition probability of A to A
+tp.A2B<-alpha.A2B/A.sum ## transition probability of A to B
+tp.A2C<-alpha.A2C/A.sum  
+tp.A2D<-alpha.A2D/A.sum
+tp.B2B<-alpha.B2B/B.sum ## transition probability of B to B
+tp.B2C<-alpha.B2C/B.sum ## transition probability of B to C
+tp.B2D<-alpha.B2D/B.sum
+tp.C2C<-alpha.C2C/C.sum ## transition probability of C to C
+tp.C2D<-alpha.C2D/C.sum ## transition probability of C to D
+
+# ### Note you could input the numbers directly 
+# ## e.g
+# tp.A2A <- 1251/1734 
+# ## but for understanding of where the numbers come frome
+# ## we asked you to work through the calculations of these numbers
+# ## also note if we wanted to calculate complements we can do this using:
+# beta.A2A <- A.sum-alpha.A2A
 
 ### COSTS ####################
-dmca<-1701  ## Direct medical costs associated with state A
-dmcb<-1774 ##Direct medical costs associated with state B
-dmcc<-6948  ## Direct medical costs associated with stateC
-dmc<-c(dmca, dmcb, dmcc,0) ## A vector storing the direct costs associated with each state
+c.dmca<-1701  ## Direct medical costs associated with state A
+c.dmcb<-1774 ##Direct medical costs associated with state B
+c.dmcc<-6948  ## Direct medical costs associated with stateC
+c_dmc<-c(c.dmca, c.dmcb, c.dmcc,0) ## A vector storing the direct costs associated with each state
                           ## the order is important as these will be multiplied according to 
                           ## matrix multiplication 
                           ## (e.g. first value in dmc - direct medical cost of A - will be multiplied by 
                           ## first value in a matrix that represents number of cases in state A) 
-ccca<-1055 ## Community care costs associated with state A
-cccb<-1278 ## Community care costs associated with state B
-cccc<-2059 ## Community care costs associated with state C
-ccc<-c(ccca,cccb,cccc,0) ## A vector storing the community costs associated with each state
+c.ccca<-1055 ## Community care costs associated with state A
+c.cccb<-1278 ## Community care costs associated with state B
+c.cccc<-2059 ## Community care costs associated with state C
+c_ccc<-c(ccca,cccb,cccc,0) ## A vector storing the community costs associated with each state
 
 #  Drug costs
-cAZT<-2278  ### Zidovudine drug cost
-cLam<-2086.5 ## Lamivudine drug cost 
-azt<-c(cAZT,cAZT,cAZT,0) ## A vector of Lamivudine drug costs per state
-Lam<-c(cLam,cLam,cLam,0) ## A vector of Lamivudine drug costs per state
+c.AZT<-2278  ### Zidovudine drug cost
+c.LAM <-2086.5 ## Lamivudine drug cost 
+c_azt<-c(c.AZT,c.AZT,c.AZT,0) ## A vector of Lamivudine drug costs per state
+                              ## Notice how the final death state has £0 cost
+c_lam<-c(c.LAM,c.LAM,c.LAM,0) ## A vector of Lamivudine drug costs per state
 
 ### OTHER PARAMETERS #######
 RR<-0.509 ## Treatment effect (RR)
-cDR<-0.06 ## Annual discount rate - costs (%)
-oDR<-0  ## Annual discount rate - benefits (%) 
+dr.c<-0.06 ## Annual discount rate - costs (%)
+dr.o<-0  ## Annual discount rate - benefits (%) 
 
 #  Seed the starting states of the model
 seed<-c(1,0,0,0) ## i.e. everyone starts in State A
 
-#  Set the total number of cycles to run
-cycles<-20
-
 ####**** MARKOV MODEL ****######
-#  Now create a transition matrix for the AZT arm
+#  Set the total number of cycles for the model to run
+cycles<-20 ## i.e. we want to run the model for each year for 20 years
 
+#  Now create a transition matrix for the AZT arm
 n.states<-length(state.names)
-A.AsympHIV.AZT<-c(tpA2A,tpA2B,tpA2C,tpA2D) ## all of the transitions out of A
-B.SympHIV.AZT<-c(0,tpB2B,tpB2C,tpB2D)
+A.AsympHIV.AZT<-c(tp.A2A,tp.A2B,tp.A2C,tp.A2D) ## all of the transitions out of A in one vector, with each value corresponding to a transition to a different state (A, B, C, D)
+B.SympHIV.AZT<-c(0,tpB2B,tpB2C,tpB2D) 
 C.AIDS.AZT<-c(0,0,tpC2C,tpC2D)
 D.Death<-c(0,0,0,1)
 tm.AZT<-matrix(data=rbind(A.AsympHIV.AZT,B.SympHIV.AZT,C.AIDS.AZT,D.Death),nrow=n.states,ncol=n.states)
