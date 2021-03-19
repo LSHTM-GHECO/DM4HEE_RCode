@@ -49,7 +49,7 @@ tp.C2D<-alpha.C2D/C.sum ## transition probability of C to D
 c.dmca<-1701  ## Direct medical costs associated with state A
 c.dmcb<-1774 ##Direct medical costs associated with state B
 c.dmcc<-6948  ## Direct medical costs associated with stateC
-c_dmc<-c(c.dmca, c.dmcb, c.dmcc,0) ## A vector storing the direct costs associated with each state
+C.dmc<-c(c.dmca, c.dmcb, c.dmcc,0) ## A vector storing the direct costs associated with each state
                           ## the order is important as these will be multiplied according to 
                           ## matrix multiplication 
                           ## (e.g. first value in dmc - direct medical cost of A - will be multiplied by 
@@ -57,14 +57,14 @@ c_dmc<-c(c.dmca, c.dmcb, c.dmcc,0) ## A vector storing the direct costs associat
 c.ccca<-1055 ## Community care costs associated with state A
 c.cccb<-1278 ## Community care costs associated with state B
 c.cccc<-2059 ## Community care costs associated with state C
-c_ccc<-c(ccca,cccb,cccc,0) ## A vector storing the community costs associated with each state
+c.ccc<-c(ccca,cccb,cccc,0) ## A vector storing the community costs associated with each state
 
 #  Drug costs
 c.AZT<-2278  ### Zidovudine drug cost
 c.LAM <-2086.5 ## Lamivudine drug cost 
-c_azt<-c(c.AZT,c.AZT,c.AZT,0) ## A vector of Lamivudine drug costs per state
+c.azt<-c(c.AZT,c.AZT,c.AZT,0) ## A vector of Lamivudine drug costs per state
                               ## Notice how the final death state has £0 cost
-c_lam<-c(c.LAM,c.LAM,c.LAM,0) ## A vector of Lamivudine drug costs per state
+c.lam<-c(c.LAM,c.LAM,c.LAM,0) ## A vector of Lamivudine drug costs per state
 
 ### OTHER PARAMETERS #######
 RR<-0.509 ## Treatment effect (RR)
@@ -79,29 +79,42 @@ seed<-c(1,0,0,0) ## i.e. everyone starts in State A
 cycles<-20 ## i.e. we want to run the model for each year for 20 years
 
 #  Now create a transition matrix for the AZT arm
+#  This shows the probability of transitioning from one state to another 
 n.states<-length(state.names)
 A.AsympHIV.AZT<-c(tp.A2A,tp.A2B,tp.A2C,tp.A2D) ## all of the transitions out of A in one vector, with each value corresponding to a transition to a different state (A, B, C, D)
-B.SympHIV.AZT<-c(0,tpB2B,tpB2C,tpB2D) 
-C.AIDS.AZT<-c(0,0,tpC2C,tpC2D)
-D.Death<-c(0,0,0,1)
+B.SympHIV.AZT<-c(0,tp.B2B,tp.B2C,tp.B2D) 
+C.AIDS.AZT<-c(0,0,tp.C2C,tp.C2D)
+D.Death<-c(0,0,0,1) ## as nobody transitions out of dead the transition probability of staying in dead, once in dead, is equal to 1
 tm.AZT<-matrix(data=rbind(A.AsympHIV.AZT,B.SympHIV.AZT,C.AIDS.AZT,D.Death),nrow=n.states,ncol=n.states)
-rownames(tm.AZT)<-state.names
-colnames(tm.AZT)<-state.names
-tm.AZT
+rownames(tm.AZT)<-state.names ## renaming the matrix row names
+colnames(tm.AZT)<-state.names ## renaming the matrix column names
+tm.AZT 
 
 #  Create a trace for the AZT arm
-
-trace.AZT<-matrix(data=NA,nrow=cycles,ncol=n.states)
+#  This captures the number of people in each state at any one time
+trace.AZT<-matrix(data=NA,nrow=cycles+1,ncol=n.states) ## the length of the matrix is equivalent to the number of cycles
+                                                      ## we add 1 row to the cycle length for the seed row (cycle 0)
 colnames(trace.AZT)<-state.names
-trace.AZT[1,]<-seed%*%tm.AZT
+trace.AZT[1,]<-seed ## set the first row as the seed population 
 
-## NN could add som more code which helps them check/see whats happening
-# head(trace.AZT)
+## Let's see what the first few rows of the Markov trace looks like:
+head(trace.AZT) ## the head() function returns the first 6 rows of a matrix (or data.frame)
+# tail(trace.AZT) ## the tail() function returns the last 6 rows.
 
-for (i in 2:cycles) {
+## building the trace function requires you to loop through each row
+## and multiply the number of people in A at time t-1 with transition probabilities related to A
+## to get the number of people in different states at time t
+trace.AZT[2,]<-trace.AZT[1,]%*%tm.AZT
+head(trace.AZT) 
+
+for (i in 3:(cycles+1)) {
   trace.AZT[i,]<-trace.AZT[i-1,]%*%tm.AZT
 }
 trace.AZT
+
+rowSums(trace.AZT)
+## note to check - why rowSums(trace.AZT)==1 is only true for 
+# 1st and last values ? rounding error?
 
 #  Create a transition matrix for the combination therapy arm
 A.AsympHIV.comb<-c(1-(tpA2B+tpA2C+tpA2D)*RR,tpA2B*RR,tpA2C*RR,tpA2D*RR)
@@ -188,7 +201,7 @@ inc.cost
 inc.LYs
 icer
 
-### JW suggestion - for this one may be easier as vector/matrix? i.e.
+### output table
 output <- c(inc.cost=disc.cost.comb-disc.cost.AZT,
             inc.LYs=disc.LYs.comb-disc.LYs.AZT,
             icer =inc.cost/inc.LYs)
