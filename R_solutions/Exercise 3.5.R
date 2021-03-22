@@ -1,5 +1,5 @@
 #  DM4HEE 
-#  Exercise 3.5 - Replication of the HIV/AIDS model
+#  Exercise 3.5 - Replication of THR model
 #  Author: Andrew Briggs
 #  Edited by: Jack Williams & Nichola Naylor
 #  Date created: 20 February 2021
