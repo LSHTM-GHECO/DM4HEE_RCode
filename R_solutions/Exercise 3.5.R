@@ -1,8 +1,9 @@
 #  DM4HEE 
-#  Exercise 3.5 - Replication of the THR model
+#  Exercise 3.5 - Replication of the HIV/AIDS model
 #  Author: Andrew Briggs
+#  Edited by: Jack Williams & Nichola Naylor
 #  Date created: 20 February 2021
-#  Date last edit: 08 March 2021
+#  Date last edit: 22 March 2021
 
 ### Loading useful packages
 library(data.table)
@@ -12,75 +13,14 @@ library(dplyr)
 #########**** PARAMETERS *****######
 #  Start by defining parameters
 
-#  Demographics
+#  Demographics & Discount rates
 
-age<-60
-male<-0
+age <-60 ## set age group for analyses
+male <-0 ## set sex identified, 0 = male and 1 = female
+        ## the specific number (0,1) becomes important for reasons you'll see further down the script
+dr.c <-0.06 ## set the discount rate for costs (6%)
+dr.o <-0.015 ## set the discount rate for outcomes (15%)
 
-#  Transition probabilities
-
-omrPTHR<-0.02
-omrRTHR<-0.02
-rrr<-0.04
-
-#  Revision rates
-
-cons<--5.490935
-ageC<--0.0367022
-maleC<-0.768536
-NP1<--1.344474
-lngamma<-0.3740968
-sp0.LP<-cons+age*ageC+male*maleC
-np1.LP<-cons+age*ageC+male*maleC+NP1
-
-# ## NN suggestion to format like excel but maybe too much 
-# # can link to "data.table" cheat sheets etc. of any
-# # similar packages we use - I think data.table should be ok
-# # in terms of above base R (?) but also happy to stick to base
-# hazards <- as.data.table(read.csv("inputs/hazardfunction.csv"))
-# cons <- hazards[explanatory.variables=="cons",coefficient]
-# ageC <- hazards[explanatory.variables=="age",coefficient]
-# maleC <- hazards[explanatory.variables=="male",coefficient]
-# NP1 <- hazards[explanatory.variables=="NP1",coefficient]
-# lngamma <- hazards[explanatory.variables=="lngamma",coefficient]
-
-#  Costs
-cPrimary<-0
-cRevision<-5294
-cSuccess<-0
-cSP0<-394
-cNP1<-579
-state.costs<-c(cPrimary, cSuccess, cRevision,cSuccess,0)
-
-#  Utilities
-uSuccessP<-0.85
-uSuccessR<-0.75
-uRevision<-0.30
-state.utilities<-c(0,uSuccessP,uRevision,uSuccessR,0)
-
-#  Read in the life table
-
-#life.table <- read.csv("life-table.csv")
-# # this is how i've saved on my computer - but need to discuss how to set the files / folders to ensure this are appropriate 
-# life.table <- read.csv("../inputs/life-table.csv")
-# life.table<-data.table(life.table)
-
-### if you open the "Rproject" file rather than the 
-# individual R codes you no longer need to set a repository
-# so here the above would be...
-life.table <- read.csv("inputs/life-table.csv")
-life.table <- as.data.table(life.table)
-## bug it's currently naming the first column strangely so for now setnames to avoid error later on
-colnames(life.table) <- c("Index","Males","Female")
-
-#  Other parameters
-cDR<-0.06
-oDR<-0.015
-
-#  Seed the starting states of the model
-seed<-c(1,0,0,0,0)
-
-#  Set the total number of cycles to run and name the states
 cycles<-60
 
 state.names<-c("P-THR","successP-THR","R-THR","successR-THR","Death")
@@ -88,14 +28,64 @@ n.states<-length(state.names)
 
 #  Create revision and death risk as function of age
 cycle<-1:cycles
+
+#  Transition probabilities
+tp.PTHR2dead<-0.02 ## Operative mortality rate following primary THR
+tp.RTHR2dead <-0.02 ##Operative mortality rate following revision THR
+tp.rrr <-0.04 ## Re-revision risk (assumed to be constant)
+
+#  Costs
+c.primary<-0  ## Cost of a primary THR procedure - 
+## Note that the cost of the primary procedure is excluded (set to 0): since both arms have this procedure it is assumed to net out of the incremental analysis.  However, if the model was to be used to estimate lifetime costs of THR it would be important to include.
+c.revision<-5294 ## Cost of one cycle in the Revision THR state (national reference costs for revision hip or knee)
+c.success<-0 ## Cost of one cycle in a 'success' state (primary or revision)
+## Note for u.sucess There are assumed to be no ongoing monitoring costs for successful THR.  However, this parameter is included in case users want to change this assumption.
+c.SP0<-394 ## Cost of standard prosthesis
+c.NP1<-579 ## Cost of new prosthesis 1
+state.costs<-c(c.Primary, c.Success, c.Revision,c.Success,0) ## a vector with the costs for each state
+
+#  Utilities
+u.SuccessP<-0.85 ## Utility score for having had a successful Primary THR
+u.SuccessR<-0.75 ## Utility score for having a successful Revision THR
+u.Revision<-0.30 ## Utility score during the revision period
+state.utilities<-c(0,u.SuccessP,u.Revision,u.SuccessR,0) ## a vector with the utilities for each state
+
+#### HAZARD FUNCTION & ASSOCIATED PARAMETERS #####
+hazards <- read.csv("inputs/hazardfunction.csv")
+
+## Coefficients - on the log hazard scale
+r.cons<- hazards$coefficient[2] ##Constant in survival analysis for baseline hazard
+r.ageC<- hazards$coefficient[3] ## Age coefficient in survival analysis for baseline hazard
+r.maleC<- hazards$coefficient[4] ## Male coefficient in survival analysis for baseline hazard
+
+## Coefficients - calculations needed
+r.gamma <- hazards$coefficient[1] ## Ancilliary parameter in Weibull distribution - equivalent to lngamma coefficient
+r.lambda <- exp(cons+age*r.ageC+male*r.maleC)
+NP1<- exp(hazards$coefficient[5]) 
+
+####!!! got to here
+sp0.LP<-cons+age*ageC+male*maleC
+np1.LP<-cons+age*ageC+male*maleC+NP1
+revision.risk.sp0<-1-exp(exp(sp0.LP)*((cycle-1)^exp(lngamma)-cycle^exp(lngamma)))
+revision.risk.np1<-1-exp(exp(np1.LP)*((cycle-1)^exp(lngamma)-cycle^exp(lngamma)))
+
+
+##### LIFE TABLES #####
+#  Read in the life table
+life.table <- read.csv("inputs/life-table.csv")
+## bug it's currently naming the first column strangely so for now setnames to avoid error later on
+colnames(life.table) <- c("Index","Males","Female")
+
+####**** STANDARD TREATMENT *****#####
+#  Seed the starting states of the model
+seed<-c(1,0,0,0,0)
+
 current.age<-age+cycle
 current.age
 death.risk<-data.table(current.age)
 setkey(life.table,"Index")
 setkey(death.risk,"current.age")
 death.risk<-life.table[death.risk, roll=TRUE]
-revision.risk.sp0<-1-exp(exp(sp0.LP)*((cycle-1)^exp(lngamma)-cycle^exp(lngamma)))
-revision.risk.np1<-1-exp(exp(np1.LP)*((cycle-1)^exp(lngamma)-cycle^exp(lngamma)))
 
 # these are all merged into a data table but then causes problems below adding to matrix - why not just use the main sources
 tdtps<-data.table(death.risk,revision.risk.sp0,revision.risk.np1)
@@ -137,6 +127,7 @@ SP0.tm
 #  We start with a three dimensional array in order to capture the time dependencies
 #  The 'pull' command gives the value of that element without the indexing (without pull the indexing gets messed up in the array)
 
+##########**** NP1 *****######
 NP1.tm<-array(data=0,dim=c(5,5,60))
 # NP1.tm <- provideDimnames(NP1.tm,sep="-",base=list(state.names,state.names,"time"))
 
