@@ -510,7 +510,6 @@ revision.evppi <- gen.evppi.results()
 
 
 
-
 ## EVPPI loops - Utilities
 
 pb = txtProgressBar(min = 0, max = outer.loops, initial = 0, style = 3)
@@ -590,8 +589,7 @@ cRevision.evppi <- gen.evppi.results()
 
 
 
-
-## EVPPI loops - State costs - transition parameters (OMRs, and re-revision risk)
+## EVPPI loops - State costs - transition parameters (OMRs)
 
 pb = txtProgressBar(min = 0, max = outer.loops, initial = 0, style = 3)
 
@@ -609,7 +607,7 @@ for(a in 1:outer.loops){
     utilities.vec <- as.numeric(state.utilities[b,])
     state.costs.vec <- as.numeric(state.costs[b,])
     #transition.vec <- as.numeric(transitions[b,])
-    
+    transition.vec[3] <- as.numeric(transitions[b,3]) # overwrite the RRR value so included in PSA
     
     inner.results[b,] <- run.model() 
     
@@ -624,9 +622,65 @@ for(a in 1:outer.loops){
   setTxtProgressBar(pb,a)
 }
 
-transitions.evppi <- gen.evppi.results()
+omr.evppi <- gen.evppi.results()
 
 
 
-## make an evppi plot (!)
+## EVPPI loops - State costs - transition parameters (Re-revision risk)
+
+pb = txtProgressBar(min = 0, max = outer.loops, initial = 0, style = 3)
+
+for(a in 1:outer.loops){
+  
+  ## 1. Select the 'partial' parameter from the outer loop 
+  
+  transition.vec <- as.numeric(transitions[a,])
+  
+  for(b in 1:inner.loops){
+    
+    # 2. Select traditional parameters, minus the outer loop parameter
+    
+    revision.vec <- revision.LP[b,]
+    utilities.vec <- as.numeric(state.utilities[b,])
+    state.costs.vec <- as.numeric(state.costs[b,])
+    #transition.vec <- as.numeric(transitions[b,])
+    transition.vec[1:2] <- as.numeric(transitions[b,1:2]) # overwrite the OMR values within inner loop
+    
+    inner.results[b,] <- run.model() 
+    
+  }
+  
+  #after each inner loop PSA, calculate the mean NMB for each tx and store the results
+  nmb <- nmb.function(lambda.values, inner.results)
+  
+  evppi.results.SP0[a,] <- nmb[[1]]
+  evppi.results.NP1[a,] <- nmb[[2]]
+  
+  setTxtProgressBar(pb,a)
+}
+
+rrr.evppi <- gen.evppi.results()
+
+
+evppi.wide.patient <- data.frame(revision.evppi, 
+                         utilities.evppi[,2],
+                         cRevision.evppi[,2],
+                         omr.evppi[,2],
+                         rrr.evppi[,2])
+
+colnames(evppi.wide.patient) <- c("lambda", "Revision risk", "Utilities", "Revision cost", "Operative mortality ratios", "Re-revision risk")
+
+evppi.wide.population <- evppi.wide.patient * effective.population
+evppi.wide.population[,1] <- evppi.wide.patient[,1]
+
+
+evppi.long.population <- reshape2::melt(evppi.wide.population, id.vars = c("lambda"))
+
+
+## per patient EVPPI
+
+plot.evppi(evppi.long.population)
+
+plot.evppi(evppi.long.population, xlimit = 10000) # Limit plot to 10,000 on x axis
+
 
