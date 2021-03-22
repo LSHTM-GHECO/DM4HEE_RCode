@@ -3,7 +3,7 @@
 #  Author: Andrew Briggs
 #  Edited by: Nichola Naylor & Jack Williams 
 #  Date created: 19 February 2021
-#  Date last edit: 18 March 2021
+#  Date last edit: 22 March 2021
 
 ####****PARAMETERS****#####
 #  Start by defining parameters
@@ -11,6 +11,7 @@ state.names<-c("A.AsympHIV","B.SympHIV","C.AIDS","D.Death")
               ## the ordering is important here, you will see why as we go 
               ## but this is stating the first value in the vector is "A.AsympHIV"
 state.names
+
 ### TRANSITION PROBABILITIES ############
 
 alpha.A2A<-1251 ## Counts of transitions from A to A (see Table 2.5)
@@ -49,7 +50,7 @@ tp.C2D<-alpha.C2D/C.sum ## transition probability of C to D
 c.dmca<-1701  ## Direct medical costs associated with state A
 c.dmcb<-1774 ##Direct medical costs associated with state B
 c.dmcc<-6948  ## Direct medical costs associated with stateC
-C.dmc<-c(c.dmca, c.dmcb, c.dmcc,0) ## A vector storing the direct costs associated with each state
+c.dmc<-c(c.dmca, c.dmcb, c.dmcc,0) ## A vector storing the direct costs associated with each state
                           ## the order is important as these will be multiplied according to 
                           ## matrix multiplication 
                           ## (e.g. first value in dmc - direct medical cost of A - will be multiplied by 
@@ -57,7 +58,7 @@ C.dmc<-c(c.dmca, c.dmcb, c.dmcc,0) ## A vector storing the direct costs associat
 c.ccca<-1055 ## Community care costs associated with state A
 c.cccb<-1278 ## Community care costs associated with state B
 c.cccc<-2059 ## Community care costs associated with state C
-c.ccc<-c(ccca,cccb,cccc,0) ## A vector storing the community costs associated with each state
+c.ccc<-c(c.ccca,c.cccb,c.cccc,0) ## A vector storing the community costs associated with each state
 
 #  Drug costs
 c.AZT<-2278  ### Zidovudine drug cost
@@ -92,34 +93,68 @@ tm.AZT
 
 #  Create a trace for the AZT arm
 #  This captures the number of people in each state at any one time
-trace.AZT<-matrix(data=NA,nrow=cycles+1,ncol=n.states) ## the length of the matrix is equivalent to the number of cycles
-                                                      ## we add 1 row to the cycle length for the seed row (cycle 0)
+trace.AZT<-matrix(data=NA,nrow=cycles,ncol=n.states) ## the length of the matrix is equivalent to the number of cycles
 colnames(trace.AZT)<-state.names
-trace.AZT[1,]<-seed ## set the first row as the seed population 
+trace.AZT[1,]<-seed%*%tm.AZT ## set the first row as the seed population (cycle0) multiplied by the transition matrix
 
 ## Let's see what the first few rows of the Markov trace looks like:
 head(trace.AZT) ## the head() function returns the first 6 rows of a matrix (or data.frame)
-# tail(trace.AZT) ## the tail() function returns the last 6 rows.
 
 ## building the trace function requires you to loop through each row
 ## and multiply the number of people in A at time t-1 with transition probabilities related to A
 ## to get the number of people in different states at time t
-trace.AZT[2,]<-trace.AZT[1,]%*%tm.AZT
-head(trace.AZT) 
 
-for (i in 3:(cycles+1)) {
+for (i in 2:cycles) {   ### we want to get the estimates for cycle2 (row 3) to cycle20 (row 21)
   trace.AZT[i,]<-trace.AZT[i-1,]%*%tm.AZT
 }
+
+rownames(trace.AZT) <- paste("cycle", 1:cycles, sep = "_") ## assigning the rownames to highlight each row is 1 cycle run of the markov model
 trace.AZT
 
-rowSums(trace.AZT)
-## note to check - why rowSums(trace.AZT)==1 is only true for 
-# 1st and last values ? rounding error?
+rowSums(trace.AZT) ## check that they sum to 1, if not something has gone wrong in your calculations
 
-#  Create a transition matrix for the combination therapy arm
-A.AsympHIV.comb<-c(1-(tpA2B+tpA2C+tpA2D)*RR,tpA2B*RR,tpA2C*RR,tpA2D*RR)
-B.SympHIV.comb<-c(0,1-(tpB2C+tpB2D)*RR,tpB2C*RR,tpB2D*RR)
-C.AIDS.comb<-c(0,0,1-tpC2D*RR,tpC2D*RR)
+##### LIFE YEARS #####
+LY <-c(1,1,1,0) ## the reward vector (i.e. benefit from being in each state)
+
+ly.AZT <-trace.AZT%*%LY 
+ly.AZT
+
+undisc.ly.AZT<-colSums(ly.AZT) ## calculating the total LYs from AZT arm
+undisc.ly.AZT 
+
+discount.factor.o <-matrix(data=NA,nrow=1,ncol=cycles)
+for (i in 1:cycles) {
+  discount.factor.o[1,i]<-1/(1+dr.o)^i
+}
+discount.factor.o
+
+disc.ly.AZT<-discount.factor.o%*%ly.AZT ##multiply the discount factor matrix and the outcome matrix of the AZT arm
+disc.ly.AZT
+
+#### COST CALCULATIONS #####
+## undiscounted:
+cost.AZT<-trace.AZT%*%c.dmc+trace.AZT%*%c.ccc+trace.AZT%*%c.azt ## multply the matrix by each cost type and sum
+cost.AZT
+
+undisc.cost.AZT<-colSums(cost.AZT) ## calculating the total cost of the AZT arm
+undisc.cost.AZT
+
+discount.factor.c<-matrix(data=NA,nrow=1,ncol=cycles)
+for (i in 1:cycles) {
+  discount.factor.c[1,i]<-1/(1+dr.c)^i
+}
+discount.factor.c
+
+disc.cost.AZT<-discount.factor.c%*%cost.AZT ## calculating the total discounted cost of the AZT arm
+disc.cost.AZT
+
+
+#### COMBINATION THERAPY ARM ##### 
+# Create a transition matrix for the combination therapy arm
+A.AsympHIV.comb<-c(1-(tp.A2B+tp.A2C+tp.A2D)*RR,tp.A2B*RR,tp.A2C*RR,tp.A2D*RR)
+B.SympHIV.comb<-c(0,1-(tp.B2C+tp.B2D)*RR,tp.B2C*RR,tp.B2D*RR)
+C.AIDS.comb<-c(0,0,1-tp.C2D*RR,tp.C2D*RR)
+## D.Death is the same as before so does not need redefining
 
 tm.comb<-matrix(data=rbind(A.AsympHIV.comb,B.SympHIV.comb,C.AIDS.comb,D.Death),nrow=n.states,ncol=n.states)
 rownames(tm.comb)<-state.names
@@ -127,82 +162,54 @@ colnames(tm.comb)<-state.names
 tm.comb
 
 #  Create a trace for the combination arm
-
 trace.comb<-matrix(data=NA,nrow=cycles,ncol=n.states)
 colnames(trace.comb)<-state.names
+
+## utilising the new matrix for the first 2 years (when combination therapy is given):
 trace.comb[1,]<-seed%*%tm.comb
 trace.comb[2,]<-trace.comb[1,]%*%tm.comb
 
+## then reverting back to the previous matrix:
 for (i in 3:cycles) {
   trace.comb[i,]<-trace.comb[i-1,]%*%tm.AZT
 }
 trace.comb
 
-#  Calculate life years & discounted life years in each treatment arm
+ly.comb<-trace.comb%*%LY
+ly.comb
 
-LYs<-c(1,1,1,0)
+undisc.ly.comb<-colSums(ly.comb)
+undisc.ly.comb
 
-LYs.AZT<-trace.AZT%*%LYs
-LYs.AZT
-LYs.comb<-trace.comb%*%LYs
-LYs.comb
-undisc.LYs.AZT<-colSums(LYs.AZT)
-undisc.LYs.AZT
-undisc.LYs.comb<-colSums(LYs.comb)
-undisc.LYs.comb
+disc.ly.comb<-discount.factor.o%*%ly.comb 
+disc.ly.comb
 
-O.discount.factor<-matrix(data=NA,nrow=1,ncol=cycles)
-for (i in 1:cycles) {
-  O.discount.factor[1,i]<-1/(1+oDR)^i
-}
-O.discount.factor
-
-## JW alternative 
-# O.discount.factor <- matrix(1/(1+oDR) ^ c(1:cycles), nrow = 1, ncol = cycles)
-
-disc.LYs.AZT<-O.discount.factor%*%LYs.AZT
-disc.LYs.comb<-O.discount.factor%*%LYs.comb
-disc.LYs.AZT
-disc.LYs.comb
-
-#  Calculate costs and discounted costs in each treatment arm
-
-cost.AZT<-trace.AZT%*%dmc+trace.AZT%*%ccc+trace.AZT%*%azt
-cost.AZT
-
-undisc.cost.AZT<-colSums(cost.AZT)
-undisc.cost.AZT
-
-cost.comb<-trace.comb%*%dmc+trace.comb%*%ccc+trace.comb%*%azt
-cost.comb[1,1]<-cost.comb[1,1]+(trace.comb[1,1]+trace.comb[1,2]+trace.comb[1,3])*cLam
-cost.comb[2,1]<-cost.comb[2,1]+(trace.comb[2,1]+trace.comb[2,2]+trace.comb[2,3])*cLam
+cost.comb<-trace.comb%*%c.dmc+trace.comb%*%c.ccc+trace.comb%*%c.azt
+## we need to replace rows 1 and 2 to add in the cost of lamivudine for years 1 and 2
+cost.comb[1,1]<-cost.comb[1,1]+(trace.comb[1,1]+trace.comb[1,2]+trace.comb[1,3])*c.LAM
+cost.comb[2,1]<-cost.comb[2,1]+(trace.comb[2,1]+trace.comb[2,2]+trace.comb[2,3])*c.LAM
 cost.comb
 
-C.discount.factor<-matrix(data=NA,nrow=1,ncol=cycles)
-for (i in 1:cycles) {
-  C.discount.factor[1,i]<-1/(1+cDR)^i
-}
-C.discount.factor
+undisc.cost.comb<-colSums(ly.AZT) 
+undisc.ly.AZT 
 
-## JW alternative 
-# C.discount.factor <- matrix(1/(1+cDR) ^ c(1:cycles), nrow = 1, ncol = cycles)
-
-disc.cost.AZT<-C.discount.factor%*%cost.AZT
-disc.cost.comb<-C.discount.factor%*%cost.comb
-disc.cost.AZT
+disc.cost.comb<-discount.factor.c%*%cost.comb 
 disc.cost.comb
 
 #######**** ANALYSIS *****#####
 #  Cost-effectiveness results
-inc.cost<-disc.cost.comb-disc.cost.AZT
-inc.LYs<-disc.LYs.comb-disc.LYs.AZT
-icer<-inc.cost/inc.LYs
-inc.cost
-inc.LYs
-icer
 
 ### output table
 output <- c(inc.cost=disc.cost.comb-disc.cost.AZT,
-            inc.LYs=disc.LYs.comb-disc.LYs.AZT,
-            icer =inc.cost/inc.LYs)
+            inc.lys=disc.ly.comb-disc.ly.AZT,
+            icer =NA)
+output[3] <- output[1]/output[2]
 output
+
+### Note if you want to round these outputs using the round() functon:
+round(output, 2)
+
+#####****More Efficient Model Notes****#####
+## More efficient code for discounting is defined below, which will be used throughout the rest of the course
+discount.factor.o <- matrix(1/(1+dr.o) ^ c(1:cycles), nrow = 1, ncol = cycles)
+discount.factor.c <- matrix(1/(1+dr.c) ^ c(1:cycles), nrow = 1, ncol = cycles)
