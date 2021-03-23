@@ -72,7 +72,7 @@ RR<-0.509 ## Treatment effect (RR)
 dr.c<-0.06 ## Annual discount rate - costs (%)
 dr.o<-0  ## Annual discount rate - benefits (%) 
 
-#  Seed the starting states of the model
+#  Seed the starting states of the model (cycle 0)
 seed<-c(1,0,0,0) ## i.e. everyone starts in State A
 
 ####**** MARKOV MODEL ****######
@@ -95,7 +95,11 @@ tm.AZT
 #  This captures the number of people in each state at any one time
 trace.AZT<-matrix(data=NA,nrow=cycles,ncol=n.states) ## the length of the matrix is equivalent to the number of cycles
 colnames(trace.AZT)<-state.names
-trace.AZT[1,]<-seed%*%tm.AZT ## set the first row as the seed population (cycle0) multiplied by the transition matrix
+
+## set the first row as the seed population (cycle0) multiplied by the transition matrix
+# i.e. running the first cycle of the model
+# Note this does not include any cost/effect of anything occuring before cycle 1
+trace.AZT[1,]<-seed%*%tm.AZT 
 
 ## Let's see what the first few rows of the Markov trace looks like:
 head(trace.AZT) ## the head() function returns the first 6 rows of a matrix (or data.frame)
