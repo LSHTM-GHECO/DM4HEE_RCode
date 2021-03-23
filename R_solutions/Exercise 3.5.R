@@ -16,7 +16,7 @@ library(dplyr)
 #  Demographics & Discount rates
 
 age <-60 ## set age group for analyses
-male <-0 ## set sex identified, 0 = male and 1 = female
+male <-0 ## set sex identified, 0 = female and 1 = male
         ## the specific number (0,1) becomes important for reasons you'll see further down the script
 dr.c <-0.06 ## set the discount rate for costs (6%)
 dr.o <-0.015 ## set the discount rate for outcomes (15%)
@@ -26,8 +26,8 @@ cycles<-60
 state.names<-c("P-THR","successP-THR","R-THR","successR-THR","Death")
 n.states<-length(state.names)
 
-#  Create revision and death risk as function of age
-cycle<-1:cycles
+#  Seed the starting states of the model
+seed<-c(1,0,0,0,0)
 
 #  Transition probabilities
 tp.PTHR2dead<-0.02 ## Operative mortality rate following primary THR
@@ -51,78 +51,95 @@ u.Revision<-0.30 ## Utility score during the revision period
 state.utilities<-c(0,u.SuccessP,u.Revision,u.SuccessR,0) ## a vector with the utilities for each state
 
 #### HAZARD FUNCTION & ASSOCIATED PARAMETERS #####
-hazards <- read.csv("inputs/hazardfunction.csv")
+hazards <- read.csv("inputs/hazardfunction.csv") ## importing the hazard inputs from the regression analysis
 
 ## Coefficients - on the log hazard scale
+r.lnlambda <- hazards$coefficient[1] ## Ancilliary parameter in Weibull distribution - equivalent to lngamma coefficient
 r.cons<- hazards$coefficient[2] ##Constant in survival analysis for baseline hazard
 r.ageC<- hazards$coefficient[3] ## Age coefficient in survival analysis for baseline hazard
 r.maleC<- hazards$coefficient[4] ## Male coefficient in survival analysis for baseline hazard
+r.NP1<- hazards$coefficient[5]
 
-## Coefficients - calculations needed
-r.gamma <- hazards$coefficient[1] ## Ancilliary parameter in Weibull distribution - equivalent to lngamma coefficient
-r.lambda <- exp(cons+age*r.ageC+male*r.maleC)
-NP1<- exp(hazards$coefficient[5]) 
-
-####!!! got to here
-sp0.LP<-cons+age*ageC+male*maleC
-np1.LP<-cons+age*ageC+male*maleC+NP1
-revision.risk.sp0<-1-exp(exp(sp0.LP)*((cycle-1)^exp(lngamma)-cycle^exp(lngamma)))
-revision.risk.np1<-1-exp(exp(np1.LP)*((cycle-1)^exp(lngamma)-cycle^exp(lngamma)))
-
+gamma <- exp(r.lnlambda)
+lambda <- exp(r.cons+age*r.ageC+male*r.maleC)
+RR.NP1 <- exp(r.NP1)
 
 ##### LIFE TABLES #####
 #  Read in the life table
-life.table <- read.csv("inputs/life-table.csv")
-## bug it's currently naming the first column strangely so for now setnames to avoid error later on
-colnames(life.table) <- c("Index","Males","Female")
+life.table <- read.csv("inputs/life-table.csv") ## importing the life table csv inputs
+colnames(life.table) <- c("Age","Index","Males","Female") ## making sure column names are correct
+
+cycle.v<-1:cycles ## a vector of cycle numbers 1 - 60
+current.age<-age+cycle.v ## a vector of cohort age throughout the model
+current.age
+
+## creating a table that has every age of the cohort plus death risks associated with that age
+life.table <- as.data.table(life.table) ## turning life.table into a data.table 
+death.risk<-as.data.table(current.age) ## turning current age into a data.table 
+setkey(life.table,"Index") ## using the setkey function (read about it by typing in ?setkey in the console)
+setkey(death.risk,"current.age") ## using the setkey function for death.risk to sort and set current.age as the key
+death.risk<-life.table[death.risk, roll=TRUE] ## joining life.table and death.risk by the key columns, rolling forward between index values
 
 ####**** STANDARD TREATMENT *****#####
-#  Seed the starting states of the model
-seed<-c(1,0,0,0,0)
+## defining the revision risks based on the parameters calculated above and cycle vector
+revision.risk.sp0<-1-exp(lambda*((cycle.v-1)^gamma-cycle.v^gamma))
+revision.risk.np1<-1-exp(lambda*RR.NP1*((cycle.v-1)^gamma-cycle.v^gamma))
 
-current.age<-age+cycle
-current.age
-death.risk<-data.table(current.age)
-setkey(life.table,"Index")
-setkey(death.risk,"current.age")
-death.risk<-life.table[death.risk, roll=TRUE]
+revision.risk.sp0 ## the time dependent risk of revision for standard treatment
+revision.risk.np1 ## the time dependent risk of revision for NP1
 
-# these are all merged into a data table but then causes problems below adding to matrix - why not just use the main sources
+# combining risks into a time-dependent transition probability data.table
 tdtps<-data.table(death.risk,revision.risk.sp0,revision.risk.np1)
 tdtps
-mr<-3-male 
+
+## creating an indicator which selects the death risk column depending on the sex the model is being run on
+col.key <- 4-male ## 4 indicates the 4th column of tdps (which is female risk of death)
+                  ## when male=1 (i.e. male selected as sex) this becomes the 3rd column (which is male risk of death)
 
 #  Now create a transition matrix for the standard prosthesis arm
 #  We start with a three dimensional array in order to capture the time dependencies
-#  The 'pull' command gives the value of that element without the indexing (without pull the indexing gets messed up in the array)
-SP0.tm<-array(data=0,dim=c(5,5,60))
+tm.SP0 <- array(data=0,dim=c(n.states,n.states,cycles),
+                dimnames= list(state.names, state.names, 1:cycles)) ## an empty array of dimenions (number of states, number of states, number of cycles)
+                   ## naming all dimensions
 
-## updates 
-n.t <- 60 ## easily adjustable then once defined if agree, need to replace throughout
-SP0.tm <- array(data=0,dim=c(5,5,n.t))
-SP0.tm <- provideDimnames(SP0.tm,sep="-",base=list(state.names,state.names,"time"))
-
-for (i in 1:60) {
+### create a loop that creates a time dependent transition matrix for each cycle
+for (i in 1:cycles) {
   
-  mortality <- as.numeric(tdtps[i,..mr]) 
+  mortality <- as.numeric(tdtps[i,..col.key]) 
+  ## tranisitions out of P-THR
+  tm.SP0["P-THR","Death",i]<-tp.PTHR2dead ## Primary THR either enter the death state or.. or..
+  tm.SP0["P-THR","successP-THR",i]<-1-tp.PTHR2dead ## they go into the success THR state 
+  ## transitions out of success-P-THR
+  tm.SP0["successP-THR","R-THR",i]<-revision.risk.sp0[i]
+  tm.SP0["successP-THR","Death",i]<-mortality
+  tm.SP0["successP-THR","successP-THR",i]<-1-revision.risk.sp0[i]-mortality
+  ## transitions out of R-THR 
+  tm.SP0["R-THR","Death",i]<-tp.RTHR2dead+mortality
+  tm.SP0["R-THR","successR-THR",i]<-1-tp.RTHR2dead-mortality 
+  ## transitions out of success-THR
+  tm.SP0["successR-THR","R-THR",i]<-tp.rrr
+  tm.SP0["successR-THR",5,i]<-mortality
+  tm.SP0["successR-THR","successR-THR",i]<-1-tp.rrr-mortality
   
-  ## as.numeric seemingly faster (v. slightly) than pull - check I've done the right calc in "verstorisation_speed_example.R"
-  
-  SP0.tm[1,2,i]<-1-omrPTHR ## NB: to come back to once finalised format - needs more annotations on what these are
-  SP0.tm[1,5,i]<-omrPTHR
-  SP0.tm[2,2,i]<-1-revision.risk.sp0[i]-mortality
-  SP0.tm[2,3,i]<-revision.risk.sp0[i]
-  SP0.tm[2,5,i]<-mortality
-  SP0.tm[3,4,i]<-1-omrRTHR-mortality
-  SP0.tm[3,5,i]<-omrRTHR+mortality
-  SP0.tm[4,3,i]<-rrr
-  SP0.tm[4,4,i]<-1-rrr-mortality
-  SP0.tm[4,5,i]<-mortality
-  SP0.tm[5,5,i]<-1
+  tm.SP0["Death","Death",i]<-1 ## no transitions out of death
 }
 
-SP0.tm
+tm.SP0
 
+#  Create a trace for the standard prosthesis arm
+trace.SP0<-matrix(data=0,nrow=cycles,ncol=n.states)
+colnames(trace.SP0)<-state.names
+
+trace.SP0[1,]<-seed%*%tm.SP0[,,1]
+
+for (i in 2:cycles) {
+  trace.SP0[i,]<-trace.SP0[i-1,]%*%tm.SP0[,,i]
+}
+trace.SP0
+
+rowSums(trace.SP0)
+
+########!!! got to here
 #  Now create a transition matrix for the new prosthesis arm
 #  We start with a three dimensional array in order to capture the time dependencies
 #  The 'pull' command gives the value of that element without the indexing (without pull the indexing gets messed up in the array)
@@ -150,16 +167,6 @@ for (i in 1:60) {
   
 }
 
-#  Create a trace for the standard prosthesis arm
-
-trace.SP0<-matrix(data=NA,nrow=cycles,ncol=n.states)
-colnames(trace.SP0)<-state.names
-trace.SP0[1,]<-seed%*%SP0.tm[,,1]
-
-for (i in 2:cycles) {
-  trace.SP0[i,]<-trace.SP0[i-1,]%*%SP0.tm[,,i]
-}
-trace.SP0
 
 #  Create a trace for the new prosthesis arm
 
