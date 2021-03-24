@@ -480,15 +480,6 @@ gen.evppi.results <- function(evppi.results1 = evppi.results.SP0, evppi.results2
 # revision.LP[1,] 
 
 
-# JW note 
-# to sample NP1 parameter but not others 
-revision.LP[1,2] <- revision.LP[1,1] + revision.LP[,4]
-
-# to sample other survival parameters but NP1 
-revision.LP[,2] <- revision.LP[,1] + revision.LP[1,4] # i.e. fix the NP1 (and sample in outer loop)
-
-
-
 
 
 pb = txtProgressBar(min = 0, max = outer.loops, initial = 0, style = 3)
@@ -707,3 +698,59 @@ plot.evppi(evppi.long.population)
 plot.evppi(evppi.long.population, xlimit = 10000) # Limit plot to 10,000 on x axis
 
 
+
+
+
+
+
+
+# JW note 
+# to sample NP1 parameter but not others 
+revision.LP[1,2] <- revision.LP[1,1] + revision.LP[,4]
+
+# to sample other survival parameters but NP1 
+revision.LP[,2] <- revision.LP[,1] + revision.LP[1,4] # i.e. fix the NP1 (and sample in outer loop)
+
+
+
+
+pb = txtProgressBar(min = 0, max = outer.loops, initial = 0, style = 3)
+
+## EVPPI loops - TEST 1 
+
+for(a in 1:outer.loops){
+  
+  ## 1. Select the 'partial' parameter from the outer loop 
+  
+  revision.vec <- revision.LP[a,]
+  
+
+  for(b in 1:inner.loops){
+    
+    # 2. Select traditional parameters, minus the outer loop parameter
+    
+    # revision.vec <- revision.LP[a,]
+    utilities.vec <- as.numeric(state.utilities[b,])
+    state.costs.vec <- as.numeric(state.costs[b,])
+    transition.vec <- as.numeric(transitions[b,])
+    revision.vec[b,1] <- revision.LP[b,1]
+    revision.vec[b,3] <- revision.LP[b,3]
+    revision.vec[b,2] <- revision.LP[b,1] + revision.LP[a,4] # this only changes on outer loop, not inner loop
+    
+    inner.results[b,] <- run.model() 
+    
+  }
+  
+  #after each inner loop PSA, calculate the mean NMB for each tx and store the results
+  nmb <- nmb.function(lambda.values, inner.results)
+  
+  evppi.results.SP0[a,] <- nmb[[1]]
+  evppi.results.NP1[a,] <- nmb[[2]]
+  
+  setTxtProgressBar(pb,a)
+}
+
+
+test1.NP1param.evppi <- gen.evppi.results()
+test1.NP1param.evppi[,2] <- test1.NP1param.evppi[,2] * effective.population
+plot.evpi(test1.NP1param.evppi)
