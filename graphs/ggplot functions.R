@@ -119,57 +119,49 @@ plot.ceac.all <- function(results){
 
 plot.evpi <- function(results){
   
-  x = 1
+  xlabel = "Willingness to pay threshold"
+  ylabel = "Expected Value of Perfect Information"
+  colnames(results) <- c("lambda", "EVPI")
   
-}
-
-
-
-
-## 
-
-gen.ceac.graph = function(psa, save = FALSE) {
-  
-  z = ggplot(psa) + geom_line(aes(x=lambda, y=prob.ce), size=0.6) + 
-    labs(x = "Willingness to pay (£)", text = element_text(size=4)) + 
-    labs (y = "Probability cost-effective", text = element_text(size=4)) + theme_classic() +
+  plot = ggplot(results) + geom_line(aes(x=lambda, y=EVPI), size=1) + 
+    labs(x = xlabel, text = element_text(size=10)) + 
+    labs(y = ylabel, text = element_text(size=10)) + theme_classic() +
     theme(legend.title = element_blank(), axis.title=element_text(face="bold"), 
           axis.title.x = element_text(margin = margin(t = 7, r = 0, b = 3, l = 0)), 
           axis.title.y = element_text(margin = margin(t = 0, r = 7, b = 0, l = 3)), 
           panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-          legend.key.width=unit(1.8,"line"), text = element_text(size=7),
-          plot.margin=unit(c(1.2,0.5,0,1.2),"cm")) + 
-    scale_x_continuous(labels = scales::comma, breaks = c(seq(0,100000,5000)), limits = c(0,40000), expand = c(0, 0.1)) + 
-    scale_y_continuous(limits = c(0,1), breaks=seq(0,1,0.1), expand = c(0, 0)) + 
-    geom_vline(xintercept = 20000, linetype="dotted", size=0.25)
+          legend.key.width=unit(1.8,"line"), text = element_text(size=12)) + 
+    scale_x_continuous(labels = scales::comma, expand = c(0, 0.1)) + 
+    scale_y_continuous(labels = scales::comma, expand = c(0, 0))
   
-  
-  if(save == TRUE) ggsave(paste("figures\\CEAC",Sys.Date(),".png"), z, width=107, height=70, dpi=300, units='mm')
-  
-  
-  return(z)
+  return(plot)
   
 }
 
-gen.evpi.graph = function(evpi, save = FALSE) {
+
+
+
+
+plot.evppi <- function(results, xlimit = 20000){
   
-  z = ggplot(evpi) + geom_line(aes(x=lambda, y=evpi.m), size=0.6) + 
-    labs(x = "Willingness to pay (£)", text = element_text(size=4)) + 
-    labs (y = "EVPI (£)", text = element_text(size=4)) + theme_classic() +
+  xlabel = "Willingness to pay threshold"
+  ylabel = "Expected Value of Perfect Partial Information"
+  
+  plot = ggplot(results) + geom_line(aes(x=lambda, y=value, colour = variable), size=1) + 
+    labs(x = xlabel, text = element_text(size=10)) + 
+    labs(y = ylabel, text = element_text(size=10)) + theme_classic() +
     theme(legend.title = element_blank(), axis.title=element_text(face="bold"), 
           axis.title.x = element_text(margin = margin(t = 7, r = 0, b = 3, l = 0)), 
           axis.title.y = element_text(margin = margin(t = 0, r = 7, b = 0, l = 3)), 
           panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-          legend.key.width=unit(1.8,"line"), text = element_text(size=7),
-          plot.margin=unit(c(1.2,0.5,0,1.2),"cm")) + 
-    scale_x_continuous(labels = scales::comma, breaks = c(seq(0,100000,5000)), limits = c(0,40000), expand = c(0, 0.1)) + 
-    scale_y_continuous(expand = c(0, 0)) + 
-    geom_vline(xintercept = 20000, linetype="dotted", size=0.25)
+          legend.key.width=unit(1.8,"line"), text = element_text(size=12)) + 
+    scale_x_continuous(labels = scales::comma, limits = c(0, xlimit), expand = c(0, 0.1)) + 
+    scale_y_continuous(labels = scales::comma, expand = c(0, 0))
   
-  if(save == TRUE) ggsave(paste("figures\\EVPI",Sys.Date(),".png"), z, width=107, height=70, dpi=300, units='mm')
-  
-  return(z)
+  return(plot)
   
 }
+
+
 
 
