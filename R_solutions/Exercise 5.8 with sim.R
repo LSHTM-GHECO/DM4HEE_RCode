@@ -329,3 +329,84 @@ head(simulation.results)
 
 # mean results across simulations
 apply(simulation.results, 2, mean)
+
+
+# Calculate NMB and CEAC
+
+lambda.values <- seq(from = 0, to = 50000, by = 100)
+
+CEAC <- data.frame(matrix(data = NA, nrow = length(lambda.values), ncol = 4))
+colnames(CEAC)<-c("lambda","Standard", "NP1", "NP2")
+
+pCE <-function(lambda, results = simulation.results) {
+  
+  # Now calculate NMB for all three interventions
+  nmb <- results[,c(1,3,5)]*lambda - results[,c(2,4,6)] 
+  max.nmb <- apply(nmb, 1, max)
+  
+  CE <- nmb[1:nrow(results),] == max.nmb[1:nrow(results)]
+  probCE<- apply(CE, 2, mean)
+  
+  return(probCE)
+  
+}
+
+
+for (i in 1:length(lambda.values)) {
+  CEAC[i,1] <- lambda.values[i]
+  CEAC[i,2:4]<- pCE(lambda.values[i], simulation.results)
+}
+
+
+# Look at the results
+head(CEAC)  
+
+
+
+
+
+
+## Plots   
+
+
+# reshape to show all in on plot
+
+CEAC.long <- reshape2::melt(CEAC, id.vars = c("lambda"))
+colnames(CEAC.long) <- c("lambda", "comparator", "pCE")
+head(CEAC.long)
+
+source("graphs/ggplot functions.R")
+
+plot.ceac.all(CEAC.long)
+
+
+
+
+## CE plane - in progress- struggling to reshape the data correctly 
+
+# simulation.results.id <- cbind(id = c(1:sim.runs), simulation.results)
+# 
+# standard.sims <- simulation.results.id[,c(1,2,3)]
+# NP1.sims <- simulation.results.id[,c(1,4,5)]
+# NP2.sims <- simulation.results.id[,c(1,6,7)]
+# 
+# ce.plane(standard.sims)
+# ce.plane(NP1.sims)
+# ce.plane(Np2.sims)
+# 
+# dplyr::bind_rows(list(df1=df1, df2=df2), .id = 'source')
+# 
+# z <- dplyr::bind_rows(list(standard = standard.sims, 
+#                       NP1 = NP1.sims,
+#                       NP2 = NP2.sims), 
+#                       .id = 'id')
+# 
+# ce.plane.all(z)
+# 
+# 
+
+
+## Different options for splicing data
+
+# reshape2::melt(CEAC, id.vars = c("lambda"))
+# tidyr::gather(CEAC, "group", "value", 2:4)

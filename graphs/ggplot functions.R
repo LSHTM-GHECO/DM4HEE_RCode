@@ -36,6 +36,7 @@ ce.plane <- function(results, transparency = 0.75){
   
 }
 
+
 # ce.plane(simulation.results)
 
 
@@ -46,8 +47,7 @@ ce.plane.all <- function(results,  transparency = 0.75){
   
   xlabel = "Incremental QALYs"
   ylabel = "Incremental costs"
-  # colnames(results) <- c("outcomes", "costs")
-  
+
   plot = ggplot(results) + 
     geom_point(shape = 21, size = 2, colour = "black", fill = NA, alpha = 0.5, aes(x=outcomes, y=costs, colour = group)) + 
     labs(x = xlabel, text = element_text(size=10)) + 
@@ -96,8 +96,9 @@ plot.ceac.all <- function(results){
   
   xlabel = "Willingness to pay threshold"
   ylabel = "Probability cost-effective"
+  colnames(results) <- c("lambda", "group", "pCE")
   
-  plot = ggplot(results) + geom_line(aes(x=lambda, y=pCE, colour=subgroup), size=1) + 
+  plot = ggplot(results) + geom_line(aes(x=lambda, y=pCE, color=group), size=1) + 
     labs(x = xlabel, text = element_text(size=10)) + 
     labs(y = ylabel, text = element_text(size=10)) + theme_classic() +
     theme(legend.title = element_blank(), axis.title=element_text(face="bold"), 
