@@ -214,6 +214,6 @@ output
 round(output, 2)
 
 #####****More Efficient Model Notes****#####
-## More efficient code for discounting is defined below, which will be used throughout the rest of the course
+## More efficient code for discounting is defined below, there are many other ways to do this, you can check results against your chosen method
 discount.factor.o <- matrix(1/(1+dr.o) ^ c(1:cycles), nrow = 1, ncol = cycles)
 discount.factor.c <- matrix(1/(1+dr.c) ^ c(1:cycles), nrow = 1, ncol = cycles)
