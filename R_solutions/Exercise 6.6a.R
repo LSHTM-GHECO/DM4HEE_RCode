@@ -2,7 +2,7 @@
 #  Exercise 6.6 - Introducing a third prosthesis into the THR model
 #  Author:  Jack Williams & Nichola Naylor
 #  Date created: 18 March 2021
-#  Date last edit: 22 March 2021
+#  Date last edit: 25 March 2021
 
 
 # Load packages 
@@ -14,7 +14,7 @@ source('graphs/ggplot functions.R')
 
 
 # Number of model simulations (for probabilistic analyses) - EVPPI loops can be changed below
-sim.runs <- 1000
+sim.runs <- 10000
 
 #  Demographics
 
@@ -53,11 +53,6 @@ C.discount.factor <- matrix(1/(1+cDR) ^ c(1:cycles), nrow = 1, ncol = cycles)
 #  Defining parameters
 
 
-#  Demographics
-  
-age<-60
-male<-0
-  
 #  Transition probabilities
   
 omrPTHR <- rbeta(sim.runs,2,98)
@@ -407,8 +402,8 @@ plot.evpi(EVPI.population)
 ## EVPPI - TBC ? 
 
 ## Enter inner and outer loop numbers - note these must be higher than sim.runs 
-inner.loops <- 100
-outer.loops <- 100
+inner.loops <- 200
+outer.loops <- 200
 
 
 
@@ -482,17 +477,16 @@ gen.evppi.results <- function(evppi.results1 = evppi.results.SP0, evppi.results2
 
 
 
-pb = txtProgressBar(min = 0, max = outer.loops, initial = 0, style = 3)
 
-## EVPPI loops - RR NP1
+## EVPPI loops - NP1 parameter (excl survial parameters)
+
+pb = txtProgressBar(min = 0, max = outer.loops, initial = 0, style = 3)
 
 for(a in 1:outer.loops){
   
   ## 1. Select the 'partial' parameter from the outer loop 
   
   revision.vec <- revision.LP[a,]
-  
-  head(revision.LP)
   
   
   for(b in 1:inner.loops){
@@ -503,7 +497,9 @@ for(a in 1:outer.loops){
     utilities.vec <- as.numeric(state.utilities[b,])
     state.costs.vec <- as.numeric(state.costs[b,])
     transition.vec <- as.numeric(transitions[b,])
-    
+    revision.vec[1] <- revision.LP[b,1]
+    revision.vec[3] <- revision.LP[b,3]
+    revision.vec[2] <- revision.LP[b,1] + revision.LP[a,4] # NP1 parameter only changes on outer loop (so select 'a' row)
     
     inner.results[b,] <- run.model() 
     
@@ -518,8 +514,50 @@ for(a in 1:outer.loops){
   setTxtProgressBar(pb,a)
 }
 
+NP1.evppi <- gen.evppi.results()
 
-revision.evppi <- gen.evppi.results()
+
+
+
+
+## EVPPI loops - EVPPI for survival parameters
+
+pb = txtProgressBar(min = 0, max = outer.loops, initial = 0, style = 3)
+
+for(a in 1:outer.loops){
+  
+  ## 1. Select the 'partial' parameter from the outer loop 
+  
+  revision.vec <- revision.LP[a,]
+  
+  
+  for(b in 1:inner.loops){
+    
+    # 2. Select traditional parameters, minus the outer loop parameter
+    
+    # revision.vec <- revision.LP[a,]
+    utilities.vec <- as.numeric(state.utilities[b,])
+    state.costs.vec <- as.numeric(state.costs[b,])
+    transition.vec <- as.numeric(transitions[b,])
+    #revision.vec[1] <- revision.LP[a,1] - this has been done in the outer loop
+    #revision.vec[3] <- revision.LP[a,3]
+    revision.vec[2] <- revision.LP[a,1] + revision.LP[b,4] # NP1 parameter is in the inner loop (not in EVPPI)
+    
+    inner.results[b,] <- run.model() 
+    
+  }
+  
+  #after each inner loop PSA, calculate the mean NMB for each tx and store the results
+  nmb <- nmb.function(lambda.values, inner.results)
+  
+  evppi.results.SP0[a,] <- nmb[[1]]
+  evppi.results.NP1[a,] <- nmb[[2]]
+  
+  setTxtProgressBar(pb,a)
+}
+
+surv.evppi <- gen.evppi.results()
+
 
 
 
@@ -640,6 +678,8 @@ omr.evppi <- gen.evppi.results()
 
 
 
+
+
 ## EVPPI loops - State costs - transition parameters (Re-revision risk)
 
 pb = txtProgressBar(min = 0, max = outer.loops, initial = 0, style = 3)
@@ -676,22 +716,28 @@ for(a in 1:outer.loops){
 rrr.evppi <- gen.evppi.results()
 
 
-evppi.wide.patient <- data.frame(revision.evppi, 
-                         utilities.evppi[,2],
-                         cRevision.evppi[,2],
-                         omr.evppi[,2],
-                         rrr.evppi[,2])
 
-colnames(evppi.wide.patient) <- c("lambda", "Revision risk", "Utilities", "Revision cost", "Operative mortality ratios", "Re-revision risk")
+
+# Create a data frame with all EVPPI results
+
+evppi.wide.patient <- data.frame(NP1.evppi,
+                                 surv.evppi[,2],
+                                 utilities.evppi[,2],
+                                 cRevision.evppi[,2],
+                                 omr.evppi[,2],
+                                 rrr.evppi[,2])
+
+colnames(evppi.wide.patient) <- c("lambda", "NP1 parameter", "Survival parameters", "Utilities", "Revision cost", "Operative mortality ratios", "Re-revision risk")
+
+# Transform from per patient EVPPI to population EVPPI 
 
 evppi.wide.population <- evppi.wide.patient * effective.population
 evppi.wide.population[,1] <- evppi.wide.patient[,1]
 
-
 evppi.long.population <- reshape2::melt(evppi.wide.population, id.vars = c("lambda"))
 
 
-## per patient EVPPI
+## Plot
 
 plot.evppi(evppi.long.population)
 
@@ -702,55 +748,3 @@ plot.evppi(evppi.long.population, xlimit = 10000) # Limit plot to 10,000 on x ax
 
 
 
-
-
-# JW note 
-# to sample NP1 parameter but not others 
-revision.LP[1,2] <- revision.LP[1,1] + revision.LP[,4]
-
-# to sample other survival parameters but NP1 
-revision.LP[,2] <- revision.LP[,1] + revision.LP[1,4] # i.e. fix the NP1 (and sample in outer loop)
-
-
-
-
-pb = txtProgressBar(min = 0, max = outer.loops, initial = 0, style = 3)
-
-## EVPPI loops - TEST 1 
-
-for(a in 1:outer.loops){
-  
-  ## 1. Select the 'partial' parameter from the outer loop 
-  
-  revision.vec <- revision.LP[a,]
-  
-
-  for(b in 1:inner.loops){
-    
-    # 2. Select traditional parameters, minus the outer loop parameter
-    
-    # revision.vec <- revision.LP[a,]
-    utilities.vec <- as.numeric(state.utilities[b,])
-    state.costs.vec <- as.numeric(state.costs[b,])
-    transition.vec <- as.numeric(transitions[b,])
-    revision.vec[b,1] <- revision.LP[b,1]
-    revision.vec[b,3] <- revision.LP[b,3]
-    revision.vec[b,2] <- revision.LP[b,1] + revision.LP[a,4] # this only changes on outer loop, not inner loop
-    
-    inner.results[b,] <- run.model() 
-    
-  }
-  
-  #after each inner loop PSA, calculate the mean NMB for each tx and store the results
-  nmb <- nmb.function(lambda.values, inner.results)
-  
-  evppi.results.SP0[a,] <- nmb[[1]]
-  evppi.results.NP1[a,] <- nmb[[2]]
-  
-  setTxtProgressBar(pb,a)
-}
-
-
-test1.NP1param.evppi <- gen.evppi.results()
-test1.NP1param.evppi[,2] <- test1.NP1param.evppi[,2] * effective.population
-plot.evpi(test1.NP1param.evppi)
