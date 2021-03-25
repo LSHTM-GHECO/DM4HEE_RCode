@@ -1,5 +1,5 @@
 #  DM4HEE 
-#  Exercise 6.6 - Introducing a third prosthesis into the THR model
+#  Exercise 6.6 - EVPI
 #  Author:  Jack Williams & Nichola Naylor
 #  Date created: 18 March 2021
 #  Date last edit: 25 March 2021
@@ -76,7 +76,7 @@ cholm <- t(chol(t(cov.55)))
 z.mat <- matrix(rnorm(sim.runs*5, 0, 1), nrow = sim.runs, ncol = 5)
   
 revision.LP <- matrix(NA, nrow = sim.runs, ncol = 4)
-colnames(revision.LP) <- c("standard", "NP1", "lngamma")
+colnames(revision.LP) <- c("standard", "NP1", "lngamma", "NP1")
 
 for(i in 1:sim.runs){
     
@@ -89,7 +89,7 @@ for(i in 1:sim.runs){
   NP1 <- x[5,1]
   
   revision.LP[i,1] <- cons+age*ageC+male*maleC
-  revision.LP[i,2] <- np1.LP<-cons+age*ageC+male*maleC+NP1
+  revision.LP[i,2] <- cons+age*ageC+male*maleC+NP1
   revision.LP[i,3] <- lngamma
   revision.LP[i,4] <- NP1 
   # the NP1 parameter values are not needed for the PSA, but are stored to consider in the EVPPI
@@ -146,7 +146,7 @@ state.utilities <- data.frame(uPrimary,uSuccessP,uRevision,uSuccessR,uDead)
 
 #  Create revision and death risk as function of age
 
-mr <- 3-male
+mr <- 4-male
 cycle <- 1:cycles
 current.age <- age+cycle
 
