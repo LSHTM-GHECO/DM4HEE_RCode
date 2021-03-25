@@ -9,17 +9,25 @@
 library(data.table)
 
 
-# Run pre-set code for ggplot graphics 
+# Run pre-set functions for ggplot graphics 
 source('graphs/ggplot functions.R')
 
 
-# Number of model simulations (for probabilistic analyses) - EVPPI loops can be changed below
-sim.runs <- 10000
+# Define the number of model simulations (for PSA) 
+sim.runs <- 1000
+
+
+#########**** PARAMETERS *****######
 
 #  Demographics
-
 age <- 60
 male <- 0
+
+# Discount rates
+dr.c <- 0.06
+dr.o <- 0.015
+
+
 
 
 #  Read in the life table and covariance table
@@ -28,26 +36,23 @@ life.table <- data.table(life.table)
 cov.55 <- read.csv("inputs/cov55.csv",row.names=1,header=TRUE) 
 
 
-# Define fixed parameters outside of the model to avoid repition
-
-cDR<-0.06
-oDR<-0.015
-
-#  Seed the starting states of the model
-seed<-c(1,0,0,0,0)
-
 #  Set the total number of cycles to run and name the states
-cycles<-60
+cycles <- 60
 
 
-state.names<-c("P-THR","successP-THR","R-THR","successR-THR","Death")
-n.states<-length(state.names)
+state.names <- c("P-THR","successP-THR","R-THR","successR-THR","Death")
+n.states <- length(state.names)
+
+#  Seed the starting states of the model (cycle 0)
+seed <- c(1,0,0,0,0)
+
+
 
 
 # Discounting matrices
 
-O.discount.factor <- matrix(1/(1+oDR) ^ c(1:cycles), nrow = 1, ncol = cycles)
-C.discount.factor <- matrix(1/(1+cDR) ^ c(1:cycles), nrow = 1, ncol = cycles)
+O.discount.factor <- matrix(1/(1+dr.o) ^ c(1:cycles), nrow = 1, ncol = cycles)
+C.discount.factor <- matrix(1/(1+dr.c) ^ c(1:cycles), nrow = 1, ncol = cycles)
 
 
 #  Defining parameters
@@ -62,14 +67,26 @@ rrr <- rbeta(sim.runs,4,96)
 # create transitions data.frame to pass into the model function
 transitions <- data.frame(omrPTHR = omrPTHR, omrRTHR = omrRTHR, rrr = rrr)
   
-#  Revision rates
+
+#### HAZARD FUNCTION & ASSOCIATED PARAMETERS #####
+
+hazards <- read.csv("inputs/hazardfunction.csv") ## importing the hazard inputs from the regression analysis
+
+r.lnlambda <- hazards$coefficient[1] ## Ancilliary parameter in Weibull distribution - equivalent to lngamma coefficient
+r.cons<- hazards$coefficient[2] ##Constant in survival analysis for baseline hazard
+r.ageC<- hazards$coefficient[3] ## Age coefficient in survival analysis for baseline hazard
+r.maleC<- hazards$coefficient[4] ## Male coefficient in survival analysis for baseline hazard
+r.NP1<- hazards$coefficient[5]
   
-mn.cons <- -5.490935
-mn.ageC <- -0.0367022
-mn.maleC <- 0.768536
-mn.NP1 <- -1.344474
-mn.lngamma <- 0.3740968
-mn <- c(mn.lngamma, mn.cons,mn.ageC,mn.maleC,mn.NP1)
+# mn.cons <- -5.490935
+# mn.ageC <- -0.0367022
+# mn.maleC <- 0.768536
+# mn.NP1 <- -1.344474
+# mn.lngamma <- 0.3740968
+
+# Need to amend below to match naming convention
+
+mn <- c(r.lnlambda, r.cons, r.ageC, r.maleC, r.NP1)
   
 cholm <- t(chol(t(cov.55))) 
   
@@ -146,15 +163,15 @@ state.utilities <- data.frame(uPrimary,uSuccessP,uRevision,uSuccessR,uDead)
 
 #  Create revision and death risk as function of age
 
-mr <- 4-male
-cycle <- 1:cycles
-current.age <- age+cycle
+col.key <- 4-male
+cycle.v <- 1:cycles
+current.age <- age+cycle.v
 
 death.risk <- data.table(current.age)
 setkey(life.table,"Index")
 setkey(death.risk,"current.age")
 death.risk <- life.table[death.risk, roll=TRUE]
-death.risk.vector <- as.vector(as.matrix(death.risk[,..mr]))
+death.risk.vector <- as.vector(as.matrix(death.risk[,..col.key]))
 
 # Parameters that need to be passed into the model 
   # 1 revision risks
@@ -170,7 +187,7 @@ death.risk.vector <- as.vector(as.matrix(death.risk[,..mr]))
   
 # need to call the model appropraitely 
 
-run.model <- function(revision = revision.vec, death = death.risk.vector, 
+model.THR <- function(revision = revision.vec, death = death.risk.vector, 
                       utilities = utilities.vec, state.costs = state.costs.vec,
                       transition = transition.vec) { # pass the model the revision paramaters / and others???
   
@@ -185,8 +202,8 @@ run.model <- function(revision = revision.vec, death = death.risk.vector,
     
   # generate time dependent revision risks
       
-  revision.risk.sp0<-1-exp(exp(sp0.LP)*((cycle-1)^exp(lngamma)-cycle^exp(lngamma)))
-  revision.risk.np1<-1-exp(exp(np1.LP)*((cycle-1)^exp(lngamma)-cycle^exp(lngamma)))
+  revision.risk.sp0<-1-exp(exp(sp0.LP)*((cycle.v-1)^exp(lngamma)-cycle.v^exp(lngamma)))
+  revision.risk.np1<-1-exp(exp(np1.LP)*((cycle.v-1)^exp(lngamma)-cycle.v^exp(lngamma)))
   
   
   SP0.tm<-array(data=0,dim=c(5,5,60))
@@ -300,7 +317,7 @@ for(i in 1:sim.runs) {
   transition.vec <- as.numeric(transitions[i,])
   
   # Run the model and save results 
-  simulation.results[i,] <- run.model()
+  simulation.results[i,] <- model.THR()
   
   # Update the progress bar 
   setTxtProgressBar(pb,i) 
@@ -310,6 +327,8 @@ for(i in 1:sim.runs) {
 
 # Mean results 
 colMeans(simulation.results)
+
+
 
 incremental.results <- data.frame(matrix(0, nrow = sim.runs, ncol = 2))
 incremental.results[,1] <- simulation.results[,3] - simulation.results[,1]
@@ -399,11 +418,14 @@ plot.evpi(EVPI.population)
 
 
 
-## EVPPI - TBC ? 
+## EVPPI 
+
+# This is technically 6.6b  
+# Jack to check if this is included in the course, and whether this should be seperate script?
 
 ## Enter inner and outer loop numbers - note these must be higher than sim.runs 
-inner.loops <- 200
-outer.loops <- 200
+inner.loops <- 100
+outer.loops <- 100
 
 
 
@@ -501,7 +523,7 @@ for(a in 1:outer.loops){
     revision.vec[3] <- revision.LP[b,3]
     revision.vec[2] <- revision.LP[b,1] + revision.LP[a,4] # NP1 parameter only changes on outer loop (so select 'a' row)
     
-    inner.results[b,] <- run.model() 
+    inner.results[b,] <- model.THR() 
     
   }
   
@@ -543,7 +565,7 @@ for(a in 1:outer.loops){
     #revision.vec[3] <- revision.LP[a,3]
     revision.vec[2] <- revision.LP[a,1] + revision.LP[b,4] # NP1 parameter is in the inner loop (not in EVPPI)
     
-    inner.results[b,] <- run.model() 
+    inner.results[b,] <- model.THR() 
     
   }
   
@@ -582,7 +604,7 @@ for(a in 1:outer.loops){
     transition.vec <- as.numeric(transitions[b,])
     
     
-    inner.results[b,] <- run.model() 
+    inner.results[b,] <- model.THR() 
     
   }
   
@@ -622,7 +644,7 @@ for(a in 1:outer.loops){
     transition.vec <- as.numeric(transitions[b,])
     
     
-    inner.results[b,] <- run.model() 
+    inner.results[b,] <- model.THR() 
     
   }
   
@@ -661,7 +683,7 @@ for(a in 1:outer.loops){
     #transition.vec <- as.numeric(transitions[b,])
     transition.vec[3] <- as.numeric(transitions[b,3]) # overwrite the RRR value so included in PSA
     
-    inner.results[b,] <- run.model() 
+    inner.results[b,] <- model.THR() 
     
   }
   
@@ -700,7 +722,7 @@ for(a in 1:outer.loops){
     #transition.vec <- as.numeric(transitions[b,])
     transition.vec[1:2] <- as.numeric(transitions[b,1:2]) # overwrite the OMR values within inner loop
     
-    inner.results[b,] <- run.model() 
+    inner.results[b,] <- model.THR() 
     
   }
   
@@ -731,20 +753,15 @@ colnames(evppi.wide.patient) <- c("lambda", "NP1 parameter", "Survival parameter
 
 # Transform from per patient EVPPI to population EVPPI 
 
-evppi.wide.population <- evppi.wide.patient * effective.population
-evppi.wide.population[,1] <- evppi.wide.patient[,1]
+evppi.wide.pop <- evppi.wide.patient * effective.population
+evppi.wide.pop[,1] <- evppi.wide.patient[,1]
 
-evppi.long.population <- reshape2::melt(evppi.wide.population, id.vars = c("lambda"))
+evppi.long.pop <- reshape2::melt(evppi.wide.pop, id.vars = c("lambda"))
 
 
 ## Plot
 
-plot.evppi(evppi.long.population)
-
-plot.evppi(evppi.long.population, xlimit = 10000) # Limit plot to 10,000 on x axis
-
-
-
+plot.evppi(evppi.long.pop)
 
 
 
