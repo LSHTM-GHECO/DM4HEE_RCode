@@ -47,9 +47,9 @@ tp.C2D <- alpha.C2D / C.sum ## transition probability of C to D
 # beta.A2A <- A.sum-alpha.A2A
 
 ### COSTS ####################
-c.dmca<-1701  ## Direct medical costs associated with state A
-c.dmcb<-1774  ##Direct medical costs associated with state B
-c.dmcc<-6948  ## Direct medical costs associated with stateC
+c.dmca <- 1701  ## Direct medical costs associated with state A
+c.dmcb <- 1774  ##Direct medical costs associated with state B
+c.dmcc <- 6948  ## Direct medical costs associated with stateC
 c.dmc<-c(c.dmca, c.dmcb, c.dmcc,0) ## A vector storing the direct costs associated with each state
                           ## the order is important as these will be multiplied according to 
                           ## matrix multiplication 
@@ -222,8 +222,3 @@ discount.factor.o <- matrix(1/(1+dr.o) ^ c(1:cycles), nrow = 1, ncol = cycles)
 discount.factor.c <- matrix(1/(1+dr.c) ^ c(1:cycles), nrow = 1, ncol = cycles)
 
 
-## This is really good - not sure if you know but to the left of the source button there is a navigation pane 
-## Might be better than using the ####**** (and only needs ####)
-## Also, structure makes sense for the first couple to match excel, but I think doing the two arms at similar times makes more sense to me
-## i.e. do the transition matrix for both - then the trace for both - etc. etc. 
-## Maybe we can revert to that structure later on? 
