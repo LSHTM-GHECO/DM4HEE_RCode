@@ -14,11 +14,34 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Course Reader 
 Text about the course generally & R resouces:
 
-## Exercise layout
+> Opening R projects
+Notes for intro pack:
+> Intro into the R project and then some code for how to set working directory (R) 
+> array, Vector, matrix, variable difference and 1 sentence etc.
+> Base r functions used a lot - e.g. rnorm() , rgamma() etc. 
+> direct to DART resources
+> pictures and bright colours 
+> installing packages (and list of packages needed across the exercises)
 
-You can also embed plots, for example:
+We try to stick to base R but occasionally need packages etc.
+
+## Key Base R functions
+
+[text description info]
 
 ```{r pressure, echo=TRUE}
-print("something here about course")
-```
 
+### r norm... etc.
+
+
+```
+## Random draws
+
+[text description info]
+
+```{r pressure, echo=TRUE}
+
+### r norm... etc.
+
+
+```
