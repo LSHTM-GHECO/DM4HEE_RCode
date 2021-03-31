@@ -39,7 +39,7 @@ c.primary <- 0  ## Cost of a primary THR procedure -
 ## Note that the cost of the primary procedure is excluded (set to 0): since both arms have this procedure it is assumed to net out of the incremental analysis.  However, if the model was to be used to estimate lifetime costs of THR it would be important to include.
 c.revision <- 5294 ## Cost of one cycle in the Revision THR state (national reference costs for revision hip or knee)
 c.success <- 0 ## Cost of one cycle in a 'success' state (primary or revision)
-## Note for u.sucess There are assumed to be no ongoing monitoring costs for successful THR.  However, this parameter is included in case users want to change this assumption.
+## Note for c.sucess There are assumed to be no ongoing monitoring costs for successful THR.  However, this parameter is included in case users want to change this assumption.
 c.SP0 <- 394 ## Cost of standard prosthesis
 c.NP1 <- 579 ## Cost of new prosthesis 1
 state.costs<-c(c.primary, c.success, c.revision,c.success,0) ## a vector with the costs for each state
