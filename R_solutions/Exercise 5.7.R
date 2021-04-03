@@ -4,27 +4,14 @@
 #  Date created: 22 February 2021
 #  Date last edit: 15 March 2021
 
-# library(dplyr)
 
-#  Make sure you have already created the function: model.THR(age,male)
+####***** THR MODEL FUNCTION ****#####
 
-# There needs to be a way to call and run the other model - one option may be to have the function in a seperate sheet (to call)
-# source("R_solutions/Exercise 4.8 with sim.R")
-
-#Note to self - is there a way to use 'replicate' and convert to dataframe to avoid using'rdply' from the 'plyr' library?
-#Problem is that replicate gives n*2d vectors and creating a dataframe generates 2rows and n columns
-#Solution: use t() to transpose before making into a data.frame
-#Using system.time() to check the two functions reveals slight gain for avoiding 'rdply' but no opportunity to use option '.progress="text"'
-
-
-## Need to source the appropriate R sheet, or a copy of the model - perhaps do a seperate model script 
-source("graphs/ggplot functions.R")
+### SETTING CONSTANT PARAMETERS OUTSIDE THE FUNCTION
 
 
 
-
-
-
+#### SIMULATION ########
 #  Run Model
 
 sim.runs<-1000
@@ -33,6 +20,12 @@ simulation.results <- data.frame(matrix(data = 0, sim.runs, 2))
 colnames(simulation.results)<-c("inc.QALYs","inc.costs")
 
 for(i in 1:sim.runs)   simulation.results[i,] <- model.THR(60,0)
+
+### do we want to integrate a setTxtProgressBar(pb,i) here?
+
+
+## Need to source the appropriate R sheet, or a copy of the model - perhaps do a seperate model script 
+source("graphs/ggplot functions.R")
 
 
 # Plots 
@@ -143,3 +136,11 @@ ce.plane.all(simulation.subgroups.long)
 
 plot.ceac.all(CEAC.subgroups.long)
 
+########## COPIES FROM OTHER CODE TO EDIT INT
+# And can return the mean results across all simulations 
+colMeans(simulation.results)
+
+#### Plots #####
+
+# Cost-effectiveness plane (using base R to produce the plot)
+plot(simulation.results$inc.LYs,simulation.results$inc.cost)
