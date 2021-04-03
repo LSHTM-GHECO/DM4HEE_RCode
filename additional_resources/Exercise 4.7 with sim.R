@@ -290,12 +290,6 @@ for(i in 1:sim.runs) simulation.results[i,] <- model.HIV()
 # We can check that the results are storing correctly 
 head(simulation.results)
 
-# And can return the mean results across all simulations 
-colMeans(simulation.results)
 
-#### Plots #####
-
-# Cost-effectiveness plane (using base R to produce the plot)
-plot(simulation.results$inc.LYs,simulation.results$inc.cost)
 
 
