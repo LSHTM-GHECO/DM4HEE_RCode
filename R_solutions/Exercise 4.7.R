@@ -24,7 +24,7 @@ seed <- c(1,0,0,0) ## i.e. everyone starts in State A
 ## The treatment effect
 RR.deterministic <- 0.509 ## The deterministic treatment effect (RR)
 lnRR <- log(RR.deterministic) ## log mean treatment effect
-se.lnRR <-(log(0.710)-log(0.365))/(2*1.96) ## log standard error of the treatment effect
+se.lnRR <-(log(0.710)-log(0.365))/(2*1.96) ## log standard error of the treatment effect (estimated from confidence intervals)
 RR <- exp(rnorm(1,lnRR,se.lnRR)) ## A random draw of RR based on the log mean and log standard error 
 RR
 
@@ -106,9 +106,7 @@ B.sum <- 1258 ## total counts of transitions out of B
 C.sum <- 1749 ## total counts of transitions out of C  
 
 
-## Beta distribution transitions (AIDS to Death)
-tp.C2D <-rbeta(1,shape1=alpha.C2D,shape2=(C.sum-alpha.C2D)) ## using the Beta distribution to estimate the transition probability between C and D
-tp.C2C <- 1-tp.C2D  ## those staying in state C 
+
 
 ## Dirichlet distribution transitions
 
@@ -133,6 +131,10 @@ gd.B <- gd.B2B + gd.B2C + gd.B2D ## Sum of draws for transitions from B
 tp.B2B<-gd.B2B/gd.B ## transition probability for B to B
 tp.B2C<-gd.B2C/gd.B  ## transition probability for B to C
 tp.B2D<-gd.B2D/gd.B
+
+## Beta distribution transitions (AIDS to Death)
+tp.C2D <-rbeta(1,shape1=alpha.C2D,shape2=(C.sum-alpha.C2D)) ## using the Beta distribution to estimate the transition probability between C and D
+tp.C2C <- 1-tp.C2D  ## those staying in state C 
 
 ####**** MARKOV MODEL ****######
 
