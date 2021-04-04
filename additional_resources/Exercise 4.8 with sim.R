@@ -1,6 +1,7 @@
 #  DM4HEE 
 #  Exercise 4.8 - Making the THR model probabilistic
 #  Author: Andrew Briggs
+#  Edited by: Jack Williams & Nichola Naylor
 #  Date created: 22 February 2021
 #  Date last edit: 12 March 2021
 
@@ -330,7 +331,7 @@ disc.QALYs.NP1
 
 ####****ANALYSIS****####
 output <- c(inc.cost = disc.cost.NP1 - disc.cost.SP0,
-            inc.lys = disc.QALYs.NP1 - disc.QALYs.SP0)
+            inc.qalys = disc.QALYs.NP1 - disc.QALYs.SP0)
 
 return(output)
 }
@@ -345,11 +346,11 @@ model.THR()
 # Now we know we can generate model results using a function, we can run and store a number of simulations
 
 # First, we set the number of simulations to run  
-sim.runs <- 1000
+sim.runs <- 1000 ## run 1,000 times
 
 # We can create a data frame to store results
-simulation.results <- data.frame(matrix(0, nrow = sim.runs, ncol = 2))
-colnames(simulation.results) <- c("inc.LYs","inc.costs")
+simulation.results <- simulation.results <- data.frame("inc.cost" = rep(0, sim.runs),
+                                                       "inc.qalys"=rep(0,sim.runs))
 
 #### Running simulations & recording results #### 
 
