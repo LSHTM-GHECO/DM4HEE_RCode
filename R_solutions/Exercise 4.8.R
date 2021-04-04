@@ -326,7 +326,7 @@ disc.QALYs.NP1
 
 ####****ANALYSIS****####
 output <- c(inc.cost = disc.cost.NP1 - disc.cost.SP0,
-            inc.lys = disc.QALYs.NP1 - disc.QALYs.SP0,
+            inc.qalys = disc.QALYs.NP1 - disc.QALYs.SP0,
             icer = NA)
 output[3] <- output[1]/output[2]
 
