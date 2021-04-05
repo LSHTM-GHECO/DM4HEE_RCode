@@ -3,13 +3,14 @@
 #  Author: Andrew Briggs
 #  Edited by: Nichola Naylor & Jack Williams
 #  Date created: 22 February 2021
-#  Date last edit: 04 April 2021
+#  Date last edit: 05 April 2021
 
 ### Loading useful packages
 library(data.table)
 library(tidyr)
 library(dplyr)
 library(ggplot2)
+library(reshape2) 
 
 #  Reading the data needed from csv files
 hazards <- read.csv("inputs/hazardfunction.csv", header=TRUE) ## importing the hazard inputs from the regression analysis
@@ -554,11 +555,10 @@ sim.runs <- 1000
 subgroups.names <- c("Male 40", "Male 60", "Male 80", "Female 40", "Female 60", "Female 80")
 subgroups.n <- length(subgroups.names)
 
-simulation.subgroups <- array(data = 0, dim = c(sim.runs, 2, subgroups.n))
-
+simulation.subgroups <- array(data = 0, dim = c(sim.runs, 2, subgroups.n),
+                              dimnames = list(1:sim.runs, c("inc.cost","inc.qalys"),subgroups.names))
 
 # Run model for each subgroup, and record results within the array
-
 for(i in 1:sim.runs){
   simulation.subgroups[i,,1] <- model.THR(40,1)
   simulation.subgroups[i,,2] <- model.THR(60,1)
@@ -568,43 +568,35 @@ for(i in 1:sim.runs){
   simulation.subgroups[i,,6] <- model.THR(80,0)
 }
 
-######## GOT TO HERE!!!
 
 # Create a CEAC table with lambda value sequence
+WTP.values <- seq(from = 0, to = 50000, by = 50)
 
-lambda.values <- seq(from = 0, to = 50000, by = 50)
-
-CEAC.subgroups <- data.frame(matrix(data=NA, nrow=length(lambda.values), ncol=subgroups.n + 1))
-colnames(CEAC.subgroups) <- c("lambda", subgroups.names)
+CEAC.subgroups <- data.frame(matrix(data=0, nrow=length(WTP.values), ncol=subgroups.n + 1))
+colnames(CEAC.subgroups) <- c("WTP", subgroups.names)
 
 
 # Estimate probability cost-effective for all subgroups
-for (i in 1:length(lambda.values)) {
+for (i in 1:length(WTP.values)) {
 
-  CEAC.subgroups[i,1]<-lambda.values[i]
-  CEAC.subgroups[i,2]<-p.CE(lambda.values[i], simulation.subgroups[,,1])
-  CEAC.subgroups[i,3]<-p.CE(lambda.values[i], simulation.subgroups[,,2])
-  CEAC.subgroups[i,4]<-p.CE(lambda.values[i], simulation.subgroups[,,3])
-  CEAC.subgroups[i,5]<-p.CE(lambda.values[i], simulation.subgroups[,,4])
-  CEAC.subgroups[i,6]<-p.CE(lambda.values[i], simulation.subgroups[,,5])
-  CEAC.subgroups[i,7]<-p.CE(lambda.values[i], simulation.subgroups[,,6])
+  CEAC.subgroups[i,1]<-WTP.values[i]
+  CEAC.subgroups[i,2]<-p.CE(WTP.values[i], simulation.subgroups[,,1])
+  CEAC.subgroups[i,3]<-p.CE(WTP.values[i], simulation.subgroups[,,2])
+  CEAC.subgroups[i,4]<-p.CE(WTP.values[i], simulation.subgroups[,,3])
+  CEAC.subgroups[i,5]<-p.CE(WTP.values[i], simulation.subgroups[,,4])
+  CEAC.subgroups[i,6]<-p.CE(WTP.values[i], simulation.subgroups[,,5])
+  CEAC.subgroups[i,7]<-p.CE(WTP.values[i], simulation.subgroups[,,6])
 
 }
 
-
-
 # Show the structure of the subgroup results 
-head(CEAC.subgroups, 10)
-
+head(CEAC.subgroups)
 
 ## Need to reshape the data from wide to long to use in ggplot 
-CEAC.subgroups.long <- reshape2::melt(CEAC.subgroups, id.vars = c("lambda"))
-colnames(CEAC.subgroups.long) <- c("lambda", "subgroup", "pCE")
+CEAC.subgroups.long <- melt(CEAC.subgroups, id.vars = c("WTP"))
+colnames(CEAC.subgroups.long) <- c("WTP", "subgroup", "pCE")
+head(CEAC.subgroups.long)
 
-
-# Plots of results 
-
-ce.plane.all(simulation.subgroups.long)
-
+# Plots of results using pre-defined ggplot functions
 plot.ceac.all(CEAC.subgroups.long)
 
