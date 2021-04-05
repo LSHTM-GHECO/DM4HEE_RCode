@@ -27,6 +27,8 @@ We try to stick to base R but occasionally need packages etc.
 
 ## Key Base R functions
 
+https://www.rstudio.com/wp-content/uploads/2016/10/r-cheat-sheet-3.pdf 
+
 [text description info]
 
 ```{r pressure, echo=TRUE}
