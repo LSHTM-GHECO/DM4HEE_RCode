@@ -104,9 +104,9 @@ alpha.C2D <- 437
 A.sum <- 1734 ## total counts of transitions out of A
 B.sum <- 1258 ## total counts of transitions out of B
 C.sum <- 1749 ## total counts of transitions out of C  
-
-
-
+## Beta distribution transitions (AIDS to Death)
+tp.C2D <-rbeta(1,shape1=alpha.C2D,shape2=(C.sum-alpha.C2D)) ## using the Beta distribution to estimate the transition probability between C and D
+tp.C2C <- 1-tp.C2D  ## those staying in state C 
 
 ## Dirichlet distribution transitions
 
@@ -131,10 +131,6 @@ gd.B <- gd.B2B + gd.B2C + gd.B2D ## Sum of draws for transitions from B
 tp.B2B<-gd.B2B/gd.B ## transition probability for B to B
 tp.B2C<-gd.B2C/gd.B  ## transition probability for B to C
 tp.B2D<-gd.B2D/gd.B
-
-## Beta distribution transitions (AIDS to Death)
-tp.C2D <-rbeta(1,shape1=alpha.C2D,shape2=(C.sum-alpha.C2D)) ## using the Beta distribution to estimate the transition probability between C and D
-tp.C2C <- 1-tp.C2D  ## those staying in state C 
 
 ####**** MARKOV MODEL ****######
 

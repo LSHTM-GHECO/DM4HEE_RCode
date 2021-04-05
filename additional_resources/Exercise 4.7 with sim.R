@@ -12,6 +12,10 @@
 # We can then create a loop to perform a large number of model simulations, for the PSA 
 
 
+### First we can assign variables that are constant throughout model runs
+# outside of the function so that the function doesn't perform the same tasks 
+# unnecessarily (reducing efficiency of the model function)
+# we'll start doing this sort of thing more and more across the remaining exercises
 
 ####****PARAMETERS****#####
 #  Start by defining parameters
@@ -286,13 +290,6 @@ for(i in 1:sim.runs) simulation.results[i,] <- model.HIV()
 # We can check that the results are storing correctly 
 head(simulation.results)
 
-# And can return the mean results across all simulations 
-colMeans(simulation.results)
-
-#### Plots #####
-
-# Cost-effectiveness plane (using base R to produce the plot)
-plot(simulation.results$inc.LYs,simulation.results$inc.cost)
 
 
 
