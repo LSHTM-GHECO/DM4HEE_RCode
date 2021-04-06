@@ -14,7 +14,7 @@ library(reshape2)
 
 #  Reading the data needed from csv files
 hazards <- read.csv("inputs/hazardfunction.csv", header=TRUE) ## importing the hazard inputs from the regression analysis
-cov.55<-read.csv("inputs/cov55.csv",row.names=1,header=TRUE) ## importing the 
+cov.55 <- read.csv("inputs/cov55.csv",row.names=1,header=TRUE) ## importing the covariance matrix
 life.table <- read.csv("inputs/life-table.csv", header=TRUE)
 life.table<- as.data.table(life.table)
 
@@ -308,8 +308,10 @@ for(i in 1:sim.runs)   simulation.results[i,] <- model.THR.f60()
 # so have adapted word doc so they don't do anything that involves ggplot functions for now
 # but we might want to adapt? in the excel they build these graphs but harder to do in R perhaps
 
+## JACK - yes let's chat about plots (and ggplot) tomorrow
+
 # simple base plot of incremental QALYs and costs
-plot(simulation.results$inc.QALYs,simulation.results$inc.cost)
+plot(simulation.results$inc.qalys,simulation.results$inc.cost)
 
 ## using pre-created ggplot2 functions for nicer cost-effectiveness plane graphs
 source("additional_resources/ggplot_CEA_functions.R")
@@ -355,8 +357,8 @@ for (i in 1:length(WTP.values)) {
 }
 
 # Display the top and bottom of the CEAC table
-head(CEAC, 10)
-tail(CEAC, 10)
+head(CEAC)
+tail(CEAC)
 
 
 # Plotting the CEAC with a plot function
@@ -558,14 +560,14 @@ subgroups.n <- length(subgroups.names)
 simulation.subgroups <- array(data = 0, dim = c(sim.runs, 2, subgroups.n),
                               dimnames = list(1:sim.runs, c("inc.cost","inc.qalys"),subgroups.names))
 
-# Run model for each subgroup, and record results within the array
+# Run model for each subgroup, inputting the age and sex into the function, and record results within the array
 for(i in 1:sim.runs){
-  simulation.subgroups[i,,1] <- model.THR(40,1)
-  simulation.subgroups[i,,2] <- model.THR(60,1)
-  simulation.subgroups[i,,3] <- model.THR(80,1)
-  simulation.subgroups[i,,4] <- model.THR(40,0)
-  simulation.subgroups[i,,5] <- model.THR(60,0)
-  simulation.subgroups[i,,6] <- model.THR(80,0)
+  simulation.subgroups[i,,1] <- model.THR(age = 40, male = 1)
+  simulation.subgroups[i,,2] <- model.THR(age = 60, male = 1)
+  simulation.subgroups[i,,3] <- model.THR(age = 80, male = 1)
+  simulation.subgroups[i,,4] <- model.THR(age = 40, male = 0)
+  simulation.subgroups[i,,5] <- model.THR(age = 60, male = 0)
+  simulation.subgroups[i,,6] <- model.THR(age = 80, male = 0)
 }
 
 
