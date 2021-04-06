@@ -599,10 +599,13 @@ head(CEAC.subgroups)
 
 ## Base R plot needed here??? 
 
-plot(CEAC.subgroups$WTP, CEAC.subgroups$`Male 40`, type="l") +
-  line(CEAC.subgroups$WTP, CEAC.subgroups$`Male 60`) + 
-  line(CEAC.subgroups$WTP, CEAC.subgroups$`Male 80`)
-
+plot(CEAC.subgroups$WTP, CEAC.subgroups$`Male 40`, type="l", ylim = c(0,1), col = "red", lty = 2)
+  lines(CEAC.subgroups$WTP, CEAC.subgroups$`Male 60`, col = "blue", lty = 2)
+  lines(CEAC.subgroups$WTP, CEAC.subgroups$`Male 80`, col = "green", lty = 2)
+  lines(CEAC.subgroups$WTP, CEAC.subgroups$`Female 40`, col = "red", lty = 1)
+  lines(CEAC.subgroups$WTP, CEAC.subgroups$`Female 60`, col = "blue", lty = 1)
+  lines(CEAC.subgroups$WTP, CEAC.subgroups$`Female 80`, col = "green", lty = 1)
+  
 ## We need to reshape the data from wide to long to use in ggplot 
 CEAC.subgroups.long <- melt(CEAC.subgroups, id.vars = c("WTP"))
 colnames(CEAC.subgroups.long) <- c("WTP", "subgroup", "pCE")
