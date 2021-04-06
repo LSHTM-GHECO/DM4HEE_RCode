@@ -597,7 +597,7 @@ for (i in 1:length(WTP.values)) {
 # Show the structure of the subgroup results 
 head(CEAC.subgroups)
 
-## Base R plot needed here??? 
+## Base R plot (col indicates colour, lty indicates linetype, where 1 = fill and 2 = dasshed) 
 
 plot(CEAC.subgroups$WTP, CEAC.subgroups$`Male 40`, type="l", ylim = c(0,1), col = "red", lty = 2)
   lines(CEAC.subgroups$WTP, CEAC.subgroups$`Male 60`, col = "blue", lty = 2)
@@ -605,7 +605,9 @@ plot(CEAC.subgroups$WTP, CEAC.subgroups$`Male 40`, type="l", ylim = c(0,1), col 
   lines(CEAC.subgroups$WTP, CEAC.subgroups$`Female 40`, col = "red", lty = 1)
   lines(CEAC.subgroups$WTP, CEAC.subgroups$`Female 60`, col = "blue", lty = 1)
   lines(CEAC.subgroups$WTP, CEAC.subgroups$`Female 80`, col = "green", lty = 1)
-  
+
+## Alternative ggplot function for CEAC  
+    
 ## We need to reshape the data from wide to long to use in ggplot 
 CEAC.subgroups.long <- melt(CEAC.subgroups, id.vars = c("WTP"))
 colnames(CEAC.subgroups.long) <- c("WTP", "subgroup", "pCE")
