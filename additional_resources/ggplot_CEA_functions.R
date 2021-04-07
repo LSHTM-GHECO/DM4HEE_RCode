@@ -1,19 +1,24 @@
-## GGplot graphics ## 
+## ggplot graphics ## 
 
 # This is a series of functions that use ggplot to create graphs
-# ggplot is more flexible than base R plots, and allows users to specify lots of options
+# ggplot is more flexible than base R plots, and allows users to specify many of options
+
+# There are lots of ways in which ggplot can be used in data visualisation, and 
+# so many options and details that this course won't be able to explore. 
+# However, for those interested, there is an excellent chapter on data visualiation chapter of 
+# the 'R for Data Science'  book, available here: 
+# https://r4ds.had.co.nz/data-visualisation.html
+ 
 
 
+# Install package and load library
 if(!require(ggplot2)) install.packages('ggplot2')
 library(ggplot2)
 
 
-##  Exercise 4.7 with sim & 4.8 with sim  ##
 
 
-
-## This uses just the incremental costs and outcomes for one intervention 
-
+## Cost-effectiveness plane (for one comparator, using incremetnal costs and outcomes)
 
 ce.plane <- function(results, transparency = 0.75){
   
@@ -37,16 +42,16 @@ ce.plane <- function(results, transparency = 0.75){
 }
 
 
-# ce.plane(simulation.results)
 
 
 
-# unfinished 
+## Cost-effectiveness plane (for multiple comparators) - this is essentially the same, except that 
+# the colour of the circles relates to the comparator
 
 ce.plane.all <- function(results,  transparency = 0.75){
   
-  xlabel = "Incremental QALYs"
-  ylabel = "Incremental costs"
+  xlabel = "QALYs"
+  ylabel = "Costs"
 
   plot = ggplot(results) + 
     geom_point(shape = 21, size = 2, colour = "black", fill = NA, alpha = 0.5, aes(x=outcomes, y=costs, colour = group)) + 
@@ -59,11 +64,12 @@ ce.plane.all <- function(results,  transparency = 0.75){
           legend.key.width=unit(1.8,"line"), text = element_text(size=12),
           plot.margin=unit(c(1.2,0.5,0,1.2),"cm"))
   
-  plot
+  return(plot)
   
 }
 
 
+# Cost-effectiveness acceptability curve (CEAC) for one comparator
 
 plot.ceac <- function(results){
 
@@ -89,7 +95,9 @@ plot.ceac <- function(results){
 
 
 
-
+# Cost-effectiveness acceptability curve (CEAC) for multiple comparators
+# similar to the cost-effectiveness plane, the only difference in the code is that 
+# the color of the CEAC differs for each comparator
 
 
 plot.ceac.all <- function(results){
@@ -115,6 +123,7 @@ plot.ceac.all <- function(results){
 
 
 
+# Expected Value of Perfect Information (EVPI)
 
 
 plot.evpi <- function(results){
@@ -139,8 +148,8 @@ plot.evpi <- function(results){
 }
 
 
-
-
+# Expected Value of Partial Perfect Information (EVPPI)
+# This function allows for a limit on the X-axis, to help show the graph with adjusted axes
 
 plot.evppi <- function(results, xlimit = 20000){
   

@@ -159,8 +159,8 @@ model.THR.f60 <- function() {
   ## when male=1 (i.e. male selected as sex) this becomes the 3rd column (which is male risk of death)
 
   # Here we create an unamed vector with the risk of death for each cycle 
-  mortality.vec <- unname(unlist(death.risk[,..col.key]))
   # This is an alternative way to selecting the mortality in the transition matrix below  
+  mortality.vec <- unname(unlist(death.risk[,..col.key]))
 
   #   STANDARD ARM
   #  Now create a transition matrix for the standard prosthesis arm
