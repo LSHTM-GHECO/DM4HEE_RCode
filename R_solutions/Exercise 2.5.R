@@ -35,7 +35,7 @@ tp.A2D <- alpha.A2D / A.sum
 tp.B2B <- alpha.B2B / B.sum ## transition probability of B to B
 tp.B2C <- alpha.B2C / B.sum ## transition probability of B to C
 tp.B2D <- alpha.B2D / B.sum
-tp.C2C < -alpha.C2C / C.sum ## transition probability of C to C
+tp.C2C <- alpha.C2C / C.sum ## transition probability of C to C
 tp.C2D <- alpha.C2D / C.sum ## transition probability of C to D
 
 # ### Note you could input the numbers directly 
