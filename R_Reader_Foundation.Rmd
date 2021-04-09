@@ -14,3 +14,14 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Course Reader 
 
 Text about the course generally & R resouces:
+
+To include: 
+* Course description / general R links
+* Matrix array data frame etc (same as advanced, maybe exlude array as not in execise)
+* Subsetting / selecting data (same as advanced)
+* Maybe a bit at the bottom about there being another reader for the advanced course
+
+* No plots 
+* No distributions
+* No install packages
+
