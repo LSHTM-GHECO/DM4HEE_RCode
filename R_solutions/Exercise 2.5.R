@@ -50,7 +50,7 @@ tp.C2D <- alpha.C2D / C.sum ## transition probability of C to D
 c.dmca <- 1701  ## Direct medical costs associated with state A
 c.dmcb <- 1774  ##Direct medical costs associated with state B
 c.dmcc <- 6948  ## Direct medical costs associated with stateC
-c.dmc<-c(c.dmca, c.dmcb, c.dmcc,0) ## A vector storing the direct costs associated with each state
+c.dmc <- c(c.dmca, c.dmcb, c.dmcc,0) ## A vector storing the direct costs associated with each state
                           ## the order is important as these will be multiplied according to 
                           ## matrix multiplication 
                           ## (e.g. first value in dmc - direct medical cost of A - will be multiplied by 
