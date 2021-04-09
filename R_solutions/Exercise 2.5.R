@@ -51,10 +51,10 @@ c.dmca <- 1701  ## Direct medical costs associated with state A
 c.dmcb <- 1774  ##Direct medical costs associated with state B
 c.dmcc <- 6948  ## Direct medical costs associated with stateC
 c.dmc <- c(c.dmca, c.dmcb, c.dmcc,0) ## A vector storing the direct costs associated with each state
-                          ## the order is important as these will be multiplied according to 
-                          ## matrix multiplication 
-                          ## (e.g. first value in dmc - direct medical cost of A - will be multiplied by 
-                          ## first value in a matrix that represents number of cases in state A) 
+## the order is important as these will be multiplied according to 
+## matrix multiplication 
+## (e.g. first value in dmc - direct medical cost of A - will be multiplied by 
+## first value in a matrix that represents number of cases in state A) 
 c.ccca <- 1055 ## Community care costs associated with state A
 c.cccb <- 1278 ## Community care costs associated with state B
 c.cccc <- 2059 ## Community care costs associated with state C
@@ -64,7 +64,7 @@ c.ccc <- c(c.ccca, c.cccb, c.cccc, 0) ## A vector storing the community costs as
 c.AZT <- 2278  ### Zidovudine drug cost
 c.LAM <- 2086.5 ## Lamivudine drug cost 
 c.azt <- c(c.AZT, c.AZT, c.AZT, 0) ## A vector of Lamivudine drug costs per state
-                              ## Notice how the final death state has £0 cost
+## Notice how the final death state has £0 cost
 c.lam <- c(c.LAM, c.LAM, c.LAM, 0) ## A vector of Lamivudine drug costs per state
 
 ### OTHER PARAMETERS #######
@@ -72,12 +72,14 @@ RR <- 0.509 ## Treatment effect (RR)
 dr.c <- 0.06 ## Annual discount rate - costs (%)
 dr.o <- 0  ## Annual discount rate - benefits (%) 
 
-#  Seed the starting states of the model (cycle 0)
-seed <- c(1,0,0,0) ## i.e. everyone starts in State A
+
 
 ####**** MARKOV MODEL ****######
 #  Set the total number of cycles for the model to run
 cycles <- 20 ## i.e. we want to run the model for each year for 20 years
+
+#  Seed the starting states of the model (cycle 0)
+seed <- c(1,0,0,0) ## i.e. everyone starts in State A
 
 #  Now create a transition matrix for the AZT arm
 #  This shows the probability of transitioning from one state to another 
