@@ -1,0 +1,16 @@
+---
+title: "R Stream of Decision Modelling for Health Economic Evaluation Reader - Foundation Course"
+author: "Nichola Naylor & Jack Williams"
+date: "09/04/2021"
+output: html_document
+#  pdf_document: default
+#  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Course Reader 
+
+Text about the course generally & R resouces:
