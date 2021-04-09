@@ -27,7 +27,6 @@ Use the data given below to populate the model and calculate the incremental cos
 These were calculated from the counts of individuals that were observed to move between the four health states each year in a longitudinal data set from the Chelsea and Westminster hospital in London.  
 These counts are given in **Table 2.5** and you should be able to verify that these counts give the transition probabilities presented in **Table 2.2 part 1(a)**.
 
-**(R code for table 2.5)**
 ```{r, echo=FALSE}
 table <- matrix(data = c(1251, 350, 116, 17,
                          0, 731, 512, 15, 
