@@ -3,12 +3,6 @@
 # This is a series of functions that use ggplot to create graphs
 # ggplot is more flexible than base R plots, and allows users to specify many of options
 
-# There are lots of ways in which ggplot can be used in data visualisation, and 
-# so many options and details that this course won't be able to explore. 
-# However, for those interested, there is an excellent chapter on data visualiation chapter of 
-# the 'R for Data Science'  book, available here: 
-# https://r4ds.had.co.nz/data-visualisation.html
- 
 
 
 # Install package and load library
