@@ -12,26 +12,22 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## Course Reader 
+
 Text about the course generally & R resouces:
 
-> Opening R projects
-Notes for intro pack:
-> Intro into the R project and then some code for how to set working directory (R) 
-> array, Vector, matrix, variable difference and 1 sentence etc.
-> Base r functions used a lot - e.g. rnorm() , rgamma() etc. 
-> direct to DART resources
-> pictures and bright colours 
-> installing packages (and list of packages needed across the exercises)
+I wonder if there is some generic text we can find for the course (?)
 
-
+\  
 
 ## R project and working directory
 
+\  
 
 #### Opening an R project 
 
 Something about R projects here 
 
+\  
 
 #### Working directory
 
@@ -42,13 +38,13 @@ If you want to manually set the working directory, then you can use the setwd() 
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 ```
 
-
+\  
 
 ## Installing packages 
 
 Although within the course we try to mostly use base R functions, we will need to use packages for some exercises. 
 
-These packages can be installed using the following code. 
+The following packages are used in the course and can be installed using the following code. 
 
 ```{r, eval = FALSE} 
 install.packages(tidyr)
@@ -58,20 +54,80 @@ install.packages(ggplot2)
 install.packages(reshape2)
 ```
 
+\  
 
-## Key Base R functions
+## Key Base R functions (what do we want to add here? Could be a bit tedious...?)
 
 We will use many base R functions throughout the course. You can see a simple cheat sheet here:
 https://www.rstudio.com/wp-content/uploads/2016/10/r-cheat-sheet-3.pdf 
 
 
+**Vector**
+```{r, echo=TRUE}
+(vector <- c(1, 2, 3))
+```
 
+
+**Matrix**
+```{r, echo=TRUE}
+matrix(1:9, nrow = 3, ncol = 3)
+```
+
+
+**Data frame (combining different classes of data)**
 ```{r, echo=TRUE}
 
-mean(c(1,2,5))
+tx <- c("No treatment", "Treatment 1", "Treatment 2", "Treatment 3")
+cost <- c(0, 500, 1500, 7500)
+duration.months <- c(0, 1, 1, 0.5)
 
+data.frame(tx, cost, duration.months)
+```
+
+
+**Array (a multi-dimenesional matrix) - the dim (dimensions) aspects indicates rows, columns, matrix numbers**
+```{r, echo=TRUE}
+array(1:18, dim = c(3, 3, 2))
+
+array(1:16, dim = c(2, 2, 3))
 
 ```
+
+\  
+
+## Subsetting and selecting data 
+
+Another important aspect of the course is selecting the appropraite data. For the various vectors, data frames and arrays, here are some selections of data
+
+
+**Vector**
+```{r, echo=TRUE}
+
+(vector <- c(10, 20, 30, 40))
+vector[2] # Takes the second element of the vector
+vector[3:4] # Takes the third and fourth element of the vector
+
+```
+**Data frame**
+```{r, echo=TRUE}  
+df <- data.frame(tx, cost, duration.months)
+print(df)
+df[3,] # Third row (all columns)
+df[,2] # Second column (all rows)
+df[3,2] # Third row and second column value
+
+df$cost # We can also call columns by their column name 
+```
+**Array**
+```{r, echo=TRUE}  
+ar <- array(1:18, dim = c(3, 3, 2))
+print(ar)
+ar[1,,2] # first row, of second matrix
+ar[,,1] # All rows, all columns, first matrix
+
+```
+\  
+
 ## Probabilistic modelling and sampling from random draws
 
 In module X we will learn about probabilistic modelling, to account for parameter uncertainty in decision models. 
@@ -90,5 +146,24 @@ rbeta(n = 8, shape1 = 1, shape2 = 19)
 rgamma(n = 8, shape = 25, scale = 40)
 
 ```
+\  
 
+## Direct to DART materials - Nichola to add
+
+Nichola to add
+
+\  
+
+## Plots 
+
+In the course we will use a mixture of base R plots and plots using a package called ggplot. 
+
+The base R plots are simple to create and provide an easy way to look at the data. 
+
+ggplot is a much more flexible package that has many more options within plots. This allows the user to edit every aspects of the plot to get it exaclty how they want it. Whilst this is really helpful for data visualisation and producing great plots, hte number of options are extensive and we won't have time to cover them in any detail in this course. 
+
+For those interested in learning more about ggplot, there is an excellent chapter on data visualiation chapter in the 'R for Data Science'  book, available here: 
+https://r4ds.had.co.nz/data-visualisation.html
+
+\  
 
