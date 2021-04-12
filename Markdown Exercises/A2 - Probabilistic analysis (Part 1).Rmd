@@ -1,9 +1,11 @@
 ---
 title: "Probabilistic analysis (Part 1 / 4.7)"
 subtitle: "Advanced Course Module 2"
-author: "Jack"
+author: "Nichola Naylor & Jack Williams"
 date: "12 April 2021"
 output: html_document
+#  pdf_document: default
+#  html_document: default
 ---
 
 
@@ -18,9 +20,8 @@ The step-by-step guide below will take you through a number of stages of making 
 3. Using a beta distribution for the transition from AIDS to Death
 4. Using a Dirichlet distribution for the transition matrix
 
-A template for the exercise, ‘Exercise 4.7 – template.R’, is available, based on the solution to **Exercise 2.5** adapted to allow additional information to be entered (JACK - this needsd to be changed?).
+Open the file **‘Exercise 4.7 – template.R’**, to get started. 
 
-\  
 
 ## Step by step guide
 

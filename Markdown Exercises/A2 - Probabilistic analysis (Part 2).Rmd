@@ -1,9 +1,11 @@
 ---
 title: "Probabilistic analysis (Part 2 / 4.8)"
 subtitle: "Advanced Course Module 2"
-author: "Jack"
+author: "Nichola Naylor & Jack Williams"
 date: "12 April 2021"
 output: html_document
+#  pdf_document: default
+#  html_document: default
 ---
 
 ## Overview

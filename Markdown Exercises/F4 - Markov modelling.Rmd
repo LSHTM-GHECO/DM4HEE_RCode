@@ -1,7 +1,8 @@
 ---
-title: "Foundation Module 4: Markov Models"
+title: "Markov Models"
+subtitle: "Foundation Module 4"
 author: "Nichola Naylor & Jack Williams"
-date: "09/04/2021"
+date: "9 April 2021"
 output: html_document
 #  pdf_document: default
 #  html_document: default

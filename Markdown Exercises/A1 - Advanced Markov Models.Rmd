@@ -1,9 +1,13 @@
 ---
-title: "Advanced Course Module 1 - Advanced Markov Models"
-author: "Jack"
+title: "Advanced Markov Models"
+subtitle: "Advanced Course Module 1"
+author: "Nichola Naylor & Jack Williams"
 date: "9 April 2021"
 output: html_document
+#  pdf_document: default
+#  html_document: default
 ---
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
