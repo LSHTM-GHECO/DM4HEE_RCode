@@ -1,0 +1,168 @@
+---
+title: "Probabilistic analysis (Part 2 / 4.8)"
+subtitle: "Advanced Course Module 2"
+author: "Nichola Naylor & Jack Williams"
+date: "12 April 2021"
+output: html_document
+#  pdf_document: default
+#  html_document: default
+---
+
+## Overview
+
+The aim of this exercise is to demonstrate how the deterministic THR model from Exercise 3.5 can be made probabilistic by fitting distributions to parameters.  Emphasis is on choosing the correct distribution for different types of parameters and on correlating parameters using the Cholesky decomposition of a variance-covariance matrix.  
+
+The step-by-step guide below will take you through a number of stages of making the model probabilistic:
+
+1. Setting up the <Parameters> section for probabilistic analysis
+2. Fitting Beta distributions to (constant) probability parameters
+3. Fitting Gamma distributions to cost parameters
+4. Fitting Beta distributions to utility parameters
+5. Correlating parameters by Cholesky decomposition
+6. Application to the regression model for prosthesis survival
+
+A template for the exercise, ‘Exercise 4.8 – template.R’, is available, and builds upon the deterministic model developed in **Module 1 / Exercise 3.5**. Previously for the HIV/AIDs model, we utilised base R packages, here we now use 3 more useful packages for data manipulation - datatable, tidyr, and dplyr. 
+
+You can have a look on the internet (e.g. via Google) for more information on these. The following cheat sheets are available:
+
+Data table : https://s3.amazonaws.com/assets.datacamp.com/img/blog/data+table+cheat+sheet.pdf 
+
+dyplr and tidyr: https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf 
+
+
+## Step by step guide 
+
+(@) **Setting up the <Parameters> section for probabilistic analysis**
+
+Before working on the code within this section, open the “hazardfunction” CSV file in the **inputs folder** - these are the results from the regression analysis. You can also open the “cov55”  CSV files, which is the corresponding covariance matrix. Finally, the  “life-table” CSV file is also within the **inputs folder** of the project. Take a moment familiarise yourself with these data. You’ll first need to read in these data files using the read.csv functions. Convert the life-table from a data.frame into a data.table (as we will need to use data.table functionality for these data later on).
+
+Firstly, start by defining all parameters that are not drawn from distributions for the probabilistic analysis: patient characteristics (age & sex), discount rates and prosthesis costs - these are to be left deterministic.  Before starting on the exercise, ensure that you are totally happy with why these parameters will not form part of the probabilistic analysis.
+
+(@) **  Fitting Beta distributions to (constant) probability parameters ** 
+
+
+The following information has been provided to you concerning operative mortality rates following primary surgery:
+
+*'The hospital records of a sample of 100 patients receiving a primary THR were examined retrospectively.  Of these patients, two patients died either during or immediately following the procedure.  The operative mortality for the procedure is therefore estimated to be 2%.'*
+
+1) Use this information to specify the parameters (alpha and beta) of a beta distribution for the probability of operative mortality during primary surgery.
+
+ii) Use the `rbeta()` function to generate a random draw from this distribution.
+
+iii) Since no information is available on operative mortality following a revision procedure, use the same distribution again for this parameter.
+
+The following information has been provided to you concerning revision procedures among patients already having had a revision operation.
+
+*'The hospital records of a sample of 100 patients having experienced a revision procedure to replace a failed primary THR were reviewed at one year.  During this time, four patients had undergone a further revision procedure.'*
+
+iv) Use this information to fit a constant transition probability for the annual re-revision rate parameter.
+
+You should now have three probabilistic parameters (tp.PTHR2dead, tp.PTHR2dead and “tp.rrr), that should automatically generate a new value from the specified distribution when you rerun the random draw assignments for these values.
+
+v) Use the formula for the moments of a Beta distribution from **Section 4.3.2** in order to specify the mean and standard error for these distributions.
+
+vi) How do these compare with the means and standard errors that would have been calculated from these data using standard methods?
+
+Hint: in order to answer (vi) you need to recall that the binomial standard error is estimated from the formula:
+
+$$ SE = \sqrt{ p(1-p)/n } $$
+
+
+(@) **Fitting Gamma distributions to cost parameters**
+
+
+Since the costs of prostheses are handled deterministically, the cost of the primary procedure is ignored (since it is assumed to be the same in each arm) and there is assumed to be no cost of monitoring successful procedures, there is only really one probabilistic cost to specify for the model – the cost of the revision procedure.
+
+You are given the following information regarding the cost of revising a failed primary THR:
+
+*'A number of units involved in THR were reviewed and the average cost of a revision procedure was found to be £5,294 with a standard error of £1,487.*'
+
+
+i) Add the value for the standard error into the spreadsheet (cell E33).
+
+ii) Use the method of moments approach described in the presentation to calculate the parameters (alpha and beta) of a Gamma distribution that has the corresponding mean and standard error.
+
+iii)Use the rgamma() function to generate a random draw from this distribution.
+
+iv) Create a vector of costs that holds the costs for each state within the model
+
+
+An alternative approach would have been to fit a normal distribution for this parameter – do you think this would be valid in this case?
+
+(@) **Fitting Beta distributions to utility parameters**
+
+As was indicated in the presentation, there are two methods to fitting the beta distribution.  Here the second approach is taken using the method of moments to fit beta distributions to the utility data.
+
+You are given the following information on utilities for patients experiencing different states of the model:
+
+The following information has been provided to you concerning operative mortality rates following primary surgery:
+
+*'A study was instigated to explore the utility weights subjects placed on different outcomes of THR related to the states of the Markov model – the following results were calculated in terms of mean (se) by state:'*
+   
+  *'Successful primary – 0.85 (0.03)'*
+  
+  *'Successful revision – 0.75 (0.04)'*
+  
+  *'Revision – 0.3 (0.03)'*
+
+
+i) Enter the means and standard errors for these parameters 
+
+ii) Obtain the Beta parameters corresponding to these means and standard errors by method of moments. Use the rbeta() function in cells to generate random draws from these distributions. Do this first for utility of successful primary prosthesis, and repeat for the 2 other utility values that need specifying. 
+
+iii) Create a vector of utility values for the states of the model.
+
+(@) **Application of Cholesky to the regression model for prosthesis survival**
+
+
+We now implement the Cholesky decomposition matrix method in the model.  Look at the <Hazard function> section, which gives the results of a regression analysis for the hazard ratio.  You have used these results before when constructing the deterministic model, but now we have added the covariance matrix for the parameters.  It should be clear that, while some parameters do not have a strong relationship, there are strong relationships within this set of parameters – particularly between the regression constant and the other parameters.
+
+
+i) Note that the covariance matrix you have been given is a  matrix in cov55.csv.  To turn this into a lower triangular Cholesky decomposition of the covariance matrix we have presented 2 options; in the main script the `chol()` function [as a note you have to transpose the cov55 matrix before reading in and then transpose back to get the format of the lower triangular Cholesky decomposition due to the way the function reads in and outputs data], but to understand what is actually happening take a look at the cholesky_decomposition.R script in the “additional resources” folder of the project.  Take a few moments to understand how this was obtained (you may want to refer back to *Section 4.4.2 - JW I think this must be covered in one of the lectures so perhaps delete here?*).
+
+ii) Create a vector (z) or 5 random values drawn from the standard normal distribution using the `rnorm()` function.
+
+iii) Enter the solution of the  matrix calculation: that is the Cholesky decomposition matrix multiplied by the vector of standard normal variates (Hint: use %*% ).
+
+iv) Now add the estimated mean values from the regression to **Tz(?)**.
+
+v) You have now created a vector of five multivariate normal parameters that are correlated according to the estimated covariance matrix.  The final task is to link the probabilistic transition probabilities to the relevant cell of the vector you have just created.
+
+vi) Remember that we have been working on the log hazard scale for the Weibull regression.  We need to make sure that the model parameters are exponentiated.  Using the parameters just created assign values for lambda [Lambda parameter survival analysis (depends on chosen mix of above coefficients)], gamma [Ancilliary parameter in Weibull distribution] and rr.NP1 [Relative risk of revision for new prosthesis 1 compared to standard].
+
+
+(@) **Life-table transitions for background mortality**
+
+We can still employ time dependent transitions in other model state providing the time dependency relates to time in the model rather than time in the state itself.  This is the case for a background mortality rate, for example, which depends on the age of a subject rather than which state of the model they are in.  In this section we will illustrate the use of a time dependent transition to model background mortality in the model from a life-table.
+
+
+Open the 'Life tables' section of the code **(L156)** and familiarise yourself with the contents.  View the imported lifetable data.frame, containing the age-sex specific mortality rates taken from a standard life-table, published as deaths per thousand per year.  These are converted to the corresponding annual probabilities.  Notice the addition of an ‘Index’ column – the reason for this will become apparent.
+
+i) Create a vector (current.age) which combines the initial age of the cohort and their ages throughout the model
+
+ii) Using the data.table package function ‘roll’ we can create **???**, we have done this for you, but take a look at the functions used and the ‘death.risk’ data.table created to understand the process. You can find more information on the data.table package in the package manual - https://cran.r-project.org/web/packages/data.table/data.table.pdf 
+
+
+(@) **Buidling the Markov model**
+
+Using the same approach taken in Exercise 3.5 build the time-dependent transition probability data.table for standard and new prosthesis pathways.
+This time we will order the building of the transition matrices for each arm, then build the cost and effect matrices to multiply through (but the order doesn’t really matter in terms of construction and is down to preference).
+
+(@) **Estimating cost-effectiveness (deterministically)**
+
+The final section of this exercise is very straightforward.  We simply want to bring all the results together onto the 'Analysis' section of the code **(l327)**  for easy viewing.
+
+In the Analysis section, link the cells for costs and QALYs for the two different models using the named results cells. Calculate the incremental cost, incremental effect and the ICER.
+
+That’s it!  Your Markov model is now complete.  Re-run the script a few times to see the different outputs. Have a play with the patient characteristics to see how these influence the results.  Make sure you are clear in your own mind why patient characteristics influence the results. We will be returning to this issue of heterogeneity in some of the later exercises .
+
+
+
+** FILES NAMES NEED TO BE EDITED ACCORDING TO COURSE **
+
+## Additional notes 
+
+We’ve turned this probabilistic model into a simulation model in the R script <“4.8 with sim.R”>  and similarly have done the same for 4.7 in **<”4.7 with sim.R”>**, which can be found in the “additional_resources” folder. In the 4.7 example, the HIV model is wrapped up in a function  - so that the function can run the whole model script, the model code within the function  is the same as that in **4.7**., and similarly **4.8** with sim wraps the model we’ve created in **4.8** into a function. Once the model is in the function, the function can be called to easily produce the model results. 
+
+We can then create a loop to perform a large number of model simulations,and store the results of these simulations, for the probabilistic sensitivity analysis. It’s worth looking through the structure of 4.7 with sim and 4.8 with sim, we’ll be doing something similar to the THR model (Exercise 3.5 & 4.8) in the following exercises. As with many things in R, there will be many ways to run the probabilistic models over a number of runs. <4.7 with sim> and <4.8 with sim> start off by simply wrapping the models into a function, in later exercises we will start to try and increase the efficiency of the model runs by structuring our scripts and functions differently. 
+
