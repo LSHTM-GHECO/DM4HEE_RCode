@@ -14,7 +14,7 @@ library(reshape2)
 
 #  Reading the data needed from csv files
 hazards <- read.csv("inputs/hazardfunction.csv", header=TRUE) ## importing the hazard inputs from the regression analysis
-cov.55<-read.csv("inputs/cov55.csv",row.names=1,header=TRUE) ## importing the 
+cov.55 <- read.csv("inputs/cov55.csv",row.names=1,header=TRUE) ## importing the covariance matrix
 life.table <- read.csv("inputs/life-table.csv", header=TRUE)
 life.table<- as.data.table(life.table)
 
@@ -157,7 +157,11 @@ model.THR.f60 <- function() {
   ## creating an indicator which selects the death risk column depending on the sex the model is being run on
   col.key <- 4-male ## 4 indicates the 4th column of tdps (which is female risk of death)
   ## when male=1 (i.e. male selected as sex) this becomes the 3rd column (which is male risk of death)
-  
+
+  # Here we create an unamed vector with the risk of death for each cycle 
+  # This is an alternative way to selecting the mortality in the transition matrix below  
+  mortality.vec <- unname(unlist(death.risk[,..col.key]))
+
   #   STANDARD ARM
   #  Now create a transition matrix for the standard prosthesis arm
   #  We start with a three dimensional array in order to capture the time dependencies
@@ -168,21 +172,20 @@ model.THR.f60 <- function() {
   ### create a loop that creates a time dependent transition matrix for each cycle
   for (i in 1:cycles) {
     
-    mortality <- as.numeric(tdtps[i,..col.key]) 
     ## tranisitions out of P-THR
     tm.SP0["P-THR","Death",i] <- tp.PTHR2dead ## Primary THR either enter the death state or.. or..
     tm.SP0["P-THR","successP-THR",i] <- 1 - tp.PTHR2dead ## they go into the success THR state 
     ## transitions out of success-P-THR
     tm.SP0["successP-THR","R-THR",i] <- revision.risk.sp0[i]
-    tm.SP0["successP-THR","Death",i] <- mortality
-    tm.SP0["successP-THR","successP-THR",i] <- 1-revision.risk.sp0[i] - mortality
+    tm.SP0["successP-THR","Death",i] <- mortality.vec[i]
+    tm.SP0["successP-THR","successP-THR",i] <- 1-revision.risk.sp0[i] - mortality.vec[i]
     ## transitions out of R-THR 
-    tm.SP0["R-THR","Death",i] <- tp.RTHR2dead + mortality
-    tm.SP0["R-THR","successR-THR",i] <- 1 - tp.RTHR2dead - mortality 
+    tm.SP0["R-THR","Death",i] <- tp.RTHR2dead + mortality.vec[i]
+    tm.SP0["R-THR","successR-THR",i] <- 1 - tp.RTHR2dead - mortality.vec[i] 
     ## transitions out of success-THR
     tm.SP0["successR-THR","R-THR",i] <- tp.rrr
-    tm.SP0["successR-THR",5,i] <- mortality
-    tm.SP0["successR-THR","successR-THR",i] <- 1 - tp.rrr - mortality
+    tm.SP0["successR-THR",5,i] <- mortality.vec[i]
+    tm.SP0["successR-THR","successR-THR",i] <- 1 - tp.rrr - mortality.vec[i]
     
     tm.SP0["Death","Death",i] <- 1 ## no transitions out of death
   }
@@ -210,21 +213,20 @@ model.THR.f60 <- function() {
   ### create a loop that creates a time dependent transition matrix for each cycle
   for (i in 1:cycles) {
     
-    mortality <- as.numeric(tdtps[i,..col.key]) 
     ## tranisitions out of P-THR
     tm.NP1["P-THR","Death",i] <- tp.PTHR2dead ## Primary THR either enter the death state or.. or..
     tm.NP1["P-THR","successP-THR",i] <- 1 - tp.PTHR2dead ## they go into the success THR state 
     ## transitions out of success-P-THR
     tm.NP1["successP-THR","R-THR",i] <- revision.risk.np1[i] ## revision risk with NP1 treatment arm 
-    tm.NP1["successP-THR","Death",i] <- mortality
-    tm.NP1["successP-THR","successP-THR",i] <- 1 - revision.risk.np1[i] - mortality
+    tm.NP1["successP-THR","Death",i] <- mortality.vec[i]
+    tm.NP1["successP-THR","successP-THR",i] <- 1 - revision.risk.np1[i] - mortality.vec[i]
     ## transitions out of R-THR 
-    tm.NP1["R-THR","Death",i] <- tp.RTHR2dead + mortality
-    tm.NP1["R-THR","successR-THR",i] <- 1 - tp.RTHR2dead - mortality 
+    tm.NP1["R-THR","Death",i] <- tp.RTHR2dead + mortality.vec[i]
+    tm.NP1["R-THR","successR-THR",i] <- 1 - tp.RTHR2dead - mortality.vec[i] 
     ## transitions out of success-THR
     tm.NP1["successR-THR","R-THR",i] <- tp.rrr
-    tm.NP1["successR-THR",5,i] <- mortality
-    tm.NP1["successR-THR","successR-THR",i] <- 1 - tp.rrr - mortality
+    tm.NP1["successR-THR",5,i] <- mortality.vec[i]
+    tm.NP1["successR-THR","successR-THR",i] <- 1 - tp.rrr - mortality.vec[i]
     
     tm.NP1["Death","Death",i] <- 1 ## no transitions out of death
   }
@@ -308,8 +310,10 @@ for(i in 1:sim.runs)   simulation.results[i,] <- model.THR.f60()
 # so have adapted word doc so they don't do anything that involves ggplot functions for now
 # but we might want to adapt? in the excel they build these graphs but harder to do in R perhaps
 
+## JACK - yes let's chat about plots (and ggplot) tomorrow
+
 # simple base plot of incremental QALYs and costs
-plot(simulation.results$inc.QALYs,simulation.results$inc.cost)
+plot(simulation.results$inc.qalys,simulation.results$inc.cost)
 
 ## using pre-created ggplot2 functions for nicer cost-effectiveness plane graphs
 source("additional_resources/ggplot_CEA_functions.R")
@@ -355,8 +359,8 @@ for (i in 1:length(WTP.values)) {
 }
 
 # Display the top and bottom of the CEAC table
-head(CEAC, 10)
-tail(CEAC, 10)
+head(CEAC)
+tail(CEAC)
 
 
 # Plotting the CEAC with a plot function
@@ -430,6 +434,9 @@ model.THR <- function(age, male) {
   col.key <- 4-male ## 4 indicates the 4th column of tdps (which is female risk of death)
   ## when male=1 (i.e. male selected as sex) this becomes the 3rd column (which is male risk of death)
   
+  ## Create a vector with the mortality values at each age, to insert into time dependent transition matrix below
+  mortality.vec <- unname(unlist(death.risk[,..col.key]))
+  
   #   STANDARD ARM
   #  Now create a transition matrix for the standard prosthesis arm
   #  We start with a three dimensional array in order to capture the time dependencies
@@ -440,21 +447,20 @@ model.THR <- function(age, male) {
   ### create a loop that creates a time dependent transition matrix for each cycle
   for (i in 1:cycles) {
     
-    mortality <- as.numeric(tdtps[i,..col.key]) 
     ## tranisitions out of P-THR
     tm.SP0["P-THR","Death",i] <- tp.PTHR2dead ## Primary THR either enter the death state or.. or..
     tm.SP0["P-THR","successP-THR",i] <- 1 - tp.PTHR2dead ## they go into the success THR state 
     ## transitions out of success-P-THR
     tm.SP0["successP-THR","R-THR",i] <- revision.risk.sp0[i]
-    tm.SP0["successP-THR","Death",i] <- mortality
-    tm.SP0["successP-THR","successP-THR",i] <- 1-revision.risk.sp0[i] - mortality
+    tm.SP0["successP-THR","Death",i] <- mortality.vec[i]
+    tm.SP0["successP-THR","successP-THR",i] <- 1-revision.risk.sp0[i] - mortality.vec[i]
     ## transitions out of R-THR 
-    tm.SP0["R-THR","Death",i] <- tp.RTHR2dead + mortality
-    tm.SP0["R-THR","successR-THR",i] <- 1 - tp.RTHR2dead - mortality 
+    tm.SP0["R-THR","Death",i] <- tp.RTHR2dead + mortality.vec[i]
+    tm.SP0["R-THR","successR-THR",i] <- 1 - tp.RTHR2dead - mortality.vec[i]
     ## transitions out of success-THR
     tm.SP0["successR-THR","R-THR",i] <- tp.rrr
-    tm.SP0["successR-THR",5,i] <- mortality
-    tm.SP0["successR-THR","successR-THR",i] <- 1 - tp.rrr - mortality
+    tm.SP0["successR-THR",5,i] <- mortality.vec[i]
+    tm.SP0["successR-THR","successR-THR",i] <- 1 - tp.rrr - mortality.vec[i]
     
     tm.SP0["Death","Death",i] <- 1 ## no transitions out of death
   }
@@ -482,21 +488,20 @@ model.THR <- function(age, male) {
   ### create a loop that creates a time dependent transition matrix for each cycle
   for (i in 1:cycles) {
     
-    mortality <- as.numeric(tdtps[i,..col.key]) 
     ## tranisitions out of P-THR
     tm.NP1["P-THR","Death",i] <- tp.PTHR2dead ## Primary THR either enter the death state or.. or..
     tm.NP1["P-THR","successP-THR",i] <- 1 - tp.PTHR2dead ## they go into the success THR state 
     ## transitions out of success-P-THR
     tm.NP1["successP-THR","R-THR",i] <- revision.risk.np1[i] ## revision risk with NP1 treatment arm 
-    tm.NP1["successP-THR","Death",i] <- mortality
-    tm.NP1["successP-THR","successP-THR",i] <- 1 - revision.risk.np1[i] - mortality
+    tm.NP1["successP-THR","Death",i] <- mortality.vec[i]
+    tm.NP1["successP-THR","successP-THR",i] <- 1 - revision.risk.np1[i] - mortality.vec[i]
     ## transitions out of R-THR 
-    tm.NP1["R-THR","Death",i] <- tp.RTHR2dead + mortality
-    tm.NP1["R-THR","successR-THR",i] <- 1 - tp.RTHR2dead - mortality 
+    tm.NP1["R-THR","Death",i] <- tp.RTHR2dead + mortality.vec[i]
+    tm.NP1["R-THR","successR-THR",i] <- 1 - tp.RTHR2dead - mortality.vec[i]
     ## transitions out of success-THR
     tm.NP1["successR-THR","R-THR",i] <- tp.rrr
-    tm.NP1["successR-THR",5,i] <- mortality
-    tm.NP1["successR-THR","successR-THR",i] <- 1 - tp.rrr - mortality
+    tm.NP1["successR-THR",5,i] <- mortality.vec[i]
+    tm.NP1["successR-THR","successR-THR",i] <- 1 - tp.rrr - mortality.vec[i]
     
     tm.NP1["Death","Death",i] <- 1 ## no transitions out of death
   }
@@ -548,9 +553,9 @@ model.THR <- function(age, male) {
 }
 
 
-sim.runs <- 1000 
+sim.runs <- 1000
 
-# CREATE ARRAY 
+# CREATE ARRAY TO STORE THE RESULTS OF THE MODEL IN EACH SUBGROUP
 
 subgroups.names <- c("Male 40", "Male 60", "Male 80", "Female 40", "Female 60", "Female 80")
 subgroups.n <- length(subgroups.names)
@@ -558,14 +563,14 @@ subgroups.n <- length(subgroups.names)
 simulation.subgroups <- array(data = 0, dim = c(sim.runs, 2, subgroups.n),
                               dimnames = list(1:sim.runs, c("inc.cost","inc.qalys"),subgroups.names))
 
-# Run model for each subgroup, and record results within the array
+# Run model for each subgroup, inputting the age and sex into the function, and record results within the array
 for(i in 1:sim.runs){
-  simulation.subgroups[i,,1] <- model.THR(40,1)
-  simulation.subgroups[i,,2] <- model.THR(60,1)
-  simulation.subgroups[i,,3] <- model.THR(80,1)
-  simulation.subgroups[i,,4] <- model.THR(40,0)
-  simulation.subgroups[i,,5] <- model.THR(60,0)
-  simulation.subgroups[i,,6] <- model.THR(80,0)
+  simulation.subgroups[i,,1] <- model.THR(age = 40, male = 1)
+  simulation.subgroups[i,,2] <- model.THR(age = 60, male = 1)
+  simulation.subgroups[i,,3] <- model.THR(age = 80, male = 1)
+  simulation.subgroups[i,,4] <- model.THR(age = 40, male = 0)
+  simulation.subgroups[i,,5] <- model.THR(age = 60, male = 0)
+  simulation.subgroups[i,,6] <- model.THR(age = 80, male = 0)
 }
 
 
@@ -592,7 +597,18 @@ for (i in 1:length(WTP.values)) {
 # Show the structure of the subgroup results 
 head(CEAC.subgroups)
 
-## Need to reshape the data from wide to long to use in ggplot 
+## Base R plot (col indicates colour, lty indicates linetype, where 1 = fill and 2 = dasshed) 
+
+plot(CEAC.subgroups$WTP, CEAC.subgroups$`Male 40`, type="l", ylim = c(0,1), col = "red", lty = 2)
+  lines(CEAC.subgroups$WTP, CEAC.subgroups$`Male 60`, col = "blue", lty = 2)
+  lines(CEAC.subgroups$WTP, CEAC.subgroups$`Male 80`, col = "green", lty = 2)
+  lines(CEAC.subgroups$WTP, CEAC.subgroups$`Female 40`, col = "red", lty = 1)
+  lines(CEAC.subgroups$WTP, CEAC.subgroups$`Female 60`, col = "blue", lty = 1)
+  lines(CEAC.subgroups$WTP, CEAC.subgroups$`Female 80`, col = "green", lty = 1)
+
+## Alternative ggplot function for CEAC  
+    
+## We need to reshape the data from wide to long to use in ggplot 
 CEAC.subgroups.long <- melt(CEAC.subgroups, id.vars = c("WTP"))
 colnames(CEAC.subgroups.long) <- c("WTP", "subgroup", "pCE")
 head(CEAC.subgroups.long)
