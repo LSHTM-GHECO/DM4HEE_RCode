@@ -1,0 +1,22 @@
+---
+title: "Expected Value of Clinical & Diagnostic Information"
+subtitle: "Foundation Course Module 4"
+author: "Jack Williams & Nichola Naylor"
+date: "14 April 2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Overview 
+
+
+The aim of this exercise is to reproduce the calculations that underlie the slides presented in the didactic session, including trading sensitivity and specificity in order to choose an optimal point on the ROC curve.
+
+/ Excel functions & commands used in this exercise:	
+
+
+## Step by step guide 
