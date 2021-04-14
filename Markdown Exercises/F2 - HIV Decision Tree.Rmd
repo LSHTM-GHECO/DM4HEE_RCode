@@ -1,9 +1,14 @@
 ---
 title: "Building a decision tree model of antenatal HIV transmission"
-subtitle: "Exercise F2"
+subtitle: "Foundation Course Module 2"
 author: "Jack Williams"
 date: "14 April 2021"
 output: html_document
+header-includes:
+  - \usepackage{titling}
+  - \pretitle{\begin{center}
+    \includegraphics[width=2in,height=2in]{logo.png}\\}
+  - \posttitle{\end{center}}
 ---
 
 ```{r setup, include=FALSE}
@@ -60,3 +65,11 @@ Since coding in R can make it difficult to visualise the model structure, we hav
 ## Alternative ways for creating decision trees in R 
 
 ** something about using vectors to calcualte all the options within R **
+
+
+<script>
+   $(document).ready(function() {
+     $head = $('#header');
+     $head.prepend('<img src=\"logo.png\" style=\"float: right;width: 150px;\"/>')
+   });
+</script>
