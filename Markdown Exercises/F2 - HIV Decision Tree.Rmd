@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Imagine that you have been asked to advise local decision-makers on the cost-effectiveness of antenatal HIV testing (i.e. testing pregnant women for the HIV virus).  You undertake a Medline search to identify published economic evaluations - but find nothing to help you in your analysis.  You quickly realise that you will have to undertake a decision analysis of your own using data from available data sources.
 
-## Data
+### Data
 
 From a Medline search you identify publications that provide you with the following information:
 
@@ -26,7 +26,7 @@ From a Medline search you identify publications that provide you with the follow
 
 * A published paper suggests that the prevalence of undetected HIV in the antenatal population in your area is 5%.
 
-### Assumtpions 
+### Assumptions 
 
 Discussions with professional staff indicate that the following assumptions can be justified:
 
@@ -35,13 +35,28 @@ Discussions with professional staff indicate that the following assumptions can 
 * All women who are tested positive will be offered risk-reduction interventions.  
 
 
+### Figure of decision tree to create 
+
+Since coding in R can make it difficult to visualise the model structure, we have provided the decision tree and conditional probabilities for each branch below: 
+
+![](DecisionTreeHIV.png)
+
+
+\  
+
 ## Task
 
-* Structure a decision tree characterising the decision regarding whether or not to offer antenatal HIV testing.
+* Create each pathway for the decision tree _(Hint: we have provided a naming convention, working through pathways 1 to 5 for the intervention arm and paths 1 to 3 for the no intervention arm)_
 
-*	Evaluate the tree to calculate the expected cost per HIV infected child avoided.
+*	Evaluate each decision tree pathway and calcualte the estimated costs and cases associated with the intervention versus no intervention
+
+* Calculate the incremental costs and the cases avoided, and calcualte the expected cost per HIV infected child avoided. 
 
 *	What are likely to be the key sensitivity analyses to undertake?
 
 *	What are the weaknesses of the analysis?
 
+
+## Alternative ways for creating decision trees in R 
+
+** something about using vectors to calcualte all the options within R **
