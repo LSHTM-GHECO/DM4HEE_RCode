@@ -1,5 +1,6 @@
-## F4 Diagnostics 
-
+#  DM4HEE 
+#  Foundation Exercise 4 - Value of Diagnostics
+#  Author: Jack Williams and Nichola Naylor
 
 
 #### Model Parameters #### 
