@@ -27,7 +27,6 @@ parameter.values
 
 treat.cost <- prevalence * expected.cost[1] + (1 - prevalence) * expected.cost[3]
 notreat.cost <- prevalence * expected.cost[2] + (1 - prevalence) * expected.cost[4]
-
 treat.qaly <- prevalence * expected.qaly[1] + (1 - prevalence) * expected.qaly[3]
 notreat.qaly <- prevalence * expected.qaly[2] + (1 - prevalence) * expected.qaly[4]
 
@@ -86,18 +85,21 @@ est.nmb <- function(prev, parameters = parameter.values, lam = lambda){
 est.nmb(prev = 0.1)
 est.nmb(prev = 0.4)
 
-
 # Now pass a vector of prevalence values into the function
 prevalence.vector <- seq(from = 0, to = 1, by = 0.05)
 
-est.nmb(prev = prevalence.vector)
-
-# Save this output, so that we can create a plot
+# estimate the NMB across prevalence values, and save this 
 no.test.nmb <- est.nmb(prev = prevalence.vector)
+no.test.nmb
 
 
-
-### PLOT ? #### 
+# We can create a plot in base R to observe the results
+# Note - we will be updating this plot in the next section
+plot(no.test.nmb$prevalence, no.test.nmb$nmb.treat, type="l", col = "blue", ylim = c(0, 30000))
+  lines(no.test.nmb$prevalence, no.test.nmb$nmb.notreat, col = "red")
+  legend(0.7, 30000, legend=c("Treat all", "Treat none"), col=c("blue", "red"), 
+         lty = 1, cex = 0.8)
+  
 
 
 #### Expected value of a perfect test ####
@@ -151,16 +153,28 @@ no.test.nmb
 perfect.test.nmb
 
 
+## We can also plot the results of the these tables
+
+plot(no.test.nmb$prevalence, no.test.nmb$nmb.treat, type="l", col = "blue", ylim = c(0, 30000))
+lines(no.test.nmb$prevalence, no.test.nmb$nmb.notreat, col = "red")
+lines(perfect.test.nmb$prevalence, perfect.test.nmb$nmb, col = "dark green")
+legend(0.7, 30000, legend=c("Treat all", "Treat none", "Perfect test"), col=c("blue", "red", "dark green"), 
+       lty = 1, cex = 0.8)
+
+
+
+
 ## We can now compare this to the values expected from a perfect test
 evpdi <- perfect.test.nmb$nmb - no.test.nmb$nmb.max
 
+# and create a data.frame to store the results
 evpdi.table <- data.frame(prevalence = prevalence.vector, evpdi = evpdi)
-
-# Here is the table EVPDI
 evpdi.table
 
+# We can create a simple plot of the expected value of perfect diagnostic information, by prevalence:
+plot(evpdi.table, type="l", col = "blue", ylim = c(0, 3000))
 
-## PLOT? ## 
+
 
 #### Expected Value of Clinical Information (EVCI) from an (imperfect) diagnostic test ####
 
@@ -184,7 +198,10 @@ biomarker.dist <- data.frame(diagnostic.threshold, diagnostic.pos, diagnostic.ne
 # We can view the table, and round to 4 decimal places to help view the numbers
 round(biomarker.dist, 4)
 
-# And here we can plot the numbers to re-create the video
+# And here we can plot the numbers to re-create the video 
+# (note we can use the data frame columns (biomarker.dist), or the vectors that formed the data frame)
+plot(diagnostic.threshold, diagnostic.pos, type="l", col = "blue", ylim = c(0, 0.3))
+lines(diagnostic.threshold, diagnostic.neg, col = "red")
 
 
 ## True Positive Rate and False Positive Rate 
@@ -195,15 +212,15 @@ FPR <- 1 - pnorm(diagnostic.threshold, test.char[3], test.char[4])
 positive.rate <- data.frame(diagnostic.threshold, TPR, FPR)
 
 
-
-#### PLOT???? # 
-
+# Plot to view TPR and FPR (Receiver Operating Characteristic (ROC) curve)
+plot(FPR, TPR, type="l", col = "red")
+# and we can add a diagonal line too
+lines(c(0,1),(c(0,1)), col = "grey")
 
 
 #### Expected Value of Clinical Information #### 
 
-# We will now 
-
+# We can now estimate the number of true and false, negatives and positives 
 true.pos <- prevalence * TPR 
 false.neg <- prevalence * (1 - TPR) 
 false.pos <- (1 - prevalence) * FPR 
@@ -215,7 +232,6 @@ diag.accuracy <- data.frame(true.pos, false.neg, false.pos, true.neg,
 
 # Now combine the original NMB values (from parameter data frame) to estimate NMB as 
 # a function of the diagnostic accuracy 
-
 parameter.values$nmb 
 
 # To combine the NMB payoff values with the diagnostic accuracy data, we first create a blank 
@@ -240,10 +256,9 @@ data.frame(diagnostic.threshold, nmb.test.vec)
 diag.accuracy$nmb <- nmb.test.vec
 
 
-# Calculate the EVCI (?)
+# Calculate the EVCI
 
 # Now we want to calcualte the EVCI across a range of prevalence values
-
 no.test.nmb <- est.nmb(prev = prevalence.vector)
 
 
@@ -300,3 +315,19 @@ evci <- est.evci(prev = prevalence.vector)
 
 # You can view the results using the round function 
 round(evci, 2)
+
+
+# We can create a plot of the EVCI compared to the EVDI calculated earlier
+
+plot(evpdi.table, type="l", col = "blue", ylim = c(0, 3000))
+lines(evci$prev, evci$evci, col = "red")
+legend("topright", legend=c("EVDI", "EVCI"), col=c("blue", "red"), 
+       lty = 1, cex = 0.8)
+
+
+
+
+
+## ggplots (if time) 
+
+## Jack to add ggplots code and do a facet wrap to show them all... 
