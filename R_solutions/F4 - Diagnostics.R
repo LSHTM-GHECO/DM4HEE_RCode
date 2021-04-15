@@ -162,8 +162,6 @@ legend(0.7, 30000, legend=c("Treat all", "Treat none", "Perfect test"), col=c("b
        lty = 1, cex = 0.8)
 
 
-
-
 ## We can now compare this to the values expected from a perfect test
 evpdi <- perfect.test.nmb$nmb - no.test.nmb$nmb.max
 
@@ -190,18 +188,18 @@ diagnostic.threshold <- seq(from = -4, to = 4, by = 0.25)
 
 # Diagnostic positive and negative values, at different diagnostic thresholds
 # These are estimated using the normal distribution 
-diagnostic.pos <- prevalence * dnorm(diagnostic.threshold, mean = test.char[1], sd = test.char[2])
-diagnostic.neg <- (1 - prevalence) * dnorm(diagnostic.threshold, mean = test.char[3], sd = test.char[4])
+dis.pos <- prevalence * dnorm(diagnostic.threshold, mean = test.char[1], sd = test.char[2])
+dis.neg <- (1 - prevalence) * dnorm(diagnostic.threshold, mean = test.char[3], sd = test.char[4])
 
-biomarker.dist <- data.frame(diagnostic.threshold, diagnostic.pos, diagnostic.neg)
+biomarker.dist <- data.frame(diagnostic.threshold, dis.pos, dis.neg)
 
 # We can view the table, and round to 4 decimal places to help view the numbers
 round(biomarker.dist, 4)
 
 # And here we can plot the numbers to re-create the video 
 # (note we can use the data frame columns (biomarker.dist), or the vectors that formed the data frame)
-plot(diagnostic.threshold, diagnostic.pos, type="l", col = "blue", ylim = c(0, 0.3))
-lines(diagnostic.threshold, diagnostic.neg, col = "red")
+plot(diagnostic.threshold, dis.pos, type="l", col = "blue", ylim = c(0, 0.3))
+lines(diagnostic.threshold, dis.neg, col = "red")
 
 
 ## True Positive Rate and False Positive Rate 
@@ -369,7 +367,7 @@ evdi.plot  <-  ggplot(evci.plot.data.long) +
         axis.title.y = element_text(margin = margin(t = 0, r = 7, b = 0, l = 3)), 
         panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
         legend.key.width=unit(1.8,"line"), text = element_text(size=12)) + 
-  scale_x_continuous(expand = c(0, 0.1)) + 
+  scale_x_continuous(expand = c(0, 0)) + 
   scale_y_continuous(limits = c(-1,3000), expand = c(0, 0))
 
 evdi.plot
