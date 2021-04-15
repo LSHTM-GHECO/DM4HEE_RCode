@@ -167,11 +167,15 @@ evpdi.table
 test.char <- c(positive.mean = 1, positive.sd = 1, 
                negative.mean = -1, negative.sd = 1)
 
+# You can see the test characteristics here
 test.char
 
+
+# Set a range of diagnostic threshold values
 diagnostic.threshold <- seq(from = -4, to = 4, by = 0.25)
 
-
+# Diagnostic positive and negative values, at different diagnostic thresholds
+# These are estimated using the normal distribution 
 diagnostic.pos <- prevalence * dnorm(diagnostic.threshold, mean = test.char[1], sd = test.char[2])
 diagnostic.neg <- (1 - prevalence) * dnorm(diagnostic.threshold, mean = test.char[3], sd = test.char[4])
 
@@ -180,42 +184,60 @@ biomarker.dist <- data.frame(diagnostic.threshold, diagnostic.pos, diagnostic.ne
 # We can view the table, and round to 4 decimal places to help view the numbers
 round(biomarker.dist, 4)
 
-## TPR and FPR 
+# And here we can plot the numbers to re-create the video
 
+
+## True Positive Rate and False Positive Rate 
 TPR <- 1 - pnorm(diagnostic.threshold, test.char[1], test.char[2])
 FPR <- 1 - pnorm(diagnostic.threshold, test.char[3], test.char[4])
 
 # We can view these alongside the diagnostic thresholds 
-data.frame(diagnostic.threshold, TPR, FPR)
+positive.rate <- data.frame(diagnostic.threshold, TPR, FPR)
+
+
+
+#### PLOT???? # 
+
+
+
+#### Expected Value of Clinical Information #### 
+
+# We will now 
 
 true.pos <- prevalence * TPR 
 false.neg <- prevalence * (1 - TPR) 
 false.pos <- (1 - prevalence) * FPR 
 true.neg <- (1 - prevalence) * (1 - FPR) 
 
-# Table showing diagnostic accuracy 
-diag.accuracy <- data.frame(diagnostic.threshold, true.pos, false.neg, false.pos, true.neg,
+# Table showing diagnostic accuracy of the imperfect test
+diag.accuracy <- data.frame(true.pos, false.neg, false.pos, true.neg,
                             nmb.test = 0)
 
+# Now combine the original NMB values (from parameter data frame) to estimate NMB as 
+# a function of the diagnostic accuracy 
 
-# Estimate the NMB as a function of the diagnostic accuracy 
+parameter.values$nmb 
 
+# To combine the NMB payoff values with the diagnostic accuracy data, we first create a blank 
+# vector to store the total NMB value at each diagnostic threshold
 nmb.test.vec <- rep(0, length(diagnostic.threshold))
 
+# Next, we can create a loop to multiply NMB payoffs with diagnostic accuracy, and save the sum of
+# these values, at each diagnostic threshold
 for(i in 1:length(diagnostic.threshold)){
-  nmb.test.vec[i] <- sum(diag.accuracy[i,2:5] * parameter.values$nmb)
+  nmb.test.vec[i] <- sum(diag.accuracy[i,] * parameter.values$nmb)
 }  
 
 ## Note: An alternative method is to write a function into apply      
-nmb.test.vec <- apply(diag.accuracy[,2:5], 1, function(x) sum(x * parameter.values$nmb))
+nmb.test.vec <- apply(diag.accuracy, 1, function(x) sum(x * parameter.values$nmb))
 
 
-# We can view the NMB here
+# We can view the output of the calculation here
+# This is the NMB associated with the imperfect diagnostic test
 data.frame(diagnostic.threshold, nmb.test.vec)    
 
-
-
-diag.accuracy$nmb <- nmb.test
+# We can add these results onto the diagnostic accuracy data.frame 
+diag.accuracy$nmb <- nmb.test.vec
 
 
 # Calculate the EVCI (?)
@@ -225,8 +247,14 @@ diag.accuracy$nmb <- nmb.test
 no.test.nmb <- est.nmb(prev = prevalence.vector)
 
 
-est.EVCI <- function(prev, diag = diagnostic.threshold, test = test.char, 
-                     nmb.input = parameter.values$NMB, nmb.notest = no.test.nmb){
+# The est.evci function below calculates the diagnostic accuracy and associated NMB 
+# of an imperfect test (similar to calculations above) and also estimates the NMB 
+# in the absense of any test, to estimate the Expected Value of Clinical Information 
+# The function also does this at different prevalence values (by passing the prevalence)
+# to the function (indicated by 'prev' argument)
+
+est.evci <- function(prev, diag = diagnostic.threshold, test = test.char, 
+                     nmb.input = parameter.values$nmb, nmb.notest = no.test.nmb){
 
   # true and false positive rate
   TPR <- 1 - pnorm(diag, test[1], test[2])
@@ -249,16 +277,26 @@ est.EVCI <- function(prev, diag = diagnostic.threshold, test = test.char,
   
   max.nmb.test <- apply(total.nmb.matrix, 2, max) # this derives the maximum value from each column 
   
-  nmb.notest <- est.NMB(prev = prev)
+  nmb.notest <- est.nmb(prev = prev)
   
   max.nmb.notest <- apply(nmb.notest[,2:3], 1, max) # this derives the maximum value for each row (prevalence by rows in this table)
   
-  EVSI <- data.frame(prev, EVSI = max.nmb.test - max.nmb.notest)
+  evci <- data.frame(prev, 
+                     nmb.notest = max.nmb.notest, 
+                     nmb.imperfect.test = max.nmb.test,
+                     evci = max.nmb.test - max.nmb.notest)
   
-  return(EVSI)
+  return(evci)
     
 }
 
 
-est.EVCI(prev = prevalence.vector)
+# Try the est.EVCI at the 30% prevalence 
+est.evci(prev = 0.3)
 
+
+# Save the EVCI results across a range of prevalence
+evci <- est.evci(prev = prevalence.vector)
+
+# You can view the results using the round function 
+round(evci, 2)

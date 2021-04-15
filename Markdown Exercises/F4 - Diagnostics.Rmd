@@ -8,6 +8,11 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+```{r, include=FALSE}
+source("../R_solutions/F4 - Diagnostics.R", local = knitr::knit_global())
 ```
 
 
@@ -62,15 +67,75 @@ If a perfect test were to exist then all sick patients would receive treatment a
 
 In this example, we will assume that all sick patients are treated, and that all healthy patients are not. 
 
-(i)	 Open the 'est.nmb.perfect.test' function, and compare it to the 'est.nmb' function above. 
+i)	 Open the 'est.nmb.perfect.test' function, and compare it to the 'est.nmb' function above. 
 
-(ii)	Run the function, using the a specific prevalence. How does this NMB compare to the previous function, and why? 
+ii)	Run the function, using the a specific prevalence. How does this NMB compare to the previous function, and why? 
 
-(iii)	Now run the function using the vector of prevalence values that you created eaerlier ('prevalence.vector'). This now shows the expected value of a perfect test, across different prevalences.  
+iii) Now run the function using the vector of prevalence values that you created eaerlier ('prevalence.vector'). This now shows the expected value of a perfect test, across different prevalences.  
 
 Next we will estimate the Expected Value of Perfect Diagnostic Information (EVPDI) - which is simply the difference between the expected value of a perfect test and the expected value of the optimal course of action ('Treat All' or 'Treat None') in the absence of a test.
 
-(iv)	 Save this as a data.frame, and then we can create a plot to observe the results. 
+iv)	 Save this as a data.frame, and then we can create a plot to observe the results. 
 
 
-### 3. Expected value of perfect diagnostic information 
+### 3. Test accuracy for imperfect tests
+
+
+Diagnostic tests typically measure the value of a biomarker that is present in both health and sick individuals – for example blood glucose levels in diabetes.  However, it is rare that such biomarkers perfectly distinguish those with the condition from those without.
+
+We can define the test characteristics, using a mean and standard deviation for the biomarker. These are provided in the 'test.char' vector. These are (highly) stylised distribution parameters for a biomarker in the disease positive and disease negative populations.
+
+These parameters assume the biomarker is distributed normally in both populations given the mean and standard deviation parameters defined, and the prevalence of disease. 
+
+**Table showing the biomarkers characteristics?**
+
+i)	Plot the distributions on a chart and verify you get the same as those presented in the teaching session (you will need to set the prevalence to 30% (0.3) if you have changed the original prevalence). 
+
+ii)	Assuming a diagnostic threshold of 0 ensure you can identify the True Positives, True Negatives, False Positives and False Negatives as per the video presentation. __(JW - ????)__
+
+iii) Now we can estimate the TPR - True Positive Rate  (i.e. sensitivity) and the FPR - False Positive Rate  (1- specificity)  *(Hint: you need to use the cumulative version of the normal distribution (this is the 'pnorm' function in R).  Make sure you understand why!)*
+
+iv) We can now save the TPR and FPR, and create a Receiver Operating Characteristic (ROC) curve, using the base R plot. 
+
+
+### 4. Expected Value of Clinical Information 
+
+
+Just as we did for a perfect test, we can also calculate the value of information provided by an imperfect test.   However, this time we need to allow for the error rates (false positives and false negatives) that will result in some patients not getting optimal treatment.
+
+
+
+(i)	Using the error rates specified earlier (True Positive Rate and False Positive Rate), calculate the pathway probabilities for true positives (TP), false positive (FP), false negatives (FN), and True negatives (TN). Note that these probabilities are based upon the prevalence of disease. 
+
+ii) We can now use the TP, FP, FN, and TN to calculate the expected NMB of the imperfect test at each diagnostic threshold. This will involve getting the NMB payoff parameters assigned in at the start of the exercise. Once these have 
+
+```{r, echo = TRUE}
+parameter.values
+````
+
+iii) Create a blank vector (the same length as the diagnostic threshold vector) to store the total NMB  results across each diagnostic threshold. 
+
+iv) Create a loop to calculate the NMB associated with each TP, FP, FN, TN, and sum these to give the total NMB. This is the NMB of the imperfect test across the diagnostic thresholds. *Note: There are other ways to estimate the NMB, instead of using a loop. One example is to use apply, and an example has been provided in the script.*/   
+
+
+<!-- (Hint: the formula you need to enter is essentially the ‘rollback’ of the decision tree for a diagnostic test as per the video presentation). -->
+
+The ‘optimised’ trade-off between sensitivity and specificity occurs when the NMB across the diagnostic threshold is maximised.  The difference between this value and the optimal strategy in the absence of a test (‘Treat All’ or ‘Treat None’) is the EVCI (Expected Value of Clinical Information).
+
+Since we want to calculate the EVCI for any given prevalence, a function is provided ('est.evci') that will estimate the TPR and FPR, and estimate the NMB at each diagnostic threshold (using the diagnostic accuracy data).  The first part of the function essentially repeats the tasks you have repeated above. 
+However, the function also calls an earlier function within in. This is the 'est.nmb' which was used to estimate the NMB in the absence of a test. 
+
+This function allows us to pass prevalence values as arguments, so that the function can estimate the EVCI at different prevalence values (or a range of prevalence values). 
+
+v) Use the 'est.evci' function and pass different prevalence values to it, to estimate the maximum NMB associated with 'no test' (by treating all or treating none) and the maximum NMB associated with the imperfect test. The difference between these values gives the EVCI. 
+
+
+
+<script>
+   $(document).ready(function() {
+     $head = $('#header');
+     $head.prepend('<img src=\"logo.png\" style=\"float: right;width: 150px;\"/>')
+   });
+</script>
+
+
