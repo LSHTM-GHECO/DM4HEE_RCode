@@ -16,7 +16,61 @@ knitr::opts_chunk$set(echo = TRUE)
 
 The aim of this exercise is to reproduce the calculations that underlie the slides presented in the didactic session, including trading sensitivity and specificity in order to choose an optimal point on the ROC curve.
 
-/ Excel functions & commands used in this exercise:	
+We will use various R functions within the exercises, including: 
+* Data frames and matrices 
+* Apply function
+* Writing our own functions and passing data to them as inputs 
 
 
 ## Step by step guide 
+
+The exercise will be split into four parts:
+
+1) Setting up the parameters of the model
+2) Expected value of perfect diagnostic information (EVPDI)
+3) Test accuracy for imperfect tests
+4) Expected value of clinical information (EVCI)
+
+\  
+
+### 1. Setting up the model parameters and estimating NMB without a test
+
+We start by defining the consequences / payoffs for the simple decision tree model presented in the videos.
+
+i)	First, we define a prevalence and a willingness to pay threshold. 
+
+ii) The `parameter.values` data,frame gives the payoffs / consequences associated with the four possible outcomes related to treating or not treating sick or healthy individuals.
+
+
+iii) There is a blank column for the net monetary benefit (NMB) in the `expected.values` data,frame. You can calculate this now, based on the prevalence selected.  _(Hint: The expected NMB will be important throughout the exercise, so make sure to calculate this correctly)._ 
+
+iv) Based on the parameters table, we can now create a data.frame comparing the costs, QALYs and NMB associated with the two strategies (treat all versus treat none), at the given prevalence defined. We will define this as the expected.values table. The costs and QALYs have been calcualted for you. Calculate the NMB, which has been left blank. 
+
+
+v)	Now we will create a function to estimate the NMB for the two strategies (treat all versus treat none) in the absence of a test. Creating a function allows us to perform the calculation many times easily, by wrapping all of the code up into a set function, and passing arguments (e.g. inputs) to this function.
+
+vi) We have called this function `est.nmb()` and the main argument that we need to provide is the prevalence (named 'prev' within the function). Try running the function by providing different prevalence values, and see how the estimated NMB changes for 'treating all' and 'treating none'. Is this what you expected?  
+
+viii) Now that you have run the function with different prevalence values, trying providing the function with a vector of prevalence values, from 0 to 1, by 0.05. You can call this `prevalence.vector`. Save the output of these NMB values in the absence of a test, so that we can create a plot to help visualise this change.   
+
+ix) Now we can create a simple plot in base R. The code for a simple plot has been provided for you. 
+
+
+### 2. Expected value of perfect diagnostic information 
+
+If a perfect test were to exist then all sick patients would receive treatment and all healthy patients would remain untreated. We will use a function to estimate NMB, similar to the function used to estimate NMB in the absence of a diagnostic test. 
+
+In this example, we will assume that all sick patients are treated, and that all healthy patients are not. 
+
+(i)	 Open the 'est.nmb.perfect.test' function, and compare it to the 'est.nmb' function above. 
+
+(ii)	Run the function, using the a specific prevalence. How does this NMB compare to the previous function, and why? 
+
+(iii)	Now run the function using the vector of prevalence values that you created eaerlier ('prevalence.vector'). This now shows the expected value of a perfect test, across different prevalences.  
+
+Next we will estimate the Expected Value of Perfect Diagnostic Information (EVPDI) - which is simply the difference between the expected value of a perfect test and the expected value of the optimal course of action ('Treat All' or 'Treat None') in the absence of a test.
+
+(iv)	 Save this as a data.frame, and then we can create a plot to observe the results. 
+
+
+### 3. Expected value of perfect diagnostic information 
