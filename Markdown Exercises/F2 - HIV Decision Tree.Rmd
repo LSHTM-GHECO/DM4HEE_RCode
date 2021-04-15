@@ -1,6 +1,6 @@
 ---
 title: "Building a decision tree model of antenatal HIV transmission"
-subtitle: "Foundation Course Module 2"
+subtitle: "Foundation Course Exercise 2"
 author: "Jack Williams & Nichola Naylor"
 date: "14 April 2021"
 output: html_document
@@ -37,14 +37,14 @@ Discussions with professional staff indicate that the following assumptions can 
 
 ### Decision Tree Figure 
 
-Since coding in R can make it difficult to visualise the model structure, we have provided the decision tree and conditional probabilities for each branch below: 
+To help visualise the decision tree model structure, we have provided the decision tree and conditional probabilities for each branch below: 
 
 ![](DecisionTreeHIV.png)
 
 
 \  
 
-## Task
+## Tasks
 
 * Create each pathway for the decision tree _(Hint: we have provided a naming convention, working through pathways 1 to 5 for the intervention arm and paths 1 to 3 for the no intervention arm)_
 
@@ -56,10 +56,11 @@ Since coding in R can make it difficult to visualise the model structure, we hav
 
 *	What are the weaknesses of the analysis?
 
+\  
 
-### Alternative ways for creating decision trees in R 
+<!-- ### Alternative ways for creating decision trees in R  -->
 
-** something about using vectors to calcualte all the options within R **
+<!-- ** something about using vectors to calcualte all the options within R ** -->
 
 
 <script>

@@ -1,9 +1,8 @@
-# R code Exercise F2
+#  DM4HEE 
+#  Foundation Course Exercise 2 
+#  Authors: Jack Williams and Nichola Naylor
 
-
-
-#### Parameters ####  
-
+####**** Parameters ****####  
 
 ## Probabilities 
 p.hiv <- 0.05 # The prevalence of undetected HIV in the antenatal population 
@@ -17,7 +16,7 @@ cost.test <- 10 # The cost of the test
 cost.int <- 800  # Cost of the vertical transmission mitigation intervention 
 
 
-#### Decision tree ####
+####**** Decision tree ****####
 
 ## Testing group ##  
 
@@ -76,12 +75,11 @@ notest.path.2 <- p.hiv * (1 - p.trans.control)
 notest.path.3 <- 1 - p.hiv
 
 
+# No testing arm probabilities and results 
+
 notest.probs.vec <- c(notest.path.1, notest.path.2, notest.path.3)
 notest.cost.vec <- c(0, 0, 0)
 notest.trans.vec <- c(1, 0, 0)
-
-
-# No testing arm results 
 
 notesting.costs <- sum(notest.probs.vec * notest.cost.vec)
 notesting.cases <- sum(notest.probs.vec * notest.trans.vec)
@@ -91,7 +89,7 @@ notesting.results
 
 
 
-#### Analysis: Incremental results #### 
+####**** Analysis: Incremental results ****#### 
 
 # Reduction in probability of vertical transmission with testing and intervention 
 cases.avoided <- notesting.cases - testing.cases
