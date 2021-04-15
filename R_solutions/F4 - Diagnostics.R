@@ -317,17 +317,102 @@ evci <- est.evci(prev = prevalence.vector)
 round(evci, 2)
 
 
-# We can create a plot of the EVCI compared to the EVDI calculated earlier
+# We can create a plot of the EVCI compared to the EVPDI calculated earlier
 
 plot(evpdi.table, type="l", col = "blue", ylim = c(0, 3000))
 lines(evci$prev, evci$evci, col = "red")
-legend("topright", legend=c("EVDI", "EVCI"), col=c("blue", "red"), 
+legend("topright", legend=c("EVPDI", "EVCI"), col=c("blue", "red"), 
        lty = 1, cex = 0.8)
 
 
 
 
 
-## ggplots (if time) 
+## ggplots (I've havent provided explanation here...) 
 
-## Jack to add ggplots code and do a facet wrap to show them all... 
+library(reshape2)
+library(ggplot2)
+
+# NMB plot
+
+nmb.plot.data <- cbind(no.test.nmb, perfect.test.nmb[,2])
+colnames(nmb.plot.data) <- c("Prevalence", "Treat all", "Treat none", "Perfect test")
+nmb.plot.data.long <- reshape2::melt(nmb.plot.data, id.vars = c("Prevalence"))
+
+nmb.plot  <-  ggplot(nmb.plot.data.long) + 
+  geom_line(aes(x=Prevalence, y=value, colour = variable), size=1) + 
+  labs(x = "Prevalence", text = element_text(size=10)) + 
+  labs(y = "Net Monetary Benefit (£)", text = element_text(size=10)) + theme_classic() +
+  theme(legend.title = element_blank(), axis.title=element_text(face="bold"), 
+        axis.title.x = element_text(margin = margin(t = 7, r = 0, b = 3, l = 0)), 
+        axis.title.y = element_text(margin = margin(t = 0, r = 7, b = 0, l = 3)), 
+        panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+        legend.key.width=unit(1.8,"line"), text = element_text(size=12)) + 
+  scale_x_continuous(expand = c(0, 0.1)) + 
+  scale_y_continuous(limits = c(0,30000), breaks=seq(0,30000,5000),  expand = c(0, 0))
+
+nmb.plot
+
+
+# EVDI plot
+
+evci.plot.data <- cbind(evpdi.table, evci$evci)
+colnames(evci.plot.data) <- c("Prevalence", "EVPDI", "EVCI") 
+evci.plot.data.long <- reshape2::melt(evci.plot.data, id.vars = c("Prevalence"))
+
+evdi.plot  <-  ggplot(evci.plot.data.long) + 
+  geom_line(aes(x=Prevalence, y=value, colour=variable), size=1) + 
+  labs(x = "Prevalence", text = element_text(size=10)) + 
+  labs(y = "Expected Value of Diagnostic Information (£)", text = element_text(size=10)) + theme_classic() +
+  theme(legend.title = element_blank(), axis.title=element_text(face="bold"), 
+        axis.title.x = element_text(margin = margin(t = 7, r = 0, b = 3, l = 0)), 
+        axis.title.y = element_text(margin = margin(t = 0, r = 7, b = 0, l = 3)), 
+        panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+        legend.key.width=unit(1.8,"line"), text = element_text(size=12)) + 
+  scale_x_continuous(expand = c(0, 0.1)) + 
+  scale_y_continuous(limits = c(-1,3000), expand = c(0, 0))
+
+evdi.plot
+
+
+
+# Diagnostic threshold
+
+head(biomarker.dist)
+colnames(biomarker.dist) <- c("Diagnostic", "Disease Positive", "Disease Negative")
+biomarker.dist.long <- reshape2::melt(biomarker.dist, id.vars = c("Diagnostic"))
+
+diag.plot  <-  ggplot(biomarker.dist.long) + 
+  geom_line(aes(x=Diagnostic, y=value, colour=variable), size=1) + 
+  labs(x = "Diagnostic Threshold", text = element_text(size=10)) + 
+  labs(y = "", text = element_text(size=10)) + theme_classic() +
+  theme(legend.title = element_blank(), axis.title=element_text(face="bold"), 
+        axis.title.x = element_text(margin = margin(t = 7, r = 0, b = 3, l = 0)), 
+        axis.title.y = element_text(margin = margin(t = 0, r = 7, b = 0, l = 3)), 
+        panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+        legend.key.width=unit(1.8,"line"), text = element_text(size=12)) + 
+  scale_x_continuous(expand = c(0, 0.1)) 
+  
+diag.plot
+
+
+
+# ROC plot 
+
+roc.data <- data.frame(TPR, FPR)
+
+roc.plot  <-  ggplot(roc.data) + 
+  geom_line(aes(x=FPR, y=TPR), size=1) + 
+  labs(x = "False Positive Rate (1-Specificity)", text = element_text(size=10)) + 
+  labs(y = "True Positive Rate (Sensitivity)", text = element_text(size=10)) + theme_classic() +
+  theme(legend.title = element_blank(), axis.title=element_text(face="bold"), 
+        axis.title.x = element_text(margin = margin(t = 7, r = 0, b = 3, l = 0)), 
+        axis.title.y = element_text(margin = margin(t = 0, r = 7, b = 0, l = 3)), 
+        panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+        legend.key.width=unit(1.8,"line"), text = element_text(size=12)) + 
+  scale_x_continuous(limits = c(0,1), breaks=seq(0,1,0.2), expand = c(0, 0.01)) + 
+  scale_y_continuous(limits = c(0,1), breaks=seq(0,1,0.2), expand = c(0, 0.01))
+
+roc.plot
+
+
