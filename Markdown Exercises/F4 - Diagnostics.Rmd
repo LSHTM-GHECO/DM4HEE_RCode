@@ -124,7 +124,7 @@ Plot the distributions on a chart and verify you get the same as those presented
 diag.plot
 ```
 
-iii)	Assuming a diagnostic threshold of 0 ensure you can identify the True Positives, True Negatives, False Positives and False Negatives as per the video presentation. __(JW - ????)__
+iii)	Assuming a diagnostic threshold of 0 ensure you can identify the True Positives, True Negatives, False Positives and False Negatives as per the video presentation. 
 
 iv) Now we can estimate the TPR - True Positive Rate  (i.e. sensitivity) and the FPR - False Positive Rate  (1- specificity), using the cumulating normal distribution, which is `pnorm` function in R. The function requires the same data (the diagnostic thresholds, and the mean and SD of the distribution). Save these as 'TPR' and 'FPR'. _(Hint: make sure you understand why the cumulative normal distribution is used here)_
 
