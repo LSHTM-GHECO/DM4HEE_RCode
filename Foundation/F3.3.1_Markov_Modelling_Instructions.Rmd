@@ -9,7 +9,7 @@ subtitle: Foundation Course Exercise 3
 ---
 
 ```{r, include=FALSE}
-source("../R_solutions/F3 - Markov models.R", local = knitr::knit_global())
+# source("../R_solutions/F3 - Markov models.R", local = knitr::knit_global())
 ```
 
 ## Overview 
