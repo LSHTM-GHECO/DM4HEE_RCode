@@ -10,6 +10,10 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r, include = FALSE}
+source("../R_solutions/F2 - Decision Tree.R", local = knitr::knit_global())
+```
+
 ## Overview 
 
 Imagine that you have been asked to advise local decision-makers on the cost-effectiveness of antenatal HIV testing (i.e. testing pregnant women for the HIV virus).  You undertake a Medline search to identify published economic evaluations - but find nothing to help you in your analysis.  You quickly realise that you will have to undertake a decision analysis of your own using data from available data sources.
@@ -46,21 +50,30 @@ To help visualise the decision tree model structure, we have provided the decisi
 
 ## Tasks
 
-* Create each pathway for the decision tree _(Hint: we have provided a naming convention, working through pathways 1 to 5 for the intervention arm and paths 1 to 3 for the no intervention arm)_
+i) First, assign the appropriate values to each parameter, using the data derived from the literature review, given above. 
 
-*	Evaluate each decision tree pathway and calcualte the estimated costs and cases associated with the intervention versus no intervention
+ii) Create each of the five pathways for the testing arm of the decision tree, estimating the pathway probabilities, costs, and cases (i.e. vertical transmission) for each pathway. _(Hint: we have provided a naming convention, working through pathways 1 to 5 for the testing arm and have completed the first one for you)_
 
-* Calculate the incremental costs and the cases avoided, and calcualte the expected cost per HIV infected child avoided. 
+iii) Once you have estimated the probabilities, costs and cases for each pathway, multiply the probability of each pathway with its expected payoffs (costs and cases). Then evaluate the entire testing pathway to calcualte the estimated costs and cases associated with testing.  _(Hint: Create vectors of the pathway probabilities and payoffs, and then multiply these vectors together. Once you have done this you can use the_ `sum()` _function to get the total for the testing arm)._  
+Once you have estimated the total costs and cases for the testing arm, the results should look like this: 
 
-*	What are likely to be the key sensitivity analyses to undertake?
+```{r, echo = TRUE}
+testing.results
+```
 
-*	What are the weaknesses of the analysis?
 
-\  
+iv) Now that you have estimated the total costs and cases associated with testing, do the same for the no testing arm, following the steps outlined in ii) and iii) to help you.   
 
-<!-- ### Alternative ways for creating decision trees in R  -->
+v) Once you have the costs and cases associated with the testing arm and no testing arm of the decision tree, use these to calculate the incremental costs and the cases avoided, and calcualte the expected cost per HIV infected child avoided. 
 
-<!-- ** something about using vectors to calcualte all the options within R ** -->
+What do your results show? You should have an estimated __£`r round(incremental.results,2)`__ per HIV-infected child avoided. If not, then make sure that you have used the correct parameters in calculating the incremental results. 
+
+Now that we have finished the practical component of the exercise, consider some of the other aspects of this analysis:
+
+vi)	What are likely to be the key sensitivity analyses to undertake?
+
+vii) What are the weaknesses of the analysis?
+
 
 
 <script>

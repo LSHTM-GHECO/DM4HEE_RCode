@@ -23,68 +23,89 @@ cost.int <- 800  # Cost of the vertical transmission mitigation intervention
 # Accepts intervention (HIV+)  - Vertical transmission
 test.path.1 <- p.hiv * p.int * p.trans.int 
 test.cost.1 <- cost.test * 1 + cost.int * 1
-test.trans.1 <- 1
+test.cases.1 <- 1
 
 # Accepts intervention (HIV+) - No vertical transmission
 test.path.2 <- p.hiv * p.int * (1 - p.trans.int) 
 test.cost.2 <- cost.test * 1 + cost.int * 1
-test.trans.2 <- 0
+test.cases.2 <- 0
 
 # Do not accept intervention (HIV+)
 test.path.3 <- p.hiv * (1 - p.int) * p.trans.control 
 test.cost.3 <- cost.test * 1 + cost.int * 0
-test.trans.3 <- 1
+test.cases.3 <- 1
 
 # Do not accept intervention (HIV+)
 test.path.4 <- p.hiv * (1 - p.int) * (1 - p.trans.control) 
 test.cost.4 <- cost.test * 1 + cost.int * 0
-test.trans.4 <- 0
+test.cases.4 <- 0
 
 # HIV-
 test.path.5 <-  1 - p.hiv
 test.cost.5 <- cost.test * 1 + cost.int * 0
-test.trans.5 <- 0
+test.cases.5 <- 0
 
 # Testing arm probabilities and results 
 
+# Now create a vector containing all the pathway probabilities. Then do the same for 
+# the costs and transmissions (cases)
+
 test.probs.vec <- c(test.path.1, test.path.2, test.path.3, test.path.4, test.path.5)
 test.costs.vec <- c(test.cost.1, test.cost.2, test.cost.3, test.cost.4, test.cost.5)
-test.trans.vec <- c(test.trans.1, test.trans.2, test.trans.3, test.trans.4, test.trans.5)
+test.cases.vec <- c(test.cases.1, test.cases.2, test.cases.3, test.cases.4, test.cases.5)
 
-testing.costs <- sum(test.probs.vec * test.costs.vec)
-testing.cases <- sum(test.probs.vec * test.trans.vec)
+## Next, multiply the appropriate vectors to get each of the pathway costs
+testing.costs <- test.probs.vec * test.costs.vec
+testing.costs
+
+testing.cases <- test.probs.vec * test.cases.vec
+testing.cases
+
+## For the total costs and cases of the whole intervention arm (i.e. all 5 pathways)
+# take the sum of the vectors 
+testing.costs.total <- sum(testing.costs)
+testing.cases.total <- sum(testing.cases)
 
 # Here we can show and label the results 
-testing.results <- (c(costs = testing.costs, cases = testing.cases))  
+testing.results <- (c(costs = testing.costs.total, cases = testing.cases.total))  
 testing.results
 
 
 
 ## No testing group 
 
-# Here we will evaluate the pathway probabilities for the no testing group.
-# We have not included costs vector here as there are no costs for any pathway 
+# Here we will evaluate the pathway probabilities for the no testing group
+
 
 # HIV positive and transmission
 notest.path.1 <- p.hiv * p.trans.control
+notest.cost.1 <- 0
+notest.cases.1 <- 1
 
 # HIV positive and no transmission
 notest.path.2 <- p.hiv * (1 - p.trans.control)
-
+notest.cost.2 <- 0
+notest.cases.2 <- 0
+  
 # HIV-
 notest.path.3 <- 1 - p.hiv
-
-
+notest.cost.3 <- 0 
+notest.cases.3 <- 0
+  
 # No testing arm probabilities and results 
 
 notest.probs.vec <- c(notest.path.1, notest.path.2, notest.path.3)
-notest.cost.vec <- c(0, 0, 0)
-notest.trans.vec <- c(1, 0, 0)
+notest.cost.vec <- c(notest.cost.1, notest.cost.2, notest.cost.3)
+notest.cases.vec <- c(notest.cases.1, notest.cases.2, notest.cases.3)
 
-notesting.costs <- sum(notest.probs.vec * notest.cost.vec)
-notesting.cases <- sum(notest.probs.vec * notest.trans.vec)
+# Now calculate the payoffs for each of the decision tree pathways
+notesting.costs <- notest.probs.vec * notest.cost.vec
+notesting.cases <- notest.probs.vec * notest.cases.vec
 
-notesting.results <- (c(costs = notesting.costs, nocases = notesting.cases))  
+notesting.costs.total <- sum(notesting.costs)
+notesting.cases.total <- sum(notesting.cases)
+
+notesting.results <- (c(costs = notesting.costs.total, nocases = notesting.cases.total))  
 notesting.results
 
 
@@ -92,10 +113,10 @@ notesting.results
 ####**** Analysis: Incremental results ****#### 
 
 # Reduction in probability of vertical transmission with testing and intervention 
-cases.avoided <- notesting.cases - testing.cases
+cases.avoided <- notesting.cases.total - testing.cases.total
 
 # Incremental cost of testing and intervention
-incr.costs <- testing.costs - notesting.costs
+incr.costs <- testing.costs.total - notesting.costs.total
 
 # Cost per HIV-infected birth avoided
 incremental.results <- incr.costs / cases.avoided
