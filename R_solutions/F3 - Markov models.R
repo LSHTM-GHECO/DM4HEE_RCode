@@ -69,8 +69,8 @@ c.lam <- c(c.LAM, c.LAM, c.LAM, 0) ## A vector of Lamivudine drug costs per stat
 
 ### OTHER PARAMETERS #######
 RR <- 0.509 ## Treatment effect (RR)
-dr.c <- 0.06 ## Annual discount rate - costs (%)
-dr.o <- 0  ## Annual discount rate - benefits (%) 
+dr.c <- 0.035 ## Annual discount rate - costs (%)
+dr.o <- 0.035  ## Annual discount rate - benefits (%) 
 
 
 
@@ -89,7 +89,8 @@ B.SympHIV.AZT <- c(0, tp.B2B, tp.B2C, tp.B2D)
 C.AIDS.AZT <- c(0, 0, tp.C2C, tp.C2D)
 D.Death <- c(0,0,0,1) ## as nobody transitions out of dead the transition probability of staying in dead, once in dead, is equal to 1
 
-tm.AZT <- matrix(data=rbind(A.AsympHIV.AZT,B.SympHIV.AZT,C.AIDS.AZT,D.Death),nrow=n.states,ncol=n.states)
+tm.AZT <- matrix(c(A.AsympHIV.AZT,B.SympHIV.AZT,C.AIDS.AZT,D.Death), 
+                 nrow = n.states, ncol=n.states, byrow = TRUE)
 rownames(tm.AZT) <- state.names ## renaming the matrix row names
 colnames(tm.AZT) <- state.names ## renaming the matrix column names
 tm.AZT 
