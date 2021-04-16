@@ -1,9 +1,11 @@
 ---
 title: "Building a decision tree model of antenatal HIV transmission"
-subtitle: "Foundation Course Exercise 2"
 author: "Jack Williams & Nichola Naylor"
 date: "14 April 2021"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
+subtitle: Foundation Course Exercise 2
 ---
 
 ```{r setup, include=FALSE}
@@ -11,7 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r, include = FALSE}
-source("../R_solutions/F2 - Decision Tree.R", local = knitr::knit_global())
+source("F2.3.3_Decision_Trees_Solutions.R", local = knitr::knit_global())
 ```
 
 ## Overview 
