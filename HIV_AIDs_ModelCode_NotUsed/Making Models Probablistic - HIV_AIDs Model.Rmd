@@ -1,0 +1,71 @@
+---
+title: "Probabilistic analysis (Part 1 / 4.7)"
+author: "Nichola Naylor & Jack Williams"
+date: "12 April 2021"
+output:
+  pdf_document: default
+  html_document: default
+subtitle: Advanced Course Module 2
+---
+
+# PART 1 - HIV/AID MODEL 
+
+## Overview 
+
+The aim of this exercise is to demonstrate how a deterministic HIV/AIDS model can be made probabilistic by fitting distributions to parameters. Emphasis is on choosing the correct distribution for different types of parameters and in particular on the use of the Dirichlet distribution for generating a probabilistic transition matrix, where constant transitions are appropriate. For those who have attended the foundation course, this model builds upon the deterministic HIV/AIDS model develop in foundation module 4. 
+
+The step-by-step guide below will take you through a number of stages of making the model probabilistic:
+
+1. Using a lognormal distribution for relative risk
+2. Using a gamma distribution for cost
+3. Using a beta distribution for the transition from AIDS to Death
+4. Using a Dirichlet distribution for the transition matrix
+
+Open the file **‘Exercise 4.7 – template.R’**, to get started. 
+
+
+## Step by step guide
+
+The general task in this exercise is to complete the probabilistic assignment of the parameter values and begin to turn your model into a probabilistic one. First enter the general model characteristics such as establishing model seed (i.e. where the population starts), which in this instance is all in State A, establish model cycle length and discount rates. You can start off with some more simple distribution assignments and then move on to transition probabilities (which may require a few more steps);
+
+(@) **Using a lognormal distribution for relative risk**
+
+In the original Chancellor et al article (1997), the quoted relative risk was 0.509 with 95% confidence interval 0.365 to 0.710.  Use this information to calculate the appropriate log mean and log standard error for relative risk.  
+
+Using the log scale of these parameters, take a random draw from the normal distribution (with the log mean and log standard deviation you just calculated). You can then exponentiate the result to give the lognormally distributed relative risk. Run the random draw a few times and print the relative risk values to see the different values drawn. Hint: the `rnorm()` function is used to take random draws from the normal distribution.
+
+(@) **Using a Gamma distribution for cost**
+
+Unfortunately, little information was given in the original article about the variance of costs (despite the fact that mean costs were derived from a patient level dataset!).  Therefore a simple assumption has been made that the standard error of the costs is equal to the mean for the purposes of this exercise, therefore assign mean and standard error values for the direct medical costs and community care costs associated with each state.  Using these values, solve for the parameters of the Gamma distribution using the method of moments. Generate a random draw from the Gamma distribution based on these parameters, assigning these values as the “c.” values to be used within the model using `rgamma()`. Don’t forget to then create a vector storing all the cost values (remember, ordering is important in the creation of the vector). 
+
+(@) **Estimate the alpha, beta and sum values for transitions**
+
+First enter the number of events observed, the totals and the complements for the transitions in the model. 
+
+(@) **Using a Beta distribution for the transition from AIDS to Death**
+
+As mentioned in the presentation, a Beta distribution can be used for a dichotomous decision probability and is straightforward to fit using the counts of events and complements. Enter the number of events (deaths) observed and the complement (total – deaths), then  generate a random draw from the Beta distribution using the alpha and beta parameters just specified.  Note that the value in cell tp.C2C must, by definition, be 1 minus the value of tp.C2D (in other words do not sample from two independent Beta distributions as probabilities must sum to one!)
+
+(@) **Using a Dirichlet distribution for polytomous transitions**
+
+**Section 4.3.2** detailed how the Dirichlet distribution is the multinomial equivalent of the Beta distribution that can be used when more than two transitions are possible.  Unfortunately, base R does not include the Dirichlet directly (although there are R packages available that do), therefore it must be constructed for this example.  This is relatively straightforward, but does require an extra step. **(I wonder if we should just use a dirichlet function? It is an advantage of R)**
+
+i) Start with the three way transition from state A to remaining in state A, moving to state B, or moving to state C (AIDS), or moving the Death.  The method is to normalise a draw from three independent single parameter Gamma distributions, where the single parameter is the number of events.  Note the single parameter gamma distribution is simply the usual two parameter distribution with the second (beta) parameter set to 1.  Therefore, enter a random draw from a Gamma distribution with the alpha parameter set to the corresponding number of events and the beta parameter equal to 1.
+
+ii) Once you have valid numbers for “gd.” values, the corresponding probability is calculated as the corresponding draw (“gd.”) divided by the sum of draw values associated with moving out of that state (i.e. the sum of A2A, A2B, A2C and A2D).  This ensures that all probabilities are in the range 0-1 and that the three probabilities sum to 1.  Enter the appropriate formula to establish the transition probability values for A (“tp.”).  Congratulations!  You have just constructed your first Dirichlet distribution.
+
+iii) Now repeat the steps above, but this time for the three probabilities associated with state B.
+
+
+Now that we’ve set up the parameters to be pulled from different distributions, we can now run these paramters through the model.  
+
+The rest of the model has been completed for you, but is broadly simular to the previous Markov models that you have been introduced to (in module 1, and in foundation course module 4). To summarise, the remainder of the model runs through the following: 
+- Create transition probability matrix for both treatments
+- Create a Markov trace for both treatments
+- Estimate the total life years (discounted and undiscounted) for each treatment
+- Estimate the total costs (discount and undiscounted) for each treatment
+- Estimate incremental costs and outcomes, and the ICER for combination therapy versus monotherapy (AZT only)
+
+The only difference is that now the module is using random draws for specific parameters. 
+
+That is it!  You now have a fully probabilistic model. Print the results. Rerun the full model script and you can see that the results will change based on the new parameters pulled from the draws coded in this exercise. 
