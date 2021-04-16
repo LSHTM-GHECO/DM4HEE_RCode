@@ -52,7 +52,7 @@ To help visualise the decision tree model structure, we have provided the decisi
 
 i) First, assign the appropriate values to each parameter, using the data derived from the literature review, given above. 
 
-ii) Create each of the five pathways for the testing arm of the decision tree, estimating the pathway probabilities, costs, and cases (i.e. vertical transmission) for each pathway. _(Hint: we have provided a naming convention, working through pathways 1 to 5 for the testing arm and have completed the first one for you)_
+ii) Create each of the five pathways for the testing arm of the decision tree, estimating the pathway probabilities, costs, and cases (HIV births due to vertical transmission) for each pathway. _(Hint: we have provided a naming convention, working through pathways 1 to 5 for the testing arm and have completed the first one for you)._
 
 iii) Once you have estimated the probabilities, costs and cases for each pathway, multiply the probability of each pathway with its expected payoffs (costs and cases). Then evaluate the entire testing pathway to calcualte the estimated costs and cases associated with testing.  _(Hint: Create vectors of the pathway probabilities and payoffs, and then multiply these vectors together. Once you have done this you can use the_ `sum()` _function to get the total for the testing arm)._  
 Once you have estimated the total costs and cases for the testing arm, the results should look like this: 
