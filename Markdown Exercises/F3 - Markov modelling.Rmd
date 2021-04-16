@@ -1,11 +1,11 @@
 ---
 title: "Markov Models"
-subtitle: "Foundation Course Exercise 3"
 author: "Nichola Naylor & Jack Williams"
 date: "9 April 2021"
-output: html_document
-#  pdf_document: default
-#  html_document: default
+output:
+  pdf_document: default
+  html_document: default
+subtitle: Foundation Course Exercise 3
 ---
 
 ```{r, include=FALSE}
@@ -81,9 +81,9 @@ We will use the current discount rates in use in the UK – 3.5% for both costs 
 
 ## Step by step guide to constructing the model
 
-Open the file ‘Exercise 2.5 – Template.R’. You will see that there are parameters that need to be defined, based on the data above.
+Open the file ‘F3 Markov modelling – Template.R’. You will see that there are parameters that need to be defined, based on the data above.
 
-Using the counts of transitions shown in the transitions probability section above, complete parameters definitions in the *'Parameters'* section for the transition probabilities (Lines 17-29).  Parameters starting with “alpha.” should contain the number of events of interest and “sum.” should contain the total transitions (the sum of events and complement), such that they should equal the appropriate row total from the transitions table above. Now calculate the respective transition probabilities in variables beginning with “tp.” using the “alpha.” and “sum.” variables. *(Note: For those on the advanced course, the reason for defining events and complements becomes apparent in later exercises using probabilistic methods)*  
+Using the counts of transitions shown in the transitions probability section above, complete parameters definitions in the 'Parameters' section for the transition probabilities (Lines 17-29).  Parameters starting with “alpha.” should contain the number of events of interest and “sum.” should contain the total transitions (the sum of events and complement), such that they should equal the appropriate row total from the transitions table above. Now calculate the respective transition probabilities in variables beginning with “tp.” using the “alpha.” and “sum.” variables. *(Note: For those on the advanced course, the reason for defining events and complements becomes apparent in later exercises using probabilistic methods)*  
 
 Enter the other information for the state costs (direct and community care costs), drug costs, treatment effect and discounting in the appropriate place in the script.
 
