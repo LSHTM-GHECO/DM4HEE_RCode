@@ -1,0 +1,71 @@
+---
+title: "Building a decision tree model of antenatal HIV transmission"
+subtitle: "Foundation Course Exercise 2"
+author: "Jack Williams & Nichola Naylor"
+date: "14 April 2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Overview 
+
+Imagine that you have been asked to advise local decision-makers on the cost-effectiveness of antenatal HIV testing (i.e. testing pregnant women for the HIV virus).  You undertake a Medline search to identify published economic evaluations - but find nothing to help you in your analysis.  You quickly realise that you will have to undertake a decision analysis of your own using data from available data sources.
+
+### Data
+
+From a Medline search you identify publications that provide you with the following information:
+
+* If a woman has HIV and her infection remains undetected during pregnancy, the probability that she will transmit the infection to her child is 26%.
+
+* If a woman’s infection is known during pregnancy, however, it is possible to use risk-reduction interventions such as caesarean section, zidovudine antiretroviral therapy and bottle-feeding.  These interventions cost £800 more than a normal delivery and reduce the probability of transmission to the child to 7%, but only 95% of infected women accept the interventions.
+
+* Discussion with midwifery staff indicates that offering the test to women could be achieved at negligible additional cost, but your pathology labs suggest that each blood test will cost £10; they also indicate that the tests are 100% accurate (i.e. there are no false negatives or false positives).  
+
+* A published paper suggests that the prevalence of undetected HIV in the antenatal population in your area is 5%.
+
+### Assumptions 
+
+Discussions with professional staff indicate that the following assumptions can be justified:
+
+* No women will select to terminate on discovering she has HIV infection.
+
+* All women who are tested positive will be offered risk-reduction interventions.  
+
+
+### Decision Tree Figure 
+
+To help visualise the decision tree model structure, we have provided the decision tree and conditional probabilities for each branch below: 
+
+![](DecisionTreeHIV.png)
+
+
+\  
+
+## Tasks
+
+* Create each pathway for the decision tree _(Hint: we have provided a naming convention, working through pathways 1 to 5 for the intervention arm and paths 1 to 3 for the no intervention arm)_
+
+*	Evaluate each decision tree pathway and calcualte the estimated costs and cases associated with the intervention versus no intervention
+
+* Calculate the incremental costs and the cases avoided, and calcualte the expected cost per HIV infected child avoided. 
+
+*	What are likely to be the key sensitivity analyses to undertake?
+
+*	What are the weaknesses of the analysis?
+
+\  
+
+<!-- ### Alternative ways for creating decision trees in R  -->
+
+<!-- ** something about using vectors to calcualte all the options within R ** -->
+
+
+<script>
+   $(document).ready(function() {
+     $head = $('#header');
+     $head.prepend('<img src=\"logo.png\" style=\"float: right;width: 150px;\"/>')
+   });
+</script>

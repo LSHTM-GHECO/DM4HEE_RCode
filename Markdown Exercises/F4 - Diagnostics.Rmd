@@ -1,0 +1,182 @@
+---
+title: "Expected Value of Clinical & Diagnostic Information"
+subtitle: "Foundation Course Module 4"
+author: "Jack Williams & Nichola Naylor"
+date: "14 April 2021"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+```{r, include=FALSE}
+source("../R_solutions/F4 - Diagnostics.R", local = knitr::knit_global())
+```
+
+
+## Overview 
+
+
+The aim of this exercise is to reproduce the calculations that underlie the slides presented in the didactic session, including trading sensitivity and specificity in order to choose an optimal point on the ROC curve.
+
+We will use various R functions within the exercises, including: 
+
+* Data frames and matrices 
+* Apply function
+* Writing our own functions and passing data to them as inputs
+* Plots (base R, and ggplots for those interested)
+
+We will use base R plots throughout the exercise, as these are  quick and easy to produce, although they tend to be relatively simplistic. 'ggplot' is a graphics package that allows you to make very good graphs and plots, but requires the data to be structured in a specific way (long format), and tends to require more detailed code (which is why it allows for highly detailed plots). 
+
+In the exercise we have provided the code for base R plots for simplicity, but we have also added code for ggplots at the end of the script, for those interested. We will need to install the following packages for ggplot and to help reshape the data:
+```{r, eval=FALSE}
+install.packages("ggplot2")
+install.packages("reshape2")
+```
+
+## Step by step guide 
+
+The exercise will be split into four parts:
+
+1) Setting up the parameters of the model
+2) Expected value of perfect diagnostic information (EVPDI)
+3) Test accuracy for imperfect tests
+4) Expected value of clinical information (EVCI)
+
+\  
+
+### 1. Setting up the model parameters and estimating NMB
+
+We start by defining the consequences / payoffs for the simple decision tree model presented in the videos.
+
+i)	First, define the prevalence (30%) and a willingness to pay threshold (£30,000). 
+
+ii) The 'parameter.values' data,frame gives the payoffs / consequences associated with the four possible outcomes related to treating or not treating sick or healthy individuals.
+
+```{r, echo=FALSE}
+parameter.values[,1:4]
+```
+
+
+iii) There is a blank column for the net monetary benefit (NMB) in the 'parameter.values' data,frame. Calculate the expected NMB payoff based on the costs and QALYs associated with each outcome, based on the prevalence assigned earlier.  _(Hint: The expected NMB will be important throughout the exercise, so make sure to calculate this correctly)._ 
+
+iv) Now that you have calculated the NMB for each outcome, this can be used to estimate  the NMB for a strategy of 'treat all' or 'treat none'. Based on the parameters table, create a data frame comparing the costs, QALYs and NMB associated with the two strategies. Note that these NMB calculations are specific to the prevalence of the condition. You can define this data frame as the expected.values table, and the costs have been calcualted for you. Calculate the QALYs using the same calculation as the costs, and then calcualte the NMB, which has been left blank. 
+
+v) Now we will create a function to estimate the NMB for the two strategies (treat all versus treat none) in the absence of a test. Creating a function allows us to perform the calculation many times easily, by wrapping all of the code up into a set function, and passing arguments (e.g. inputs) to this function. 
+We pass the function the parameter values (defined at the start of the exercise) and the lambda value (i.e. the willingness to pay threshold), and the function also requires the prevalence of the condition to evaluate the NMB. 
+The calculations within the function are provided for you, but make sure that you understand how the costs and outcomes are being calculated for those who are healthy and sick (and treated or not treated). The calculations are the same as those defined in point iv) above, except that this time they are within the function. 
+
+vi) We have called this function `est.nmb()` and the main argument that we need to provide is the prevalence (named 'prev' within the function). Try running the function by providing different prevalence values, and see how the estimated NMB changes for 'treating all' and 'treating none'. Is this what you expected?  
+
+vii) Now that you have run the function with different prevalence values, create a vector of prevalence values, from 0% to 100% (or 0 to 1) by 5% increments, you can call this 'prevalence.vector'. Pass the vector of prevalence values to the `est.nmb()` function.  Save the NMB values, the output of the function, so that we can create a plot to help visualise this change.   
+
+viii) Now we can create a simple plot in base R, showing the NMB for the two strategies (treat all vs. treat none). The code for a simple plot has been provided for you. 
+
+
+### 2. Expected value of perfect diagnostic information 
+
+If a perfect test were to exist then all sick patients would receive treatment and all healthy patients would remain untreated. We will use a function to estimate NMB, similar to the function used to estimate NMB in the absence of a diagnostic test. 
+
+In this example, we will assume that all sick patients are treated, and that all healthy patients are not. 
+
+i)	 Go to the `est.nmb.perfect.test` function (L110), and compare it to the `est.nmb` function above. You can see that now the payoff parameters for 'sick, treated', and 'healthy, not treated' are the only payoffs used.  
+
+ii)	Run the function, using the 30% prevalence. How does this NMB compare to the previous function, and why? _(Hint: You can run the the function using the 30% value two ways, either as shown below, to get the same output)_
+
+```{r, echo=True}
+est.nmb.perfect.test(prev = 0.3)
+est.nmb.perfect.test(prev = prevalence)
+```
+
+iii) Now run the function using the vector of prevalence values that you created eaerlier ('prevalence.vector'), to get the NMB of a perfect test, across different prevalences.  
+
+Next we will estimate the Expected Value of Perfect Diagnostic Information (EVPDI) - which is simply the difference between the expected value of a perfect test and the expected value of the optimal course of action ('Treat All' or 'Treat None') in the absence of a test.
+
+iv)	 Save this as a data.frame, and then we can create a plot to observe the results. The code for the plot is provided for you, and should look like this:. 
+
+
+```{r, echo=FALSE}
+nmb.plot
+```
+
+### 3. Test accuracy for imperfect tests
+
+
+Diagnostic tests typically measure the value of a biomarker that is present in both health and sick individuals – for example blood glucose levels in diabetes.  However, it is rare that such biomarkers perfectly distinguish those with the condition from those without.
+
+We can define the test characteristics, using a mean and standard deviation for the biomarker. These are provided in the 'test.char' vector. These are (highly) stylised distribution parameters for a biomarker in the disease positive and disease negative populations.
+
+These parameters assume the biomarker is distributed normally in both populations given the mean and standard deviation parameters defined, and the prevalence of disease. 
+
+**Table showing the biomarkers characteristics????**
+
+i) First, create a vector of diagnostic values from -4 to 4, in increments of 0.25. Use the `seq()` function to do this.  
+
+ii) Next, using the mean and standard deviations of the test characteristics for positive and negative disease (within the vector `test.char`), the disease positive and disease negative distributions can be calculated. Use the normal distribution (this is the `dnorm` function, for **the probability density of the normal distribution**), which requires the diagnostic threshold values assigned in point i), and the mean and SD parameters of the distribution. Once these have been estimated, store them in the `biomarker.dist` data frame. 
+
+Plot the distributions on a chart and verify you get the same as those presented in the teaching session (you will need to set the prevalence to 30% if you have changed the original prevalence). The distributions will look like this:
+
+```{r, echo=FALSE}
+diag.plot
+```
+
+iii)	Assuming a diagnostic threshold of 0 ensure you can identify the True Positives, True Negatives, False Positives and False Negatives as per the video presentation. 
+
+iv) Now we can estimate the TPR - True Positive Rate  (i.e. sensitivity) and the FPR - False Positive Rate  (1- specificity), using the cumulating normal distribution, which is `pnorm` function in R. The function requires the same data (the diagnostic thresholds, and the mean and SD of the distribution). Save these as 'TPR' and 'FPR'. _(Hint: make sure you understand why the cumulative normal distribution is used here)_
+
+v) We can now save the TPR and FPR, and create a Receiver Operating Characteristic (ROC) curve, using the base R plot. Using the ggplot package, the figure will look like this: 
+
+```{r, echo=FALSE}
+roc.plot
+```
+
+### 4. Expected Value of Clinical Information 
+
+Just as we did for a perfect test, we can also calculate the value of information provided by an imperfect test.   However, this time we need to allow for the error rates (false positives and false negatives) that will result in some patients not getting optimal treatment.
+
+
+i)	Using the error rates specified earlier (True Positive Rate and False Positive Rate), calculate the pathway probabilities for true positives (TP), false positive (FP), false negatives (FN), and True negatives (TN). Note that these probabilities are based upon the prevalence of disease, and the equations are provided for you. 
+
+ii) Next we can now use the TP, FP, FN, and TN to calculate the expected NMB of the imperfect test at each diagnostic threshold. This will involve getting the NMB payoff parameters assigned in at the start of the exercise (in `parmaeter.values` data frame), and these are shown below:
+
+```{r, echo = FALSE}
+parameter.values
+```
+
+iii) Create a blank vector (the same length as the diagnostic threshold vector) to store the total NMB  results across each diagnostic threshold. 
+
+iv) Create a loop to calculate the NMB associated with each TP, FP, FN, TN, and sum these to give the total NMB. This is the NMB of the imperfect test across the diagnostic thresholds. *Note: There are other ways to estimate the NMB, instead of using a loop. One example is to use apply, and an example has been provided in the script.*   
+
+
+<!-- (Hint: the formula you need to enter is essentially the ‘rollback’ of the decision tree for a diagnostic test as per the video presentation). JW taken out as don't understand exactly what this means or where it should be... -->
+
+The ‘optimised’ trade-off between sensitivity and specificity occurs when the NMB across the diagnostic threshold is maximised. The difference between this value and the optimal strategy in the absence of a test (‘Treat all’ or ‘Treat none’) is the EVCI (Expected Value of Clinical Information).
+
+Since we want to calculate the EVCI for any given prevalence, a function is provided (`est.evci`) that will estimate the TPR and FPR, and estimate the NMB at each diagnostic threshold (using the diagnostic accuracy data). The first part of the function essentially repeats the calculations above (i.e. estimating TPR and FPR, and using this to calculate the overall NMB across true and false positives and negatives). 
+
+However, the function also calls an earlier function within in. This is the `est.nmb` which was used to estimate the NMB in the absence of a test. 
+
+This function allows us to pass prevalence values (arguments) into the function, so that the function can estimate the EVCI at different prevalence values provided (or a vector of prevalence values). 
+
+v) Use the `est.evci` function and pass different prevalence values to it, to estimate the maximum NMB associated with 'no test' (the higher NMB of the treat all or treat none strategy), and the NMB associated with the imperfect test. The difference between these values gives the EVCI. 
+
+vi) Finally, you can produce a plot to compare the Expected Value of Clinical Information (EVCI) with the Expected Value of Perfect Diagnostic Information (EVPDI), that was estimated with the perfect test. The plot will look like this:
+
+```{r, echo=FALSE}
+evdi.plot
+```
+
+
+
+<script>
+   $(document).ready(function() {
+     $head = $('#header');
+     $head.prepend('<img src=\"logo.png\" style=\"float: right;width: 150px;\"/>')
+   });
+</script>
+
+
