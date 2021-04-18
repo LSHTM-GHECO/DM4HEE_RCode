@@ -1,4 +1,4 @@
-#  Decision Modelling for Economic Evaluation
+#  Decision Modelling for Health Economic Evaluation
 #  Advanced Course Exercise 1: SOLUTION FILE
 #  Authors: Andrew Briggs, Jack Williams & Nichola Naylor
 

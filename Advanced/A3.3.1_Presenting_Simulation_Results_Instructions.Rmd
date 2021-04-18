@@ -1,11 +1,17 @@
 ---
 title: "Presenting Simulation Results"
+subtitle: "Advanced Course Module 3"
 author: "Nichola Naylor & Jack Williams"
 date: "14 April 2021"
 output:
   pdf_document: default
   html_document: default
-subtitle: Advanced Course Module 3
+header-includes:
+- \usepackage{titling}
+- \pretitle{\begin{center}\LARGE\includegraphics[width=12cm]{logo.png}\\[\bigskipamount]}
+- \posttitle{\end{center}}
+urlcolor: blue
+linkcolor: red
 ---
 
 ```{r setup, include=FALSE}
@@ -118,3 +124,50 @@ We can do this using the melt() function within the reshape2 package (which shou
 Finally, we've used plot the resulting CEACs for the different patient characteristics using the pre-defined ggplot function plot.ceac.all().
 
 You should find that the curves can be quite different for different patient characteristics.  For example, the new prosthesis seems to be more cost-effective generally for men (due to the fact that men have higher failure rates on average and so the absolute benefits of reducing failure risk are greater) and that the new prosthesis is not so cost-effective for elderly patients (where death is an important competing risk for prosthesis failure).
+
+## PART 2: Step-by-step guide
+
+### TO BE ADAPTED
+
+The purpose of this exercise is to introduce a further prosthesis into the THR model in order to illustrate the approach to calculating multiple CEACs for multiple treatment options.
+
+The step-by-step guide covers two main tasks 
+Adding in a third prosthesis option
+Multiple curves for mutually exclusive treatment options.
+
+The template for this exercise is ‘Exercise 5.8 – template.R’.
+
+Step-by-step guide
+
+1.	Adding in a third prosthesis option
+
+Although in the vast majority of trials just two treatment alternatives are compared, in modelling it is much more common to look at multiple treatment options.  If you open Exercise 5.8 - template.R, you will find that an additional section <NP2> has been added that contains the model for a second new prosthesis.  Take a moment to examine the <Hazard function> section, which contains additional information concerning this prosthesis in terms of its effectiveness and correlation with other parameters.
+
+The aim in this section is to update the model so that the third prosthesis option is fully integrated.  This involves updating the parameter, analysis and simulation sheets before re-running the probabilistic sensitivity analysis.
+
+Starting with the <Hazard function> section, update the last row of the Cholesky decomposition matrix (row 32).  Also update the last row of the random variable generating table (row 41).
+Move to the <Parameters> section and add in the information concerning the effectiveness of the new prosthesis in row 28.
+On the <Simulation> section, link the input and output parameters in F4 and U4:V4 to the relevant cells (note that the naming has already been done for you).
+The simulation macro has already been edited to take into account the wider range of results to be recorded (C4: V4) so you can now run the ‘MCsimulation’ macro.
+
+Now that the adaptations relating to the third option are complete the updated results can be produced. 
+
+Calculate the averages across the simulations in cells Q1007:V1007 of the <Simulation> section and use these values to update the point estimates for the probabilistic analysis on the <Analysis> section.
+Plot the three options on the CE plane using the <CE plane> section.  (Note that you should do this by plotting three point clouds from columns Q to V, rather than plotting increments).
+
+Note that one of the problems of looking at the three clouds of points on the CE plane is that we lose the perception of how the points are correlated between the three options.
+
+2.	Multiple curves for mutually exclusive treatment options
+
+The results from the probabilistic analysis of mutually exclusive options can be presented as multiple acceptability curves.  However, in contrast to the independent sub-group analysis of the first part of this exercise, these multiple curves must sum to one.  We must therefore repeat the analysis based on net-benefit, but this time for three options, which is where the use of average net-benefit becomes useful.
+
+Calculate the average net monetary benefit for each option in columns X to Z.
+Now create indicator variables in columns AB to AD to show whether each of the three prostheses are cost effective for that trial (only the prosthesis with the greatest net-benefit is cost-effective).
+Calculate the proportions of trials in which each of the prostheses are cost effective in AB4:AD4.
+Now run the ‘CEACurve’ macro, which will generate the data for the acceptability curves in columns AF to AI.
+Finally, plot the three acceptability curves using the section <CEA curve>.
+
+As was noted in Section 5.5, the interpretation of multiple acceptability curves can be tricky – especially when the model is non-linear.  Fenwick et al (2001) have argued for the use of a cost-effectiveness acceptability frontier in these situations and an example of this applied to the model you have just constructed can be downloaded from the book website.
+
+
+

@@ -1,9 +1,6 @@
-#  ADVANCED MODULE 3 PART 1 - Analysing THR model simulation results
-#  TEMPLATE
-#  Author: Andrew Briggs
-#  Edited by: Nichola Naylor & Jack Williams
-#  Date created: 22 February 2021
-#  Date last edit: 14 April 2021
+#  Decision Modelling for Health Economic Evaluation
+#  Advanced Course Exercise 3a (Part 1): TEMPLATE FILE
+#  Authors: Andrew Briggs, Jack Williams & Nichola Naylor
 
 ### Loading useful packages
 library(data.table)
