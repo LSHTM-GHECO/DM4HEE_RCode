@@ -1,9 +1,8 @@
-#  DM4HEE 
-#  Exercise 6.6b - Expected value of partial perfect information (EVPPI)
-#  Author:  Jack Williams & Nichola Naylor
-#  Date created: 25 March 2021
-#  Date last edit: 25 March 2021
+#  Decision Modelling for Economic Evaluation
+#  Advanced Course Exercise 4b (Part 2): TEMPLATE FILE
+#  Authors: Andrew Briggs, Jack Williams & Nichola Naylor
 
+## !! to do
 
 # The source function runs the EVPI model - so that data / model are avaialable here
 

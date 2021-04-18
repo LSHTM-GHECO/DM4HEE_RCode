@@ -1,0 +1,86 @@
+---
+title: "Value of Informaton"
+subtitle: "Advanced Course Module 4"
+author: "Nichola Naylor & Jack Williams"
+date: "18 April 2021"
+output:
+  pdf_document: default
+  html_document: default
+header-includes:
+- \usepackage{titling}
+- \pretitle{\begin{center}\LARGE\includegraphics[width=12cm]{logo.png}\\[\bigskipamount]}
+- \posttitle{\end{center}}
+urlcolor: blue
+linkcolor: red
+---
+
+## Overview
+
+## TO BE ADAPTED
+
+The purpose of this exercise is to show how the model you have already developed can be adapted to calculate the expected value of perfect information (EVPI).  As a first step, the overall EVPI for the model is calculated in order to summarise the overall importance of uncertainty for decision-making.  Secondly, the partial EVPI for individual parameters (or groups of parameters) can be calculated in order to examine the individual contribution of different parameter (combinations) to the overall uncertainty.
+
+The step-by-step guide below will take you through the following stages for calculating expected value of information for the overall decision problem and for the parameters of the decision model.
+
+Calculating per patient EVPI from simulation output
+Calculating the effective population and population EVPI
+Plotting EVPI as a function of the ceiling ratio
+Partial EVPI for a parameter
+Plotting partial EVPIs.
+
+There are two templates for this exercise.  Begin with the file Exercise 6.6a – template.R for parts 1 - 3 above.  Once complete, you will be prompted to open Exercise 6.6b – template.R to continue the exercise.
+
+1.	Calculating per patient EVPI from simulation output
+
+In the template file you will find that we have returned to the model from Exercise 5.7  – where there is one new prosthesis to compare to the standard prosthesis.  Move to the <Simulation> section, which you should recognise from the previous exercise.  Recall that, under a decision theoretic approach, it is the expected outcome that should guide the decision.  That is, we will use the new prosthesis if it has an expected net benefit that is greater than that of the standard prosthesis.  However, due to uncertainty, sometimes we will make the wrong decision and the losses associated with the wrong decision are the net-benefits forgone. 
+
+In row four of the net-benefit columns (X to Z), record the average net-benefit across the 1000 Monte Carlo simulations.
+In the EVPI column (AK) calculate the maximum of the net-benefits observed for standard or NP1 for each of the 1000 simulations (if we think of each simulation if like a ‘realisation of a state of the world’ then this column represents net-benefits under perfect information  -- where we always choose the prosthesis with the greatest net-benefit).
+Now calculate the average across the net-benefits we would have under perfect information in cell AK4.
+Finally, in cell AK1, calculate the difference between the average of the maximised net-benefits and the maximum of the averages (X4 and Y4) – this gives the EVPI for the individual.
+
+
+2.	Calculating the effective population and population EVPI
+
+Of course, there will be more than one patient eligible for a particular treatment.  Therefore, the individual patient EVPI must be inflated by the effective population, which is a function of the eligible patients per annum and the expected lifetime of the technology.  For the hip replacement example, we are going to assume an effective technology life of ten years with 40,000 new patients eligible for treatment each year.
+
+In column AN link the cell showing the 40,000 patients per annum to the individual years of the technology lifetime and discount the population.
+Sum the result in cell AN4 to give the effective population (discounted) over the lifetime of the technology.
+Finally, multiply this effective population by the individual EVPI in cell AK1 to give the EVPI for the population in cell AP1.
+
+
+3.	Plotting EVPI as a function of the ceiling ratio
+
+Since EVPI is calculated using net-benefit and net-benefit is a function of the unknown ceiling ratio it is important to estimate EVPI as a function of the ceiling ratio.
+
+If you have calculated everything correctly so far the population EVPI should automatically change when you enter a new value for the ceiling ratio in cell Z1.  Test this and when you are satisfied all is well, run the macro ‘EVPI’ which will use ceiling ratios from column AP and record the corresponding EVPI in column AQ.
+Now plot these results on the figure template <EVPI>.
+Notice the peak in EVPI – where does this occur?
+
+4.	Partial EVPI for a parameter
+
+The overall EVPI for the model is a useful upper limit on returns to future research.  However, of crucial importance is which particular parameters (or groups of related parameters) are most important in terms of having the greatest value of information.  Partial EVPI approaches are designed to look at just that.  They work by looking at the value of information of the remaining parameters of the model if we assume perfect information for the parameter of interest. 
+
+Begin by opening up the template file ‘Exercise 6.6b – Template.R’.  In this exercise, the approach is illustrated using the effectiveness parameter for the new prosthesis rrNP1.   The exercise will get you to manually run through a looped exercise of obtaining estimates of net-benefit assuming that the value of rrNP1 is known.  This may begin to appear repetitive – but the aim is to get a full appreciation of the approach before running a pre-written macro which will do the same thing but many more times (the aim is to get an understanding of the process rather than to give you practice in macro writing!)
+
+Start by checking the ceiling ratio value in cell Z1 is set to 2200 (this value is chosen to give a high EVPI for this part of the exercise!)
+We wish to estimate the effect of certain knowledge of rrNP1 on reducing the expected cost of uncertainty.  However, we are uncertain as to the true value of rrNP1, therefore the first step is to draw a value at random from the distribution of rrNP1.  Note that this can be done simply by copying the value in cell C27 of the <Parameters> section and using the ‘PasteSpecial/values’ command to enter this value into cell B27.
+The model now has a constant value for rrNP1 (drawn from its estimated distribution).  Now run the MCsimulation macro to estimate the effect of the joint uncertainty in all the remaining parameters of the model.
+Copy the average net benefits for each prosthesis (cells X4:Y4) into the AS6:AT6 cells, remembering to use the ‘PasteSpecial/values’ command.
+Now repeat steps (ii) to (v) nine more times to give ten average net-benefits for different draws from the distribution of rrNP1.  Record these values in AS7:AT15.  
+(Note, if your PC is slow such that this is taking a long period of time reduce the number of times you do this looping before progressing to the next step).
+Now average across these ten evaluations of net benefit to give an overall net-benefit averaged over the draws from the distribution of rrNP1.  Record these values in cells AS4:AT4.  Note that these values are equivalent to the average net-benefits over all uncertainty in all parameters (since uncertainty over rrNP1 has been reintegrated.)
+In column AU6:AU15, find the maximum of the net-benefits in columns AS and AT for the ten realisations you have obtained.  This is the perfect information payoff given certainty over rrNP1.  Calculate the average value in cell AU4.
+The partial EVPI for an individual patient is now calculated by subtracting the expected payoff with uncertainty over all parameters (the maximum of cells AS4 and AT4) from the expected payoff with perfect information about rrNP1 (cell AU4).  Enter this formula in cell AX7 and multiply by the effective population (cell AN4) to give the partial EVPI on rNP1 for the population.
+Copy this partial EVPI from cell AX7 and paste into the partial EVPI table (cell AX11 using the ‘PasteSpecial/values’ command.
+The final step relates to ‘tidying up’ the model (this is crucial before moving on to section 5 below).  Copy the formula from cell B26 on the parameters section down to cell B27.  This returns the rrNP1 from a deterministic draw to the deterministic mean or probabilistic value (depending on the value of the switch in cell D3).
+
+5.	Plotting partial EVPIs 
+
+Now that you understand the process behind calculating partial EVPIs, take a moment to examine the macros recorded for you in the spreadsheet by opening the visual basic editor.  What you will see is a macro for six different parameters/groups of parameters (where parameters are related, such as utilities or survival parameters, it makes sense to consider their partial EVPI together).  An overall macro called ‘partialEVPI’ will run the full set of six partial EVPI macros and record the results in the table AX11:AX16.
+
+When you are happy with what the macros are doing, run the ‘partialEVPI’ macro.  
+
+Note: this macro runs 100 Monte Carlo simulations by 100 draws from the parameter (group) of interest.  Therefore it will take sometime to complete.  You may need to leave your computer running for sometime!  However – and this is very important – accurate estimation of partial EVPIs takes many more runs than this – we would recommend at least 1000 inner and 1000 outer loops.  Time to buy a faster computer – or employ someone with specific programming skills (we recognise our code suggestions are not the fastest possible, but we are not Visual Basic experts!)
+
+When the macro is finished running, plot the results of the partial EVPI analysis in the <partialEVPI> section template as simple bar chart.
