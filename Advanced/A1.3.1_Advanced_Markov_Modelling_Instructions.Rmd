@@ -1,13 +1,16 @@
 ---
 title: "Advanced Markov Models"
-subtitle: "Advanced Course Module 1"
 author: "Nichola Naylor & Jack Williams"
 date: "9 April 2021"
-output: html_document
-#  pdf_document: default
-#  html_document: default
+output:
+  pdf_document: default
+  html_document: default
+subtitle: Advanced Course Module 1
+header-includes:
+- \usepackage{titling}
+- \pretitle{\begin{center}\LARGE\includegraphics[width=12cm]{logo.png}\\[\bigskipamount]}
+- \posttitle{\end{center}}
 ---
-
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -15,9 +18,9 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Overview 
 
-In this exercise we will build a Markov model. Of particular interest is the use of time dependent transition functions to represent probabilities.  The exercise will get you to construct two types of time varying transition probabilities: (i) time-varying transitions from a life-table, and (ii) time-varying transitions estimated from a parametric survival model.
+In this exercise we will build a Markov model in R. Of particular interest is the use of time dependent transition functions to represent probabilities.  The exercise will get you to construct two types of time varying transition probabilities: (i) time-varying transitions from a life-table, and (ii) time-varying transitions estimated from a parametric survival model.
 
-The  step-by-step guide below will take you through a number of stages of developing the model which is based on a simplified version of a published cost-effectiveness model (Briggs et al. 2004).
+In this exercise we will be focusing on:
 
 1. Preparing parameters 
 2. Parametric time-dependent transitions from a survival analysis
@@ -27,21 +30,22 @@ The  step-by-step guide below will take you through a number of stages of develo
 6. Estimating cost-effectiveness (deterministically)
 
 
-Before beginning the exercise take a moment to familiarise yourself with the R template for the exercise, ‘Exercise 3.5 – template.R’.  
-
-**Figure 3.7** contains the overall structure of the model you are about to build and it will be worth you spending a little time familiarising yourself with this figure.  It contains state transition diagram of the four-state Markov model you will be building and contains a key to the different parameters of the model, which are seperated into three categories: transition probabilities, state costs and state utilities.  
+Before beginning the exercise take a moment to familiarise yourself with the R template for the exercise, ‘A1.3.1_Advanced_Markov_Modelling_Template.R' and the figure below. Figure A1.3.1a contains the overall structure of the model you are about to build and it will be worth you spending a little time familiarising yourself with this figure.  It contains state transition diagram of the four-state Markov model you will be building and contains a key to the different parameters of the model, which are seperated into three categories: transition probabilities, state costs and state utilities.  
 The model itself is constructed across a number of sections with separate sections for the parameters of the model and the final analysis, for the survival analysis used to estimate prosthesis failure rates, for each of the Markov model arms and for the life tables used for mortality rates.  Of course, there are many ways to structure models – much being down to personal preference.  However, we hope that you will find that our chosen way of presenting the model does not deviate too much from your own preferences!
 
+**Figure A1.3.1a** 
+![](markov_diagram.png)
 
 ## Step by step guide  
 
-Open the file ‘Exercise 3.5 – Template.R’ and start at the <Parameters> section of the script. 
+Open the corresponding template file and start at the <Parameters> section of the script. 
 
 You will see that there are parameters that need to be defined. We will use 3 useful packages for data manipulation - datatable, tidyr, and dplyr. You can have a look on the internet (e.g. via Google) for more information on these.
 
-The following cheat sheets are also available for 1) data.table and 2) tidyr and dplyr
+The following cheat sheets are also available:
+1) For data.table: 
 https://s3.amazonaws.com/assets.datacamp.com/img/blog/data+table+cheat+sheet.pdf 
-
+2) For tidyr and dplyr:
 https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf 
 
 \  
@@ -140,3 +144,12 @@ v) Finally, sum the columns to get the per patient predictions of cost, life exp
 Now perform the same processes for the NP1 treatment arm within the <NP1> section, then create an output matrix storing the differences in treatment costs and effects, and incremental cost-effectiveness ratio in the <Analysis> section. 
 
 Try re-running the model for a different sex and age groups (between 40 and 90 years), and/or different discount rates, and see differences in the results produced. 
+
+
+
+<script>
+   $(document).ready(function() {
+     $head = $('#header');
+     $head.prepend('<img src=\"logo.png\" style=\"float: right;width: 150px;\"/>')
+   });
+</script>
