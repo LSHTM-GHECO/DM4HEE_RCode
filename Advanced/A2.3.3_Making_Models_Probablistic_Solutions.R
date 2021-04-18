@@ -1,9 +1,6 @@
-#  DM4HEE 
-#  Exercise 4.8 - Making the THR model probabilistic
-#  Author: Andrew Briggs
-#  Edited by: Jack Williams & Nichola Naylor
-#  Date created: 22 February 2021
-#  Date last edit: 29 March 2021
+#  Decision Modelling for Economic Evaluation
+#  Advanced Course Exercise 2: SOLUTION FILE
+#  Authors: Andrew Briggs, Jack Williams & Nichola Naylor
 
 ### Loading useful packages
 library(data.table)
@@ -11,11 +8,11 @@ library(tidyr)
 library(dplyr)
 
 #  Reading the data needed from csv files
-hazards <- read.csv("inputs/hazardfunction.csv", header=TRUE) ## importing the hazard inputs from the regression analysis
+hazards <- read.csv("Advanced/A0.2_R_Starting Material_for_Advanced_Course/hazardfunction.csv", header=TRUE) ## importing the hazard inputs from the regression analysis
 
-cov.55<-read.csv("inputs/cov55.csv",row.names=1,header=TRUE) ## importing the 
+cov.55<-read.csv("Advanced/A0.2_R_Starting Material_for_Advanced_Course/cov55.csv",row.names=1,header=TRUE) ## importing the 
 
-life.table <- read.csv("inputs/life-table.csv", header=TRUE)
+life.table <- read.csv("Advanced/A0.2_R_Starting Material_for_Advanced_Course/life-table.csv", header=TRUE)
 life.table<- as.data.table(life.table)
 
 #########**** PARAMETERS *****######
@@ -49,9 +46,9 @@ tp.PTHR2dead <- rbeta(1,a.PTHR2dead,b.PTHR2dead) ## Operative mortality rate  (O
 # since we assume the same shape parameters for RTHR : 
 tp.RTHR2dead <- rbeta(1,a.PTHR2dead,b.PTHR2dead)  ## Operative mortality rate (OMR) following revision THR
 
-a.rrr <- 4
-b.rrr <- 100-a.rrr
-tp.rrr <-rbeta(1,a.rrr,b.rrr) ## Re-revision risk 
+a.rrr <- 4   ## alpha value for re-revision risk
+b.rrr <- 100-a.rrr  ## beta value for re-revision risk
+tp.rrr <-rbeta(1,a.rrr,b.rrr) ## Re-revision risk transition probability
 
 tp.PTHR2dead
 tp.RTHR2dead
@@ -96,29 +93,29 @@ mn.uSuccessP <- 0.85 ## mean utility value for successful primary prosthesis
 se.uSuccessP <- 0.03 ## standard errror utility value for successful primary prosthesis
 
 ab.uSuccessP <- mn.uSuccessP*(1-mn.uSuccessP)/(se.uSuccessP^2) ## estimating alpha plus beta (ab)
-a.uSuccessP<-mn.uSuccessP*ab.uSuccessP ## estimating alpha (a)
-b.uSuccessP<-a.uSuccessP*(1-mn.uSuccessP)/mn.uSuccessP ## estimating beta (b)
-uSuccessP<-rbeta(1,a.uSuccessP,b.uSuccessP) ## drawing from the Beta distribution based on a and b
+a.uSuccessP <- mn.uSuccessP*ab.uSuccessP ## estimating alpha (a)
+b.uSuccessP <- a.uSuccessP*(1-mn.uSuccessP)/mn.uSuccessP ## estimating beta (b)
+uSuccessP <- rbeta(1,a.uSuccessP,b.uSuccessP) ## drawing from the Beta distribution based on a and b
 
 ## revision surgery
-mn.uSuccessR<-0.75 ## mean utility value for having a successful Revision THR
-se.uSuccessR<-0.04 ## standard error utility value for having a successful Revision THR
+mn.uSuccessR <- 0.75 ## mean utility value for having a successful Revision THR
+se.uSuccessR <- 0.04 ## standard error utility value for having a successful Revision THR
 
-ab.uSuccessR<-mn.uSuccessR*(1-mn.uSuccessR)/(se.uSuccessR^2) ## alpha + beta (ab)
-a.uSuccessR<-mn.uSuccessR*ab.uSuccessR ## alpha (a)
-b.uSuccessR<-a.uSuccessR*(1-mn.uSuccessR)/mn.uSuccessR ## beta(b)
-uSuccessR<-rbeta(1,a.uSuccessR,b.uSuccessR) ## drawing from the Beta distribution based on a and b
+ab.uSuccessR <- mn.uSuccessR*(1-mn.uSuccessR)/(se.uSuccessR^2) ## alpha + beta (ab)
+a.uSuccessR <- mn.uSuccessR*ab.uSuccessR ## alpha (a)
+b.uSuccessR <- a.uSuccessR*(1-mn.uSuccessR)/mn.uSuccessR ## beta(b)
+uSuccessR <- rbeta(1,a.uSuccessR,b.uSuccessR) ## drawing from the Beta distribution based on a and b
 
 ## during the revision period 
-mn.uRevision<-0.30 ## mean utility score during the revision period
-se.uRevision<-0.03 ## standard error utility score during the revision period
+mn.uRevision <- 0.30 ## mean utility score during the revision period
+se.uRevision <- 0.03 ## standard error utility score during the revision period
 
-ab.uRevision<-mn.uRevision*(1-mn.uRevision)/(se.uRevision^2) ## alpha + beta (ab)
-a.uRevision<-mn.uRevision*ab.uRevision ## alpha (a)
-b.uRevision<-a.uRevision*(1-mn.uRevision)/mn.uRevision ## beta(b)
-uRevision<-rbeta(1,a.uRevision,b.uRevision) ## drawing from the Beta distribution based on a and b
+ab.uRevision <- mn.uRevision*(1-mn.uRevision)/(se.uRevision^2) ## alpha + beta (ab)
+a.uRevision  <- mn.uRevision*ab.uRevision ## alpha (a)
+b.uRevision  <- a.uRevision*(1-mn.uRevision)/mn.uRevision ## beta(b)
+uRevision  <- rbeta(1,a.uRevision,b.uRevision) ## drawing from the Beta distribution based on a and b
 
-state.utilities<-c(0,uSuccessP,uRevision,uSuccessR,0)
+state.utilities <- c(0,uSuccessP,uRevision,uSuccessR,0) ## a vector of health state utilities
 
 ##  Hazard function ####
 ## Coefficients - on the log hazard scale
@@ -128,13 +125,13 @@ mn.ageC <- hazards$coefficient[3] ## Age coefficient in survival analysis for ba
 mn.maleC <- hazards$coefficient[4] ## Male coefficient in survival analysis for baseline hazard
 mn.NP1 <- hazards$coefficient[5]
 
-mn<-c(mn.lngamma, mn.cons,mn.ageC,mn.maleC,mn.NP1) ## vector of mean values from the regression analysis
+mn <- c(mn.lngamma, mn.cons,mn.ageC,mn.maleC,mn.NP1) ## vector of mean values from the regression analysis
 
 cholm <- t(chol(t(cov.55))) ## lower triangle of the Cholesky decomposition
 
-z<-rnorm(5,0,1) ## 5 random draws from the normal distribution
+z <- rnorm(5,0,1) ## 5 random draws from the normal distribution
 
-Tz<-cholm%*%z ## Tz which is the Cholesky matrix multiplied by the 5 random draws
+Tz <- cholm%*%z ## Tz which is the Cholesky matrix multiplied by the 5 random draws
 
 x <- mn+Tz ## mu plus Tz
 
@@ -144,14 +141,9 @@ r.ageC<-x[3,1]
 r.maleC<-x[4,1]
 r.NP1<-x[5,1]
 
-gamma <- exp(r.lngamma)
-lambda <- exp(r.cons+age*r.ageC+male*r.maleC)
-RR.NP1 <- exp(r.NP1)
-
-# sp0.LP<-cons+age*ageC+male*maleC
-# np1.LP<-cons+age*ageC+male*maleC+NP1
-## trying to keep consistent with the exercise 3.5 and excel
-
+gamma <- exp(r.lngamma)  ##Ancilliary parameter in Weibull distribution
+lambda <- exp(r.cons+age*r.ageC+male*r.maleC) ##Lambda parameter survival analysis
+RR.NP1 <- exp(r.NP1) ##Relative risk of revision for new prosthesis 1 compared to standard
 
 ##### LIFE TABLES #####
 
@@ -283,7 +275,7 @@ cost.SP0
 undisc.cost.SP0 <- colSums(cost.SP0) + c.SP0
 undisc.cost.SP0
 
-discount.factor.c <- 1/(1+dr.c)^cycle.v
+discount.factor.c <- 1/(1+dr.c)^cycle.v  ## discount factor matrix for costs
 discount.factor.c
 
 disc.cost.SP0 <- (discount.factor.c%*%cost.SP0) + c.SP0
@@ -296,7 +288,7 @@ cost.NP1
 undisc.cost.NP1 <- colSums(cost.NP1) + c.NP1
 undisc.cost.NP1
 
-disc.cost.NP1 <- (discount.factor.c%*%cost.NP1) + c.NP1
+disc.cost.NP1 <- (discount.factor.c%*%cost.NP1) + c.NP1 ## the same discount factor matrix can be used for costs for both arms
 disc.cost.NP1
 
 ###QALYS######
@@ -308,7 +300,7 @@ QALYs.SP0
 undisc.QALYs.SP0 <- colSums(QALYs.SP0)
 undisc.QALYs.SP0
 
-discount.factor.o <- 1/(1+dr.o)^cycle.v 
+discount.factor.o <- 1/(1+dr.o)^cycle.v  ## discount factor matrix for outcomes
 discount.factor.o
 
 disc.QALYs.SP0 <- discount.factor.o%*%QALYs.SP0
@@ -328,6 +320,6 @@ disc.QALYs.NP1
 output <- c(inc.cost = disc.cost.NP1 - disc.cost.SP0,
             inc.qalys = disc.QALYs.NP1 - disc.QALYs.SP0,
             icer = NA)
-output[3] <- output[1]/output[2]
+output["icer"] <- output["inc.cost"]/output["inc.lys"]
 
 round(output,2)
