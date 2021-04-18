@@ -153,7 +153,7 @@ disc.QALYs.SP0
 cost.SP0 <-      ### trace.SP0 multiplied by state costs
 cost.SP0
 
-undisc.cost.SP0 <-   ### total costs, don't forget about any one off costs that needed to be added here also
+undisc.cost.SP0 <-   ### total costs, don't forget about any one off cycle0 costs that needed to be added here also
 undisc.cost.SP0
 
 ## DISCOUNTING
@@ -221,9 +221,9 @@ disc.cost.NP1
 
 ####****ANALYSIS****####
 
-output <- c(inc.cost = ,
-            inc.lys =  ,
-            icer = NA)
+output <- c(inc.cost = , ## incremental cost
+            inc.lys =  ,  ## incremental effect 
+            icer = NA)  ## incremental cost-effectiveness ratioe
 output["icer"] <- 
 
 output
