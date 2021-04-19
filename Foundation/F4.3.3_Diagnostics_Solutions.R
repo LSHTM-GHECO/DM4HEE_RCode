@@ -1,6 +1,6 @@
-#  DM4HEE 
-#  Foundation Exercise 4 - Value of Diagnostics
-#  Author: Jack Williams and Nichola Naylor
+#  Decision Modelling for Health Economic Evaluation
+#  Foundation Course Exercise 4: SOLUTIONS FILE
+#  Authors: Jack Williams and Nichola Naylor 
 
 
 #### Model Parameters #### 

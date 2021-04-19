@@ -1,16 +1,15 @@
-#  DM4HEE 
-#  Foundation Exercise 4 - Value of Diagnostics
-#  Author: Jack Williams and Nichola Naylor
-
+#  Decision Modelling for Health Economic Evaluation
+#  Foundation Course Exercise 4: TEMPLATE FILE
+#  Authors: Jack Williams and Nichola Naylor 
 
 #### Model Parameters #### 
 
-lambda <- 30000 # This is our willingness to pay threshold
-prevalence <- 0.3 # This is the prevalence of the condition
+lambda <-    # This is our willingness to pay threshold
+prevalence <-    # This is the prevalence of the condition
 
 # Here are the outcomes, and the expected costs and QALYs for sick and healthy individuals, treated and not treated. 
 
-outcome.names <- c("Sick per treated", "Sick person not treated", 
+outcome.names <- c("Sick person treated", "Sick person not treated", 
                    "Healthy person treated", "Health person not treated")
 expected.cost <- c(6000, 5000, 3000, 1000)
 expected.qaly <- c(0.8, 0.5, 0.95, 1)
@@ -25,9 +24,7 @@ parameter.values$nmb <-
 # here you can see the expected costs, QALYs and NMB for each possible outcome
 parameter.values
 
-
 # Estimating costs and QALYs associated with treating all vs. treat none 
-
 treat.cost <- prevalence * expected.cost[1] + (1 - prevalence) * expected.cost[3]
 notreat.cost <- prevalence * expected.cost[2] + (1 - prevalence) * expected.cost[4]
 treat.qaly <- 

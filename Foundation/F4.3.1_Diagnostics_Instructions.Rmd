@@ -52,12 +52,10 @@ The exercise will be split into four parts:
 2) Expected value of perfect diagnostic information (EVPDI)
 3) Test accuracy for imperfect tests
 4) Expected value of clinical information (EVCI)
-
 \  
-
 ### 1. Setting up the model parameters and estimating NMB
 
-We start by defining the consequences / payoffs for the simple decision tree model presented in the videos.
+We start by defining the consequences / payoffs for the simple decision tree model presented in the videos. Please use the "F4.3.2_Diagnostics_Template.R" file. 
 
 i)	First, define the prevalence (0.3, i.e. 30%) and a willingness to pay threshold (£30,000). 
 
@@ -68,9 +66,9 @@ cbind(parameter.values[,1:3], nmb = c(NA, NA, NA, NA))
 ```
 
 
-iii) There is a blank column for the net monetary benefit (NMB) in the 'parameter.values' data,frame. Calculate the expected NMB payoff based on the costs and QALYs associated with each outcome, based on the prevalence assigned earlier.  _(Hint: The expected NMB will be important throughout the exercise, so make sure to calculate this correctly)._ 
+iii) There is a blank column for the net monetary benefit (NMB) in the `parameter.values` data,frame. Calculate the expected NMB payoff based on the costs and QALYs associated with each outcome, based on the prevalence assigned earlier. The NMB for Sick person treated should be equal to __£`r  format(parameter.values[1,"nmb"], scientific=FALSE) `__  . *Hint: The expected NMB will be important throughout the exercise, so make sure to calculate this correctly).*
 
-iv) Now that you have calculated the NMB for each outcome, this can be used to estimate  the NMB for a strategy of 'treat all' or 'treat none'. Based on the parameters table, create a data frame comparing the costs, QALYs and NMB associated with the two strategies. Note that these NMB calculations are specific to the prevalence of the condition. You can define this data frame as the 'expected.values' table, and the costs have been calcualted for you. Calculate the QALYs using the same calculation as the costs, and then calcualte the NMB, which has also been left blank. 
+iv) Now that you have calculated the NMB for each outcome, this can be used to estimate  the NMB for a strategy of 'treat all' or 'treat none'. Based on the parameters table, create a data.frame comparing the costs, QALYs and NMB associated with the two strategies. Note that these NMB calculations are specific to the prevalence of the condition. You can define this data frame as the `expected.values` table, and the costs have been calcualted for you. Calculate the QALYs using the same calculation as the costs, and then calcualte the NMB, which has also been left blank. 
 
 v) The next step will involve creating a function to estimate the NMB for the two strategies (treat all versus treat none) in the absence of a test. The function will be called `est.nmb`. Creating a function allows us to perform the calculation many times easily, by wrapping all of the code up into a set function, and passing arguments (e.g. inputs) to this function. 
 The function will take the parameter values (defined at the start of the exercise) and the lambda value (i.e. the willingness to pay threshold) by default, as these are assigned when the function is written. The function also requires the prevalence of the condition to evaluate the NMB. 
