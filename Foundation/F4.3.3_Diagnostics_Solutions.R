@@ -6,18 +6,20 @@
 #### Model Parameters #### 
 
 lambda <- 30000 # This is our willingness to pay threshold
-prevalence <- 0.3
+prevalence <- 0.3 # This is the prevalence of the condition
 
-# Payoffs and cost parameters for sick and healthy individuals, treated and not treated 
+# Here are the outcomes, and the expected costs and QALYs for sick and healthy individuals, treated and not treated. 
 
 outcome.names <- c("Sick per treated", "Sick person not treated", 
                    "Healthy person treated", "Health person not treated")
 expected.cost <- c(6000, 5000, 3000, 1000)
 expected.qaly <- c(0.8, 0.5, 0.95, 1)
 
+# These parameters are combined into a data frame, with the NMB column left blank, to be calculated seperately.
 parameter.values <- data.frame(outcome.names, expected.cost, expected.qaly,
                               nmb = NA)
 
+# Estimate the NMB associted with each outcome status: 
 parameter.values$nmb <- (expected.qaly * lambda) - expected.cost
 
 # here you can see the expected costs, QALYs and NMB for each possible outcome
