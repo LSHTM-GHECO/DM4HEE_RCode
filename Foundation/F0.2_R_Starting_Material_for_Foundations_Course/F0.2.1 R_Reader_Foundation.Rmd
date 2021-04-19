@@ -1,27 +1,144 @@
 ---
 title: "R Stream of Decision Modelling for Health Economic Evaluation Reader - Foundation Course"
 author: "Nichola Naylor & Jack Williams"
-date: "09/04/2021"
-output: html_document
-#  pdf_document: default
-#  html_document: default
+date: "19 April 2021"
+output:
+  pdf_document: default
+  html_document: default
+subtitle: Foundation Course Reader
+header-includes:
+- \usepackage{titling}
+- \pretitle{\begin{center}\LARGE\includegraphics[width=12cm]{logo.png}\\[\bigskipamount]}
+- \posttitle{\end{center}}
+urlcolor: blue
+linkcolor: red
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Course Reader 
+## Introduction
 
-Text about the course generally & R resouces:
+Welcome to the R Stream of Decision Modelling for Health Economic Evaluation Reader for the Foundation Course! 
 
-To include: 
-* Course description / general R links
-* Matrix array data frame etc (same as advanced, maybe exlude array as not in execise)
-* Subsetting / selecting data (same as advanced)
-* Maybe a bit at the bottom about there being another reader for the advanced course
+Over the course of the next few modules we will cover how to code Decision Trees (Module 2), Markov Models (Module 3) and Expected Value of Clinical & Diagnostic Information (Module 4).
 
-* No plots 
-* No distributions
-* No install packages
+This course stream is not intended to teach you how to use R, but rather to teach potential ways of constructing health economic evaluation models within R. For more information on how to use R seek readily available resources such as:
 
+* Free R books:
+http://www.cookbook-r.com
+
+* Free forums online can solve *almost* any problem:
+http://www.stackoverflow.com
+
+
+There are often many ways to do the same thing in R. Throughout this course we present one potential way of coding things, often opting for code which is easier to follow (for example, choosing a loop process over something more efficient but less intuitive). This is not to say another way is "wrong" or that the solutions provided are the only way to code these models. We encourage playing around with the code, checking whether the results align across the different methods. 
+
+## R Exercise Structure
+ 
+Each Module (excluding Module 1 which does not have an R exercise component) has the following:
+
+* An instruction pdf (e.g. "F2.3.1_Decision_Trees_Instructions.pdf" which refers to Foundation Module 2, R stream, File 1): This provides a step-by-step guide for each exercise, providing important information on parameters and hints & tips on how to code your models. This should be used in conjunction with...
+
+* A template R script (e.g. "F2.3.2_Decision_Trees_Template.R" which refers to Foundation Module 2, R stream, File 2): This provides an outline of the model code, with key variables, functions and/or loops to define - there are blank spaces to fill whilst following the Instructions pdf. 
+
+* A solutions R script (e.g. "F2.3.1_Decision_Trees_Solutions.pdf" which refers to Foundation Module 2, R stream, File 3) which provides a filled in model code script. If you run this R script (having in mind the section below about directory set up), this will provide the fully functional models and results. 
+
+## Setting up your working directory
+Once all of the above files have been downloaded from the course website, please make sure that you have a dedicated folder for the course code. This folder should become your working directory for the Foundation course. 
+
+If you want to manually set the working directory, then you can use the setwd() function, or alternatively, if you want to set the working directory automatically to the folder your are currently in, you can run the following code: 
+```{r, eval = FALSE} 
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+```
+
+
+## Some R Reminders
+
+We will use many base R functions throughout the course. You can see a simple cheat sheet here:
+https://www.rstudio.com/wp-content/uploads/2016/10/r-cheat-sheet-3.pdf 
+
+Key terms to be familiar with before starting: vectors, matrices, functions, loops. 
+
+**Vector**
+```{r, echo=TRUE}
+(vector <- c(1, 2, 3))
+```
+
+
+**Matrix**
+```{r, echo=TRUE}
+matrix(1:9, nrow = 3, ncol = 3)
+
+```
+
+
+**Functions**
+```{r, echo=TRUE}
+
+print.greeting <- function(){
+  print("hello")
+}
+print.greeting()
+```
+
+**For Loop**
+```{r, echo=TRUE}
+
+x <- c(1:5)
+x
+for(i in 1:5){
+  x[i] <- x[i]*2
+}
+x
+
+```
+
+## Subsetting and selecting data 
+
+Another important aspect of the course is selecting the appropraite data. For the various vectors, data frames and arrays, here are some selections of data
+
+
+**Vector**
+```{r, echo=TRUE}
+
+(vector <- c(10, 20, 30, 40))
+vector[2] # Takes the second element of the vector
+vector[3:4] # Takes the third and fourth element of the vector
+
+```
+
+**Matrix**
+```{r, echo=TRUE}
+x <- matrix(1:9, nrow = 3, ncol = 3)
+x
+## we can provide column and row names to matrices:
+colnames(x) <- c("a","b","c")
+rownames(x) <- c("d","e","f")
+x
+
+## these can be used to call values
+x["d","a"] ## remember: rowname first, then colname
+
+
+```
+**Data frame**
+```{r, echo=TRUE}  
+df <- data.frame(cost=1:5, effect=100:104)
+print(df)
+df[3,] # Third row (all columns)
+df[,2] # Second column (all rows)
+df[3,2] # Third row and second column value
+
+df$cost # We can also call columns by their column name
+df[1,"cost"] ## 1st row, cost value
+
+```
+
+## Other Information
+Please do let us know (via the blog post tool) whether there are any issues in the R exercise information provided. 
+
+If you are doing the Advanced course following this course, there will be a separate reader with additional information related to related material.
+
+## Happy coding! 
