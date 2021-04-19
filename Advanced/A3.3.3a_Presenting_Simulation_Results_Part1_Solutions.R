@@ -10,9 +10,9 @@ library(ggplot2)
 library(reshape2) 
 
 #  Reading the data needed from csv files
-hazards <- read.csv("A0.2_R_Starting Material_for_Advanced_Course/hazardfunction.csv", header=TRUE) ## importing the hazard inputs from the regression analysis
-cov.55 <- read.csv("A0.2_R_Starting Material_for_Advanced_Course/cov55.csv",row.names=1,header=TRUE) ## importing the covariance matrix
-life.table <- read.csv("A0.2_R_Starting Material_for_Advanced_Course/life-table.csv", header=TRUE)
+hazards <- read.csv("Advanced/A0.2_R_Starting Material_for_Advanced_Course/hazardfunction.csv", header=TRUE) ## importing the hazard inputs from the regression analysis
+cov.55 <- read.csv("Advanced/A0.2_R_Starting Material_for_Advanced_Course/cov55.csv",row.names=1,header=TRUE) ## importing the covariance matrix
+life.table <- read.csv("Advanced/A0.2_R_Starting Material_for_Advanced_Course/life-table.csv", header=TRUE)
 life.table<- as.data.table(life.table)
 
 ####***** THR MODEL FUNCTION ****#####
@@ -80,6 +80,10 @@ se.uRevision<-0.03 ## standard error utility score during the revision period
 ab.uRevision<-mn.uRevision*(1-mn.uRevision)/(se.uRevision^2) ## alpha + beta (ab)
 a.uRevision<-mn.uRevision*ab.uRevision ## alpha (a)
 b.uRevision<-a.uRevision*(1-mn.uRevision)/mn.uRevision ## beta(b)
+
+## discount matrices
+discount.factor.c <- 1/(1+dr.c)^cycle.v ## the discount factor matrix
+discount.factor.o <- 1/(1+dr.o)^cycle.v  ## discount factor matrix for utility 
 
 model.THR <- function(age=60, male=0) {
   ### A function running the THR model, setting age and sex
@@ -241,7 +245,7 @@ model.THR <- function(age=60, male=0) {
   cost.SP0 <- trace.SP0%*%state.costs  ## the cost of SP0 based on cost per state and numbers in each state per cycle 
   # the above retruns a matrix of 1 column and 60 rows
   undisc.cost.SP0 <- colSums(cost.SP0) + c.SP0  ## the (undiscouted) sum of cost.SP0 plus the 1 off Cost of a primary THR procedure (c.SP0)
-  discount.factor.c <- 1/(1+dr.c)^cycle.v ## the discount factor matrix
+  
   disc.cost.SP0 <- (discount.factor.c%*%cost.SP0) + c.SP0   ## the discouted sum of cost.SP0 plus the 1 off Cost of a primary THR procedure (c.SP0)
   
   # NP1 ARM
@@ -253,7 +257,7 @@ model.THR <- function(age=60, male=0) {
   # STANDARD ARM
   QALYs.SP0 <- trace.SP0%*%state.utilities ## utility per cycle
   undisc.QALYs.SP0 <- colSums(QALYs.SP0) ## total undiscounted utility 
-  discount.factor.o <- 1/(1+dr.o)^cycle.v  ## discount factor matrix for utility 
+  
   disc.QALYs.SP0 <- colSums(discount.factor.o%*%QALYs.SP0) ## total discounted utility
   
   # NP1 ARM
@@ -268,7 +272,7 @@ model.THR <- function(age=60, male=0) {
   output <- c(cost.SP0 = disc.cost.SP0,
               qalys.SP0 = disc.QALYs.SP0,
               cost.NP1 = disc.cost.NP1,
-              qapls.NP1 = disc.QALYs.NP1,
+              qalys.NP1 = disc.QALYs.NP1,
               inc.cost = disc.cost.NP1 - disc.cost.SP0,
               inc.qalys = disc.QALYs.NP1 - disc.QALYs.SP0)
   
