@@ -33,7 +33,7 @@ http://www.cookbook-r.com
 http://www.stackoverflow.com
 
 
-There are often many ways to do the same thing in R. Throughout this course we present one potential way of coding things, often opting for code which is easier to follow (for example, choosing a loop process over something more efficient but less intuitive). This is not to say another way is "wrong" or that the solutions provided are the only way to code these models. We encourage playing around with the code, checking whether the results align across the different methods. 
+There are often many ways to do the same thing in R. Throughout this course we present one potential way of coding things, often opting for code which is easier to follow (for example, choosing a loop process over something more efficient but less intuitive), and also tending to use base R functions wherever possible. This is not to say another way is "wrong" or that the solutions provided are the only way to code these models. We encourage playing around with the code, checking whether the results align across the different methods. In some instances, we have also provided two different lines of code to produce the same output, to demonstrate the different approaches available. 
 
 ## R Exercise Structure
  
@@ -89,11 +89,11 @@ print.greeting()
 ```{r, echo=TRUE}
 
 x <- c(1:5)
-x
+print(x)
 for(i in 1:5){
   x[i] <- x[i]*2
 }
-x
+print(x)
 
 ```
 
