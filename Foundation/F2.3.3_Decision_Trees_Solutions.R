@@ -1,5 +1,5 @@
-#  DM4HEE 
-#  Foundation Course Exercise 2 
+#  Decision Modelling for Health Economic Evaluation
+#  Foundation Course Exercise 2: SOLUTION FILE
 #  Authors: Jack Williams and Nichola Naylor
 
 ####**** Parameters ****####  
@@ -30,12 +30,12 @@ test.path.2 <- p.hiv * p.int * (1 - p.trans.int)
 test.cost.2 <- cost.test * 1 + cost.int * 1
 test.cases.2 <- 0
 
-# Do not accept intervention (HIV+)
+# Do not accept intervention (HIV+) - Vertical transmission
 test.path.3 <- p.hiv * (1 - p.int) * p.trans.control 
 test.cost.3 <- cost.test * 1 + cost.int * 0
 test.cases.3 <- 1
 
-# Do not accept intervention (HIV+)
+# Do not accept intervention (HIV+) - No vertical transmission
 test.path.4 <- p.hiv * (1 - p.int) * (1 - p.trans.control) 
 test.cost.4 <- cost.test * 1 + cost.int * 0
 test.cases.4 <- 0
@@ -55,10 +55,10 @@ test.costs.vec <- c(test.cost.1, test.cost.2, test.cost.3, test.cost.4, test.cos
 test.cases.vec <- c(test.cases.1, test.cases.2, test.cases.3, test.cases.4, test.cases.5)
 
 ## Next, multiply the appropriate vectors to get each of the pathway costs
-testing.costs <- test.probs.vec * test.costs.vec
+testing.costs <- test.probs.vec * test.costs.vec  ## expected value of costs for each pathway
 testing.costs
 
-testing.cases <- test.probs.vec * test.cases.vec
+testing.cases <- test.probs.vec * test.cases.vec ## expected value of cases for each pathways
 testing.cases
 
 ## For the total costs and cases of the whole intervention arm (i.e. all 5 pathways)
@@ -70,12 +70,9 @@ testing.cases.total <- sum(testing.cases)
 testing.results <- (c(costs = testing.costs.total, cases = testing.cases.total))  
 testing.results
 
-
-
 ## No testing group 
 
 # Here we will evaluate the pathway probabilities for the no testing group
-
 
 # HIV positive and transmission
 notest.path.1 <- p.hiv * p.trans.control
@@ -108,8 +105,6 @@ notesting.cases.total <- sum(notesting.cases)
 notesting.results <- (c(costs = notesting.costs.total, nocases = notesting.cases.total))  
 notesting.results
 
-
-
 ####**** Analysis: Incremental results ****#### 
 
 # Reduction in probability of vertical transmission with testing and intervention 
@@ -121,8 +116,6 @@ incr.costs <- testing.costs.total - notesting.costs.total
 # Cost per HIV-infected birth avoided
 incremental.results <- incr.costs / cases.avoided
 incremental.results
-
-
 
 #### Example of using vectors to evaluate multiple pathways at once ####
 

@@ -1,13 +1,18 @@
 ---
 title: "Building a decision tree model of antenatal HIV transmission"
 author: "Jack Williams & Nichola Naylor"
-date: "14 April 2021"
+date: "19 April 2021"
 output:
   pdf_document: default
   html_document: default
 subtitle: Foundation Course Exercise 2
+header-includes:
+- \usepackage{titling}
+- \pretitle{\begin{center}\LARGE\includegraphics[width=12cm]{logo.png}\\[\bigskipamount]}
+- \posttitle{\end{center}}
+urlcolor: blue
+linkcolor: red
 ---
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -52,9 +57,9 @@ To help visualise the decision tree model structure, we have provided the decisi
 
 ## Tasks
 
-i) First, assign the appropriate values to each parameter, using the data derived from the literature review, given above. 
+i) First, assign the appropriate values to each parameter, using the data derived from the literature review, given above within the <Parameters> section of the Template R script (we have listed the variable names for you). 
 
-ii) Create each of the five pathways for the testing arm of the decision tree, estimating the pathway probabilities, costs, and cases (HIV births due to vertical transmission) for each pathway. _(Hint: we have provided a naming convention, working through pathways 1 to 5 for the testing arm and have completed the first one for you)._
+ii) Within the <Decision Tree> section, create each of the five pathways - shown in the figure above - for the testing arm of the decision tree, estimating the pathway probabilities, costs, and cases (HIV births due to vertical transmission) for each pathway. _(Hint: We have provided a naming convention, working through pathways 1 to 5 for the testing arm and have completed the first one for you)._
 
 iii) Once you have estimated the probabilities, costs and cases for each pathway, multiply the probability of each pathway with its expected payoffs (costs and cases). Then evaluate the entire testing pathway to calcualte the estimated costs and cases associated with testing.  _(Hint: Create vectors of the pathway probabilities and payoffs, and then multiply these vectors together. Once you have done this you can use the_ `sum()` _function to get the total for the testing arm)._  
 Once you have estimated the total costs and cases for the testing arm, the results should look like this: 
@@ -66,9 +71,11 @@ testing.results
 
 iv) Now that you have estimated the total costs and cases associated with testing, do the same for the no testing arm, following the steps outlined in ii) and iii) to help you.   
 
-v) Once you have the costs and cases associated with the testing arm and no testing arm of the decision tree, use these to calculate the incremental costs and the cases avoided, and calcualte the expected cost per HIV infected child avoided. 
+v) Now onto the analysis: Once you have the costs and cases associated with the testing arm and no testing arm of the decision tree, use these to calculate the incremental costs and the cases avoided, and calcualte the expected cost per HIV infected child avoided.
 
 What do your results show? You should have an estimated __£`r round(incremental.results,2)`__ per HIV-infected child avoided. If not, then make sure that you have used the correct parameters in calculating the incremental results. 
+
+Within the solutions R file, we've also included an example of how you can use vectors to evaluate multiple pathways at once. Vectors will become very important in the next exercise.
 
 Now that we have finished the practical component of the exercise, consider some of the other aspects of this analysis:
 
@@ -76,11 +83,3 @@ vi)	What are likely to be the key sensitivity analyses to undertake?
 
 vii) What are the weaknesses of the analysis?
 
-
-
-<script>
-   $(document).ready(function() {
-     $head = $('#header');
-     $head.prepend('<img src=\"logo.png\" style=\"float: right;width: 150px;\"/>')
-   });
-</script>
