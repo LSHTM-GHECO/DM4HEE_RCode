@@ -1,9 +1,7 @@
-#  DM4HEE 
-#  Exercise 4.8 - Making the THR model probabilistic
-#  Author: Andrew Briggs
-#  Edited by: Jack Williams & Nichola Naylor
-#  Date created: 22 February 2021
-#  Date last edit: 12 March 2021
+#  Decision Modelling for Health Economic Evaluation
+#  Advanced Course Exercise 2: Additional Information
+#  Authors: Andrew Briggs, Jack Williams & Nichola Naylor
+
 
 ### Loading useful packages
 library(data.table)

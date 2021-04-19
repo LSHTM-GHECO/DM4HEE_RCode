@@ -1,9 +1,6 @@
-#  ADVANCED MODULE 3 PART 1 - Analysing THR model simulation results
-#  TEMPLATE
-#  Author: Andrew Briggs
-#  Edited by: Nichola Naylor & Jack Williams
-#  Date created: 22 February 2021
-#  Date last edit: 14 April 2021
+#  Decision Modelling for Health Economic Evaluation
+#  Advanced Course Exercise 3a (Part 1): TEMPLATE FILE
+#  Authors: Andrew Briggs, Jack Williams & Nichola Naylor
 
 ### Loading useful packages
 library(data.table)
@@ -13,9 +10,9 @@ library(ggplot2)
 library(reshape2) 
 
 ###  Reading in the data needed from csv files
-hazards <- read.csv("A0.2_R_Starting Material_for_Advanced_Course/hazardfunction.csv", header=TRUE) ## importing the hazard inputs from the regression analysis
-cov.55 <- read.csv("A0.2_R_Starting Material_for_Advanced_Course/cov55.csv",row.names=1,header=TRUE) ## importing the covariance matrix
-life.table <- read.csv("A0.2_R_Starting Material_for_Advanced_Course/life-table.csv", header=TRUE)
+hazards <- read.csv("Advanced/A0.2_R_Starting Material_for_Advanced_Course/hazardfunction.csv", header=TRUE) ## importing the hazard inputs from the regression analysis
+cov.55 <- read.csv("Advanced/A0.2_R_Starting Material_for_Advanced_Course/cov55.csv",row.names=1,header=TRUE) ## importing the covariance matrix
+life.table <- read.csv("Advanced/A0.2_R_Starting Material_for_Advanced_Course/life-table.csv", header=TRUE)
 life.table<- as.data.table(life.table)
 
 
@@ -24,7 +21,7 @@ life.table<- as.data.table(life.table)
 # SETTING CONSTANT PARAMETERS OUTSIDE THE FUNCTION 
 ##### DETERMINISTIC PARAMETERS ######
 dr.c <-  ## set the discount rate for costs 
-dr.o <-  ## set the discount rate for outcomes 
+dr.o <-  ## set the discount rate for outcomes
 cycles <-  ## set the number of cycles running the model
 state.names <-   ## a vector of state names
 n.states <-   ## number of states in the model
@@ -47,6 +44,14 @@ c.NP1 <-  ## Cost of new prosthesis 1
 
 # FOR UTILITY ESTIMATION
 ## define here the mean utility and related alpha and beta values
+
+# Discount factor matrices
+cycle.v <- 1:cycles ## a vector of cycle numbers 1 - 60
+
+discount.factor.c <-     ## the discount factor matrix for costs
+
+discount.factor.o <-       ## discount factor matrix for utility 
+
 
 model.THR <- function(age=60, male=0) {
   ### A function running the THR model, setting age and sex
@@ -180,7 +185,7 @@ model.THR <- function(age=60, male=0) {
   cost.SP0 <- trace.SP0%*%state.costs  ## the cost of SP0 based on cost per state and numbers in each state per cycle 
   # the above retruns a matrix of 1 column and 60 rows
   undisc.cost.SP0 <-        ## the (undiscouted) sum of cost.SP0 plus the 1 off Cost of a primary THR procedure (c.SP0)
-  discount.factor.c <-     ## the discount factor matrix
+ 
   disc.cost.SP0 <-        ## the discouted sum of cost.SP0 plus the 1 off Cost of a primary THR procedure (c.SP0)
   
   # NP1 ARM
@@ -192,7 +197,7 @@ model.THR <- function(age=60, male=0) {
   # STANDARD ARM
   QALYs.SP0 <-            ## utility per cycle
   undisc.QALYs.SP0 <-        ## total undiscounted utility 
-  discount.factor.o <-       ## discount factor matrix for utility 
+    
   disc.QALYs.SP0 <-          ## total discounted utility
   
   # NP1 ARM
@@ -204,7 +209,7 @@ model.THR <- function(age=60, male=0) {
   output <- c(cost.SP0 =    , ## fill in with variable(s) listed above 
               qalys.SP0 =    ,
               cost.NP1 =     ,
-              qapls.NP1 =    ,
+              qalys.NP1 =    ,
               inc.cost =     , 
               inc.qalys =    )
   
@@ -215,9 +220,10 @@ model.THR <- function(age=60, male=0) {
 ## testing the function:
 model.THR(age=60, male=0) 
 
-#### RUNNING THE SIMULATION
+#### RUNNING THE SIMULATION ####
 sim.runs <-    ## the number of simulation runs
 
+## creating an empty data.frame for simulation results to fill:
 simulation.results <- data.frame("cost.SP0" =     , ## use the rep() function to create sim.runs rows of values
                                  "qalys.SP0"=     ,
                                  "cost.NP1" =     ,
@@ -225,6 +231,7 @@ simulation.results <- data.frame("cost.SP0" =     , ## use the rep() function to
                                  "inc.cost" =     ,
                                  "inc.qalys"=     )
 
+## running the simulations and filling the simulation.results data.frame:
 for(i in 1:sim.runs){
   ## define each row as a result from each run  
   

@@ -1,9 +1,6 @@
-#  DM4HEE 
-#  Exercise 3.5 - Replication of THR model
-#  Author: Andrew Briggs
-#  Edited by: Jack Williams & Nichola Naylor
-#  Date created: 20 February 2021
-#  Date last edit: 22 March 2021
+#  Decision Modelling for Health Economic Evaluation
+#  Advanced Course Exercise 1: SOLUTION FILE
+#  Authors: Andrew Briggs, Jack Williams & Nichola Naylor
 
 ### Loading useful packages
 library(data.table)
@@ -12,7 +9,6 @@ library(dplyr)
 
 #########**** PARAMETERS *****######
 #  Start by defining parameters
-
 #  Demographics & Discount rates
 
 age <- 60 ## set age group for analyses
@@ -21,13 +17,13 @@ male <- 0 ## set sex identified, 0 = female and 1 = male
 dr.c <- 0.06 ## set the discount rate for costs (6%)
 dr.o <- 0.015 ## set the discount rate for outcomes (15%)
 
-cycles <- 60
+cycles <- 60 ## number of cycles
 
 state.names <- c("P-THR","successP-THR","R-THR","successR-THR","Death")
 n.states <- length(state.names)
 
 #  Seed the starting states of the model
-seed <- c(1,0,0,0,0)
+seed <- c(1,0,0,0,0) ## all people start in the first state
 
 #  Transition probabilities
 tp.PTHR2dead <- 0.02 ## Operative mortality rate (OMR) following primary THR
@@ -35,17 +31,20 @@ tp.RTHR2dead <- 0.02 ##Operative mortality rate (OMR) following revision THR
 tp.rrr <- 0.04 ## Re-revision risk (assumed to be constant)
 
 #  Costs
-c.primary <- 0  ## Cost of a primary THR procedure - 
+c.primary <- 0  ## Cost of a primary THR procedure 
 ## Note that the cost of the primary procedure is excluded (set to 0): since both arms have this procedure it is assumed to net out of the incremental analysis.  However, if the model was to be used to estimate lifetime costs of THR it would be important to include.
-c.revision <- 5294 ## Cost of one cycle in the Revision THR state (national reference costs for revision hip or knee)
 c.success <- 0 ## Cost of one cycle in a 'success' state (primary or revision)
 ## Note for c.sucess There are assumed to be no ongoing monitoring costs for successful THR.  However, this parameter is included in case users want to change this assumption.
-c.SP0 <- 394 ## Cost of standard prosthesis
-c.NP1 <- 579 ## Cost of new prosthesis 1
+
+c.revision <- 5294 ## Cost of one cycle in the Revision THR state (national reference costs for revision hip or knee)
+
 state.costs<-c(c.primary, c.success, c.revision,c.success,0) ## a vector with the costs for each state
 
+c.SP0 <- 394 ## Cost of standard prosthesis
+c.NP1 <- 579 ## Cost of new prosthesis 1
+
 # Life years
-state.lys <- c(1,1,1,1,0)
+state.lys <- c(1,1,1,1,0)  ## a vector of life year effects for each state
 
 #  Utilities
 u.success.p <- 0.85 ## Utility score for having had a successful Primary THR
@@ -54,7 +53,8 @@ u.revision <- 0.30 ## Utility score during the revision period
 state.utilities <- c(0,u.success.p,u.revision,u.success.r,0) ## a vector with the utilities for each state
 
 #### HAZARD FUNCTION & ASSOCIATED PARAMETERS #####
-hazards <- read.csv("inputs/hazardfunction.csv") ## importing the hazard inputs from the regression analysis
+
+hazards <- read.csv("Advanced/A0.2_R_Starting Material_for_Advanced_Course/hazardfunction.csv") ## importing the hazard inputs from the regression analysis
 
 ## Coefficients - on the log hazard scale
 r.lnlambda <- hazards$coefficient[1] ## Ancilliary parameter in Weibull distribution - equivalent to lngamma coefficient
@@ -69,7 +69,7 @@ RR.NP1 <- exp(r.NP1)
 
 ##### LIFE TABLES #####
 #  Read in the life table
-life.table <- read.csv("inputs/life-table.csv") ## importing the life table csv inputs
+life.table <- read.csv("Advanced/A0.2_R_Starting Material_for_Advanced_Course/life-table.csv") ## importing the life table csv inputs
 colnames(life.table) <- c("Age","Index","Males","Female") ## making sure column names are correct
 
 cycle.v <- 1:cycles ## a vector of cycle numbers 1 - 60
@@ -84,6 +84,7 @@ setkey(death.risk,"current.age") ## using the setkey function for death.risk to 
 death.risk <- life.table[death.risk, roll=TRUE] ## joining life.table and death.risk by the key columns, rolling forward between index values
 
 ####**** STANDARD *****#####
+
 ## defining the revision risks based on the parameters calculated above and cycle vector
 revision.risk.sp0 <- 1- exp(lambda * ((cycle.v-1) ^gamma-cycle.v ^gamma))
 revision.risk.np1 <- 1- exp(lambda * RR.NP1 * ((cycle.v-1) ^gamma-cycle.v ^gamma))
@@ -144,6 +145,7 @@ rowSums(trace.SP0)
 
 
 ###Life Years####
+
 lys.SP0 <- trace.SP0%*%state.lys
 lys.SP0
 undisc.lys.SP0 <- colSums(lys.SP0)
@@ -256,7 +258,7 @@ disc.cost.NP1
 output <- c(inc.cost = disc.cost.NP1 - disc.cost.SP0,
             inc.lys = disc.QALYs.NP1 - disc.QALYs.SP0,
             icer = NA)
-output[3] <- output[1]/output[2]
+output["icer"] <- output["inc.cost"]/output["inc.lys"]
 
 output
 

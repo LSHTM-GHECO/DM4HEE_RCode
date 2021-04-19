@@ -1,7 +1,8 @@
 #  Decision Modelling for Health Economic Evaluation
-#  Advanced Course Exercise 4a (Part 1): SOLUTION FILE
+#  Advanced Course Exercise 4a (Part 1): TEMPLATE FILE
 #  Authors: Andrew Briggs, Jack Williams & Nichola Naylor
 
+### !!! to do
 
 # Load packages 
 library(data.table)

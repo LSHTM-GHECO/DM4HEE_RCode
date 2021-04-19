@@ -1,9 +1,6 @@
-#  ADVANCED MODULE 3 PART 1 - Analysing THR model simulation results
-#  SOLUTIONS
-#  Author: Andrew Briggs
-#  Edited by: Nichola Naylor & Jack Williams
-#  Date created: 22 February 2021
-#  Date last edit: 14 April 2021
+#  Decision Modelling for Health Economic Evaluation
+#  Advanced Course Exercise 3a (Part 1): SOLUTION FILE
+#  Authors: Andrew Briggs, Jack Williams & Nichola Naylor
 
 ### Loading useful packages
 library(data.table)
@@ -13,9 +10,9 @@ library(ggplot2)
 library(reshape2) 
 
 #  Reading the data needed from csv files
-hazards <- read.csv("A0.2_R_Starting Material_for_Advanced_Course/hazardfunction.csv", header=TRUE) ## importing the hazard inputs from the regression analysis
-cov.55 <- read.csv("A0.2_R_Starting Material_for_Advanced_Course/cov55.csv",row.names=1,header=TRUE) ## importing the covariance matrix
-life.table <- read.csv("A0.2_R_Starting Material_for_Advanced_Course/life-table.csv", header=TRUE)
+hazards <- read.csv("Advanced/A0.2_R_Starting Material_for_Advanced_Course/hazardfunction.csv", header=TRUE) ## importing the hazard inputs from the regression analysis
+cov.55 <- read.csv("Advanced/A0.2_R_Starting Material_for_Advanced_Course/cov55.csv",row.names=1,header=TRUE) ## importing the covariance matrix
+life.table <- read.csv("Advanced/A0.2_R_Starting Material_for_Advanced_Course/life-table.csv", header=TRUE)
 life.table<- as.data.table(life.table)
 
 ####***** THR MODEL FUNCTION ****#####
@@ -84,6 +81,11 @@ ab.uRevision<-mn.uRevision*(1-mn.uRevision)/(se.uRevision^2) ## alpha + beta (ab
 a.uRevision<-mn.uRevision*ab.uRevision ## alpha (a)
 b.uRevision<-a.uRevision*(1-mn.uRevision)/mn.uRevision ## beta(b)
 
+## discount matrices
+cycle.v <- 1:cycles ## a vector of cycle numbers 1 - 60
+discount.factor.c <- 1/(1+dr.c)^cycle.v ## the discount factor matrix
+discount.factor.o <- 1/(1+dr.o)^cycle.v  ## discount factor matrix for utility 
+
 model.THR <- function(age=60, male=0) {
   ### A function running the THR model, setting age and sex
   ### INPUTS: age = a numeric value, male = 0 for female and 1 for male 
@@ -92,7 +94,6 @@ model.THR <- function(age=60, male=0) {
   ## LIFE TABLE DATA 
   # This is included within the function as it varies by age and sex (which are inputs into the function)
   colnames(life.table) <- c("Age","Index","Males","Female") ## making sure column names are correct
-  cycle.v <- 1:cycles ## a vector of cycle numbers 1 - 60
   current.age <- age + cycle.v ## a vector of cohort age throughout the model
   life.table <- as.data.table(life.table) ## turning life.table into a data.table 
   death.risk <- as.data.table(current.age) ## turning current age into a data.table 
@@ -169,7 +170,7 @@ model.THR <- function(age=60, male=0) {
     tm.SP0["P-THR","Death",i] <- tp.PTHR2dead ## Primary THR either enter the death state or.. or..
     tm.SP0["P-THR","successP-THR",i] <- 1 - tp.PTHR2dead ## they go into the success THR state 
     ## transitions out of success-P-THR
-    tm.SP0["successP-THR","R-THR",i] <- revision.risk.sp0[i]
+    tm.SP0["successP-THR","R-THR",i] <- revision.risk.sp0[i] ## could also link this to tdps if preferred
     tm.SP0["successP-THR","Death",i] <- mortality.vec[i]
     tm.SP0["successP-THR","successP-THR",i] <- 1-revision.risk.sp0[i] - mortality.vec[i]
     ## transitions out of R-THR 
@@ -244,7 +245,7 @@ model.THR <- function(age=60, male=0) {
   cost.SP0 <- trace.SP0%*%state.costs  ## the cost of SP0 based on cost per state and numbers in each state per cycle 
   # the above retruns a matrix of 1 column and 60 rows
   undisc.cost.SP0 <- colSums(cost.SP0) + c.SP0  ## the (undiscouted) sum of cost.SP0 plus the 1 off Cost of a primary THR procedure (c.SP0)
-  discount.factor.c <- 1/(1+dr.c)^cycle.v ## the discount factor matrix
+  
   disc.cost.SP0 <- (discount.factor.c%*%cost.SP0) + c.SP0   ## the discouted sum of cost.SP0 plus the 1 off Cost of a primary THR procedure (c.SP0)
   
   # NP1 ARM
@@ -256,7 +257,7 @@ model.THR <- function(age=60, male=0) {
   # STANDARD ARM
   QALYs.SP0 <- trace.SP0%*%state.utilities ## utility per cycle
   undisc.QALYs.SP0 <- colSums(QALYs.SP0) ## total undiscounted utility 
-  discount.factor.o <- 1/(1+dr.o)^cycle.v  ## discount factor matrix for utility 
+  
   disc.QALYs.SP0 <- colSums(discount.factor.o%*%QALYs.SP0) ## total discounted utility
   
   # NP1 ARM
@@ -271,7 +272,7 @@ model.THR <- function(age=60, male=0) {
   output <- c(cost.SP0 = disc.cost.SP0,
               qalys.SP0 = disc.QALYs.SP0,
               cost.NP1 = disc.cost.NP1,
-              qapls.NP1 = disc.QALYs.NP1,
+              qalys.NP1 = disc.QALYs.NP1,
               inc.cost = disc.cost.NP1 - disc.cost.SP0,
               inc.qalys = disc.QALYs.NP1 - disc.QALYs.SP0)
   
@@ -287,12 +288,15 @@ model.THR(age=60, male=0)
 #### RUNNING THE SIMULATIONS ########
 sim.runs <- 1000 ## the number of simulation runs
 
+## creating an empty data.frame for simulation results to fill:
 simulation.results <- data.frame("cost.SP0" = rep(as.numeric(NA), sim.runs), ## use the rep() function to create sim.runs rows of values
                                  "qalys.SP0"= rep(as.numeric(NA),sim.runs),
                                  "cost.NP1" = rep(as.numeric(NA),sim.runs),
                                  "qalys.NP1" = rep(as.numeric(NA), sim.runs),
                                  "inc.cost" = rep(as.numeric(NA),sim.runs),
                                  "inc.qalys"=  rep(as.numeric(NA),sim.runs))
+
+## running the simulations and filling the simulation.results data.frame:
 for(i in 1:sim.runs){
   simulation.results[i,] <- model.THR(age=60, male=0) ## running the model 1,000 times
 }
@@ -306,7 +310,7 @@ head(sim.runs)
 plot(simulation.results$inc.qalys,simulation.results$inc.cost)
 
 ## using pre-created ggplot2 functions for nicer cost-effectiveness plane graphs
-source("additional_resources/ggplot_CEA_functions.R")
+source("Advanced/A0.2_R_Starting Material_for_Advanced_Course/ggplot_CEA_functions.R")
 ce.plane(simulation.results)
 
 ## Estimating average ICER from the simulation
@@ -342,7 +346,7 @@ p.CE<-function(WTP, simulation.results) {
 # Generate CEAC table
 WTP.values <- seq(from = 0, to = 50000, by = 10) ## use the seq() function to get a vector of specified numeric values
 CEAC <- data.frame(WTP = WTP.values, 
-                   pCE = rep(is.numeric(NA),length(WTP.values)))
+                   pCE = rep(as.numeric(NA),length(WTP.values)))
 
 for (i in 1:length(WTP.values)) {
   CEAC[i,"pCE"]<- p.CE(CEAC[i,"WTP"], simulation.results)
