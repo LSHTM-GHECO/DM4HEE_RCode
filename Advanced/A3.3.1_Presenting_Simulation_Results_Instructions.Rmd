@@ -53,7 +53,7 @@ It should be noted that you can have functions stored in a separate R script wit
 Remember that we are still running the model only for females aged 60 currently (we will move on-to patient subgroups later in this exercise).
 Create the following first:
 (i) A `sim.runs` variable that stores the number of runs we want (1,000 in this case)
-(ii) A data.frame with 6 columns (for costs and effects of standard treatment, for costs and the effects of new treatment, and incremental costs and effects -  name the columns appropriately) that has the same number of rows as specified in `sim.runs`. Values can be set to NA for now, but set the class to numeric (this can be done through using `is.numeric(NA)`). You should also use the `rep()` function. We've laid out the structure for you to fill.
+(ii) A data.frame with 6 columns (for costs and effects of standard treatment, for costs and the effects of new treatment, and incremental costs and effects -  name the columns appropriately) that has the same number of rows as specified in `sim.runs`. Values can be set to NA for now, but set the class to numeric (this can be done through using `as.numeric(NA)`). You should also use the `rep()` function. We've laid out the structure for you to fill.
 
 Then run the simulations in a loop, and replace the blank with the results from 1,000 runs of the `model.THR()` function. 
 

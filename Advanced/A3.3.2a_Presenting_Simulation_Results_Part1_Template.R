@@ -46,6 +46,8 @@ c.NP1 <-  ## Cost of new prosthesis 1
 ## define here the mean utility and related alpha and beta values
 
 # Discount factor matrices
+cycle.v <- 1:cycles ## a vector of cycle numbers 1 - 60
+
 discount.factor.c <-     ## the discount factor matrix for costs
 
 discount.factor.o <-       ## discount factor matrix for utility 
@@ -218,9 +220,10 @@ model.THR <- function(age=60, male=0) {
 ## testing the function:
 model.THR(age=60, male=0) 
 
-#### RUNNING THE SIMULATION
+#### RUNNING THE SIMULATION ####
 sim.runs <-    ## the number of simulation runs
 
+## creating an empty data.frame for simulation results to fill:
 simulation.results <- data.frame("cost.SP0" =     , ## use the rep() function to create sim.runs rows of values
                                  "qalys.SP0"=     ,
                                  "cost.NP1" =     ,
@@ -228,6 +231,7 @@ simulation.results <- data.frame("cost.SP0" =     , ## use the rep() function to
                                  "inc.cost" =     ,
                                  "inc.qalys"=     )
 
+## running the simulations and filling the simulation.results data.frame:
 for(i in 1:sim.runs){
   ## define each row as a result from each run  
   

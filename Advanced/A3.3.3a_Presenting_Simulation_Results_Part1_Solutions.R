@@ -82,6 +82,7 @@ a.uRevision<-mn.uRevision*ab.uRevision ## alpha (a)
 b.uRevision<-a.uRevision*(1-mn.uRevision)/mn.uRevision ## beta(b)
 
 ## discount matrices
+cycle.v <- 1:cycles ## a vector of cycle numbers 1 - 60
 discount.factor.c <- 1/(1+dr.c)^cycle.v ## the discount factor matrix
 discount.factor.o <- 1/(1+dr.o)^cycle.v  ## discount factor matrix for utility 
 
@@ -93,7 +94,6 @@ model.THR <- function(age=60, male=0) {
   ## LIFE TABLE DATA 
   # This is included within the function as it varies by age and sex (which are inputs into the function)
   colnames(life.table) <- c("Age","Index","Males","Female") ## making sure column names are correct
-  cycle.v <- 1:cycles ## a vector of cycle numbers 1 - 60
   current.age <- age + cycle.v ## a vector of cohort age throughout the model
   life.table <- as.data.table(life.table) ## turning life.table into a data.table 
   death.risk <- as.data.table(current.age) ## turning current age into a data.table 
@@ -170,7 +170,7 @@ model.THR <- function(age=60, male=0) {
     tm.SP0["P-THR","Death",i] <- tp.PTHR2dead ## Primary THR either enter the death state or.. or..
     tm.SP0["P-THR","successP-THR",i] <- 1 - tp.PTHR2dead ## they go into the success THR state 
     ## transitions out of success-P-THR
-    tm.SP0["successP-THR","R-THR",i] <- revision.risk.sp0[i]
+    tm.SP0["successP-THR","R-THR",i] <- revision.risk.sp0[i] ## could also link this to tdps if preferred
     tm.SP0["successP-THR","Death",i] <- mortality.vec[i]
     tm.SP0["successP-THR","successP-THR",i] <- 1-revision.risk.sp0[i] - mortality.vec[i]
     ## transitions out of R-THR 
@@ -288,12 +288,15 @@ model.THR(age=60, male=0)
 #### RUNNING THE SIMULATIONS ########
 sim.runs <- 1000 ## the number of simulation runs
 
+## creating an empty data.frame for simulation results to fill:
 simulation.results <- data.frame("cost.SP0" = rep(as.numeric(NA), sim.runs), ## use the rep() function to create sim.runs rows of values
                                  "qalys.SP0"= rep(as.numeric(NA),sim.runs),
                                  "cost.NP1" = rep(as.numeric(NA),sim.runs),
                                  "qalys.NP1" = rep(as.numeric(NA), sim.runs),
                                  "inc.cost" = rep(as.numeric(NA),sim.runs),
                                  "inc.qalys"=  rep(as.numeric(NA),sim.runs))
+
+## running the simulations and filling the simulation.results data.frame:
 for(i in 1:sim.runs){
   simulation.results[i,] <- model.THR(age=60, male=0) ## running the model 1,000 times
 }
@@ -307,7 +310,7 @@ head(sim.runs)
 plot(simulation.results$inc.qalys,simulation.results$inc.cost)
 
 ## using pre-created ggplot2 functions for nicer cost-effectiveness plane graphs
-source("additional_resources/ggplot_CEA_functions.R")
+source("Advanced/A0.2_R_Starting Material_for_Advanced_Course/ggplot_CEA_functions.R")
 ce.plane(simulation.results)
 
 ## Estimating average ICER from the simulation
@@ -343,7 +346,7 @@ p.CE<-function(WTP, simulation.results) {
 # Generate CEAC table
 WTP.values <- seq(from = 0, to = 50000, by = 10) ## use the seq() function to get a vector of specified numeric values
 CEAC <- data.frame(WTP = WTP.values, 
-                   pCE = rep(is.numeric(NA),length(WTP.values)))
+                   pCE = rep(as.numeric(NA),length(WTP.values)))
 
 for (i in 1:length(WTP.values)) {
   CEAC[i,"pCE"]<- p.CE(CEAC[i,"WTP"], simulation.results)

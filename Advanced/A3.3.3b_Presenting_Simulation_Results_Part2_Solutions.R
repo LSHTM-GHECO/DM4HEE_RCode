@@ -83,12 +83,11 @@ se.uRevision<-0.03 ## standard error utility score during the revision period
 ab.uRevision<-mn.uRevision*(1-mn.uRevision)/(se.uRevision^2) ## alpha + beta (ab)
 a.uRevision<-mn.uRevision*ab.uRevision ## alpha (a)
 b.uRevision<-a.uRevision*(1-mn.uRevision)/mn.uRevision ## beta(b)
+## discount matrices
+cycle.v <- 1:cycles ## a vector of cycle numbers 1 - 60
+discount.factor.c <- 1/(1+dr.c)^cycle.v ## the discount factor matrix
+discount.factor.o <- 1/(1+dr.o)^cycle.v  ## discount factor matrix for utility 
 
-O.discount.factor <- matrix(1/(1+oDR) ^ c(1:cycles), nrow = 1, ncol = cycles)
-O.discount.factor
-
-C.discount.factor <- matrix(1/(1+cDR) ^ c(1:cycles), nrow = 1, ncol = cycles)
-C.discount.factor
 
 model.THR.3b <- function(age=60, male=0) {
   ### A function running the THR model with an additional NP2 treatment pathway, setting age and sex
@@ -150,14 +149,14 @@ model.THR.3b <- function(age=60, male=0) {
   #  We start with a three dimensional array in order to capture the time dependencies
   revision.risk.sp0 <- 1- exp(lambda * ((cycle.v-1) ^gamma-cycle.v ^gamma))
   revision.risk.np1 <- 1- exp(lambda * RR.NP1 * ((cycle.v-1) ^gamma-cycle.v ^gamma))
-  revision.risl.np2 <- 1- exp(lambda * RR.NP2 * ((cycle.v-1) ^gamma-cycle.v ^gamma))
+  revision.risk.np2 <- 1- exp(lambda * RR.NP2 * ((cycle.v-1) ^gamma-cycle.v ^gamma))
     
   revision.risk.sp0 ## the time dependent risk of revision for standard treatment
   revision.risk.np1 ## the time dependent risk of revision for NP1
   revision.risk.np2 ## the time dependent risk of revision for NP2
   
   # combining risks into a time-dependent transition probability data.table
-  tdtps <- data.table(death.risk, revision.risk.sp0, revision.risk.np1, revision.risl.np2)
+  tdtps <- data.table(death.risk, revision.risk.sp0, revision.risk.np1, revision.risk.np2)
   
   ## creating an indicator which selects the death risk column depending on the sex the model is being run on
   col.key <- 4-male ## 4 indicates the 4th column of tdps (which is female risk of death)
@@ -180,7 +179,7 @@ model.THR.3b <- function(age=60, male=0) {
     tm.SP0["P-THR","Death",i] <- tp.PTHR2dead ## Primary THR either enter the death state or.. or..
     tm.SP0["P-THR","successP-THR",i] <- 1 - tp.PTHR2dead ## they go into the success THR state 
     ## transitions out of success-P-THR
-    tm.SP0["successP-THR","R-THR",i] <- revision.risk.sp0[i]
+    tm.SP0["successP-THR","R-THR",i] <- revision.risk.sp0[i] ## could also link this to tdps if preferred
     tm.SP0["successP-THR","Death",i] <- mortality.vec[i]
     tm.SP0["successP-THR","successP-THR",i] <- 1-revision.risk.sp0[i] - mortality.vec[i]
     ## transitions out of R-THR 
@@ -342,11 +341,22 @@ model.THR.3b <- function(age=60, male=0) {
   
 }
 
+## testing the function:
+model.THR.3b(age=60, male=0) 
 
-sim.runs <- 1000
+#### RUNNING THE SIMULATIONS ########
+sim.runs <- 1000 ## the number of simulation runs
 
-simulation.results <- data.frame(matrix(0, sim.runs, 6))
-colnames(simulation.results)<-c("QALY SP0","Cost SP0", "QALY NP1","Cost NP1", "QALY NP2","Cost NP2")
+## creating an empty data.frame for simulation results to fill:
+simulation.results <- data.frame("cost.SP0" = rep(as.numeric(NA), sim.runs), ## use the rep() function to create sim.runs rows of values
+                                 "qalys.SP0"= rep(as.numeric(NA),sim.runs),
+                                 "cost.NP1" = rep(as.numeric(NA),sim.runs),
+                                 "qalys.NP1" = rep(as.numeric(NA), sim.runs),
+                                 "cost.NP2" = rep(as.numeric(NA),sim.runs),
+                                 "qalys.NP2"=  rep(as.numeric(NA),sim.runs))
+
+## adding a progress bar to the simulatio runs allows you to keep track of where the simulation is
+# this is particularly useful for more complex models that may take longer to run
 pb = txtProgressBar(min = 0, max = sim.runs, initial = 0, style = 3)
 
 for(i in 1:sim.runs) {
@@ -354,89 +364,101 @@ for(i in 1:sim.runs) {
   simulation.results[i,] <- model.THR.3b(60,0)
 }
 
-
+## have a look at what you've created so far:
 head(simulation.results)
 
-# mean results across simulations
-apply(simulation.results, 2, mean)
+# calculate the mean results across simulations
+mean.results <- apply(simulation.results, 2, mean)
+mean.results
+
+#### PLOTTING THE COST-EFFECTIVENESS PLANE #####
+
+## need to format the data to get into the correct format
+# want costs and outcomes for each group for each run
+standard.sims <- simulation.results[,c("cost.SP0","qalys.SP0")]
+standard.sims$comparator <- "standard"
+NP1.sims <- simulation.results[,c("cost.NP1","qalys.NP1")]
+NP1.sims$comparator <- "NP1"
+NP2.sims <- simulation.results[,c("cost.NP2","qalys.NP2")]
+NP2.sims$comparator <- "NP2"
+
+### !!! got to here 
+
+ce.plane.all <- function(results,  transparency = 0.75){
+  
+  xlabel = "QALYs"
+  ylabel = "Costs"
+  
+  plot = ggplot(results) + 
+    geom_point(shape = 21, size = 2, colour = "black", fill = NA, alpha = 0.5, aes(x=outcomes, y=costs, colour = group)) + 
+    labs(x = xlabel, text = element_text(size=10)) + 
+    labs (y = ylabel, text = element_text(size=10)) + theme_classic() +
+    theme(legend.title = element_blank(), axis.title=element_text(face="bold"), 
+          axis.title.x = element_text(margin = margin(t = 7, r = 0, b = 3, l = 0)), 
+          axis.title.y = element_text(margin = margin(t = 0, r = 7, b = 0, l = 3)), 
+          panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+          legend.key.width=unit(1.8,"line"), text = element_text(size=12),
+          plot.margin=unit(c(1.2,0.5,0,1.2),"cm"))
+  
+  return(plot)
+  
+}
 
 
-# Calculate NMB and CEAC
+#### PLOTTING THE COST-EFFECTIVENESS ACCEPTABILITY CURVE #####
+# Generate CEAC table
+WTP.values <- seq(from = 0, to = 50000, by = 10) ## use the seq() function to get a vector of specified numeric values
+CEAC <- data.frame(WTP = WTP.values, 
+                   Standard= rep(as.numeric(NA),length(WTP.values)),
+                   NP1= rep(as.numeric(NA),length(WTP.values)),
+                   NP2= rep(as.numeric(NA),length(WTP.values)))
 
-lambda.values <- seq(from = 0, to = 50000, by = 100)
 
-CEAC <- data.frame(matrix(data = NA, nrow = length(lambda.values), ncol = 4))
-colnames(CEAC)<-c("lambda","Standard", "NP1", "NP2")
-
-pCE <-function(lambda, results = simulation.results) {
+pCE.3b <-function(WTP, simulation.results) {
+  ## a function that estimates the probability of the new intervention
+  # being cost-effective 
+  # INPUTS: WTP = willingness to pay value (numeric)
+  #         simulation.results = a data.frame output of PSA simulations which includes
+  #         columns prefixed with "cost." and "qalys." for SP0, NP1 and NP2
+  # OUTPUTS: A numeric value specifying the probability of cost-effectiveness across the 3 pathways given the inputs
   
   # Now calculate NMB for all three interventions
-  nmb <- results[,c(1,3,5)]*lambda - results[,c(2,4,6)] 
-  max.nmb <- apply(nmb, 1, max)
+  nmb <- simulation.results[,c("qalys.SP0",
+                               "qalys.NP1",
+                               "qalys.NP2")]*WTP - 
+                                    simulation.results[,c("cost.SP0",
+                                                          "cost.NP1",
+                                                          "cost.NP2")] 
+  ## this time we want to choose the prothesis with the greatest net monetary benefit:
+  max.nmb <- apply(nmb, 1, max) # selecting max value indication by row within nmb
   
-  CE <- nmb[1:nrow(results),] == max.nmb[1:nrow(results)]
-  probCE<- apply(CE, 2, mean)
+  ## creating an indication of TRUE/FALSE as to whether each treatment column == that max value:
+  CE <- nmb[1:nrow(simulation.results),] == max.nmb[1:nrow(simulation.results)]
+  probCE<- apply(CE, 2, mean) ## averaging over TRUE (=1) and FALE (=0) for each column
   
   return(probCE)
   
 }
 
 
-for (i in 1:length(lambda.values)) {
-  CEAC[i,1] <- lambda.values[i]
-  CEAC[i,2:4]<- pCE(lambda.values[i], simulation.results)
+for (i in 1:length(WTP.values)) {
+  CEAC[i,"WTP"] <- WTP.values[i]
+  CEAC[i,2:4]<- pCE.3b(WTP.values[i], simulation.results)
 }
 
 
 # Look at the results
 head(CEAC)  
+tail(CEAC)
 
-
-
-
-
-
-## Plots   
-
-
+# Plotting the CEAC with a plot function
 # reshape to show all in on plot
 
-CEAC.long <- reshape2::melt(CEAC, id.vars = c("lambda"))
-colnames(CEAC.long) <- c("lambda", "comparator", "pCE")
+CEAC.long <- reshape2::melt(CEAC, id.vars = c("WTP"))
+colnames(CEAC.long) <- c("WTP", "comparator", "pCE")
 head(CEAC.long)
 
-source("graphs/ggplot functions.R")
+source("Advanced/A0.2_R_Starting Material_for_Advanced_Course/ggplot_CEA_functions.R")
 
 plot.ceac.all(CEAC.long)
 
-
-
-
-## CE plane - in progress- struggling to reshape the data correctly 
-
-# simulation.results.id <- cbind(id = c(1:sim.runs), simulation.results)
-# 
-# standard.sims <- simulation.results.id[,c(1,2,3)]
-# NP1.sims <- simulation.results.id[,c(1,4,5)]
-# NP2.sims <- simulation.results.id[,c(1,6,7)]
-# 
-# ce.plane(standard.sims)
-# ce.plane(NP1.sims)
-# ce.plane(Np2.sims)
-# 
-# dplyr::bind_rows(list(df1=df1, df2=df2), .id = 'source')
-# 
-# z <- dplyr::bind_rows(list(standard = standard.sims, 
-#                       NP1 = NP1.sims,
-#                       NP2 = NP2.sims), 
-#                       .id = 'id')
-# 
-# ce.plane.all(z)
-# 
-# 
-
-
-## Different options for splicing data
-
-# reshape2::melt(CEAC, id.vars = c("lambda"))
-# tidyr::gather(CEAC, "group", "value", 2:4)
