@@ -45,7 +45,7 @@ Each Module (excluding Module 1 which does not have an R exercise component) has
 
 * A solutions R script (e.g. "F2.3.1_Decision_Trees_Solutions.pdf" which refers to Foundation Module 2, R stream, File 3) which provides a filled in model code script. If you run this R script (having in mind the section below about directory set up), this will provide the fully functional models and results. 
 
-We mention "sections" within the R scripts for this course, similar to how you might refer to sheets in Excel. If you are using RStudio, sections can be selected using the bottom left of the Source panel or alternativly using the document outline functionality (top right of the Source panel).
+We mention "sections" within the R scripts (such as 'see <Parameters> section') for this course, similar to how you might refer to sheets in Excel. If you are using RStudio, sections can be selected using the bottom left of the Source panel or alternativly using the document outline functionality (top right of the Source panel).
 
 ## Setting up your working directory
 Once all of the above files have been downloaded from the course website, please make sure that you have a dedicated folder for the course code. This folder should become your working directory for the Foundation course. 
