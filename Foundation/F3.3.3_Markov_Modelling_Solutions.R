@@ -1,8 +1,6 @@
-#  DM4HEE 
-#  Foundation Course Exercise 3 - Replication of the HIV/AIDS model
-#  Author: Andrew Briggs
-#  Edited by: Nichola Naylor & Jack Williams 
-
+#  Decision Modelling for Health Economic Evaluation
+#  Foundation Course Exercise 3: SOLUTION FILE
+#  Authors: Andrew Briggs, Nichola Naylor and Jack Williams 
 
 ####****PARAMETERS****#####
 #  Start by defining parameters
@@ -13,7 +11,7 @@ state.names
 
 ### TRANSITION PROBABILITIES ############
 
-alpha.A2A <- 1251 ## Counts of transitions from A to A (see Table 2.5)
+alpha.A2A <- 1251 ## Counts of transitions from A to A
 alpha.A2B <- 350 ## Counts of transitions from A  to B
 alpha.A2C <- 116 ## Counts of transitions from A to C
 alpha.A2D <- 17 ## Counts of transitions from A to D

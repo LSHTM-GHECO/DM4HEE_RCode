@@ -1,11 +1,17 @@
 ---
 title: "Markov Models"
 author: "Nichola Naylor & Jack Williams"
-date: "9 April 2021"
+date: "19 April 2021"
 output:
   pdf_document: default
   html_document: default
 subtitle: Foundation Course Exercise 3
+header-includes:
+- \usepackage{titling}
+- \pretitle{\begin{center}\LARGE\includegraphics[width=12cm]{logo.png}\\[\bigskipamount]}
+- \posttitle{\end{center}}
+urlcolor: blue
+linkcolor: red
 ---
 
 ```{r, include=FALSE}
@@ -16,13 +22,13 @@ source("F3.3.3_Markov_Modelling_Solutions.R", local = knitr::knit_global())
 
 The aim of this exercise is to get you to replicate a previously published Markov model by Chancellor and colleagues (1997). The model itself is somewhat out of date in that it compares combination therapy (lamivudine and AZT) to monotherapy (AZT alone).  Nevertheless, the model is straightforward enough to serve as a simple example that it is possible to replicate in a short period of time.
 
-The basic structure of the model is given in the figure below **(To be added)**, which shows that the chronic disease process is structured as  such that patients can move to successively more serious disease states, but cannot recover.
-
-<!-- ![](HIVMarkov.png) -->
+The basic structure of the model is given in the figure below, which shows that the chronic disease process is structured as  such that patients can move to successively more serious disease states, but cannot recover.
 
 \  
 
-The cycle length of the model is one year and is evaluated over 20 years (after which more than 95% of patients are expected to have died).
+![](MarkovModelHIV.png)
+
+The cycle length of the model is one year and the model is evaluated over 20 years (after which more than 95% of patients are expected to have died).
 
 In this exercise you will use the data given below to populate the model and calculate the incremental cost-effectiveness ratio (ICER) for AZT monotherapy. Ultimately, you should be able to calcualte an ICER of £9,971.
 
@@ -82,11 +88,11 @@ We will use the current discount rates in use in the UK – 3.5% for both costs 
 
 Open the file ‘F3.3.2_Markov_Modelling_Template.R’. You will see that there are parameters that need to be defined, based on the data above.
 
-i) Using the counts of transitions shown in the transitions probability section above, complete parameters definitions in the 'Parameters' section for the transition probabilities (Lines 17-29).  Parameters starting with “alpha.” should contain the number of events of interest and “sum.” should contain the total transitions (the sum of events and complement), such that they should equal the appropriate row total from the transitions table above. Now calculate the respective transition probabilities in variables beginning with “tp.” using the “alpha.” and “sum.” variables. *(Note: For those on the advanced course, the reason for defining events and complements becomes apparent in later exercises using probabilistic methods)*  
+i) Using the counts of transitions shown in the transitions probability section above, complete parameters definitions in the <Parameters> section for the transition probabilities.  Parameters starting with “`alpha.`” should contain the number of events of interest and “`sum.`” should contain the total transitions (the sum of events and complement), such that they should equal the appropriate row total from the transitions table above. Now calculate the respective transition probabilities in variables beginning with “`tp.`” using the “`alpha.`” and “`sum.`” variables. *(Note: For those on the advanced course, the reason for defining events and complements becomes apparent in later exercises using probabilistic methods)*  
 
 ii) Enter the other information for the state costs (direct and community care costs), drug costs, treatment effect and discounting in the appropriate place in the script.
 
-Having entered the input parameters of the model, the task now is to construct the Markov models for the treatment alternatives: combination and monotherapy. If you move to the 'Markov Model' section, you will see that the number of model cycles are defined (20), and the starting distribution of patients is set so that all patients start in State A. 
+Having entered the input parameters of the model, the task now is to construct the Markov models for the treatment alternatives: combination and monotherapy. If you move to the <Markov Model> section, you will see that the number of model cycles are defined (`cycles <- 20 `), and the starting distribution of patients is set so that all patients start in State A (`seed <- c(1,0,0,0)`). 
 
 First we will first create the transition matrix, and then create the structure for the Markov model, for each treatment alternative, starting with the monotherapy model.
 
@@ -102,7 +108,7 @@ The first step in building a Markov model is to define the transition matrix. Th
 |    D |    0    |     0   |     0     |  tpD2D | 
 
 
-Try building a transition matrix based on the transition parameters you’ve just defined in the above section. You can store a vector that represents the transitions out of each state first, before creating a matrix to add the data to. The first vector, named 'A.AsympHIV.AZT', represents transitions from State A, and this has been created for you. Now complete the remaining vectors and create the transition matrix.
+Try building a transition matrix based on the transition parameters you’ve just defined in the above section. You can store a vector that represents the transitions out of each state first, before creating a matrix to add the data to. The first vector, named `A.AsympHIV.AZT`, represents transitions from State A, and this has been created for you. Now complete the remaining vectors and create the transition matrix.
 
 
 Once you have completed the transition matrix, it should look like this:
@@ -115,9 +121,9 @@ Once you have completed the transition matrix, it should look like this:
 
   We now need to generate the Markov trace: that is showing the proportions of patients that are in any one state at any one time.  Start by making sure that you understand the above transition matrix. In particular, make sure you can replicate it from the information given in the diagram of the model structure above.
 
-i) First create an empty trace matrix of the right dimensions - we can call this 'trace.AZT' (L99). The data, number of rows, and number of columns have been left blank for you to add in. 
+i) First create an empty trace matrix of the right dimensions - we can call this `trace.AZT` (L98 in the template document). The data, number of rows, and number of columns have been left blank for you to add in. 
 
-ii) Next, calculate the transitions for cycle1, by multiplying the transition matrix by the starting distribution of patients _(hint: use %*% for matrix multiplication in R for this)._
+ii) Next, calculate the transitions for cycle1, by multiplying the transition matrix by the starting distribution of patients _(hint: use `%*%` for matrix multiplication in R for this)._
 
 Your first cycle should now look like this:
 
@@ -141,22 +147,21 @@ By far the most tricky bit of building the basic Markov model in R is now comple
 
 i) Create a vector for life years (LY) for each state (each alive state should be associated with 1 life year, as the cycle length for this model is 1 year). 
 
-ii) The reward vector (LY) can then be multiplied by the results in the trace matrix to estimate 'ly.AZT' _(hint: again use %*% for matrix multiplication)._ 
+ii) The reward vector (LY) can then be multiplied by the results in the trace matrix to estimate `ly.AZT`. _(Hint: again use %*% for matrix multiplication)._ 
 
-iii) Use the `colSums()` function to estimate the total undiscounted life years from the AZT arm. However, since this is undiscounted, we need to apply the standard discount formula. You can do this by creating a matrix (discount.factor.o) which specifies the discount factor that needs to be applied for each cycle. Once you have run the code to creat this, you can then  multiply the 'discount.factor.o' with 'ly.AZT' to get the discounted life years for the AZT treatment arm. _(hint: use the same method as above for matrix multiplication)._ 
+iii) Use the `colSums()` function to estimate the total undiscounted life years from the AZT arm. However, since this is undiscounted, we need to apply the standard discount formula. You can do this by creating a matrix (`discount.factor.o`) which specifies the discount factor that needs to be applied for each cycle. Once you have run the code to create this, you can then  multiply the `discount.factor.o` with `ly.AZT` to get the discounted life years for the AZT treatment arm. _(Hint: use the same method as above for matrix multiplication)._ 
 
-Once you have done this, you should have calculated total undiscounted LYs of ```round(undisc.ly.AZT,4)``` and discounted LY of ```round(disc.ly.AZT,4)```. 
+Once you have done this, you should have calculated total undiscounted LYs of __`r round(undisc.ly.AZT,4)`__ and discounted LY of __`r round(disc.ly.AZT,4)`__. 
 
 (@) **Estimating costs**
 
-Similarly the the life years, we can now calculate the costs. 
+Similarly to the life years, we can now calculate the costs. 
 
 i) First, calculate the undiscounted costs for each time period by multiplying the appropriate cost vectror with the trace matrix. Note that there are multiple costs associated with states, including direct medical costs adn community costs, in addition to drug costs for AZT, that are given for the whole time period. *(Hint: You might want to consider adding performing a matrix multiplication for each cost, and then add these together for each cost item to estimate the total costs.)*  
 
 ii) Similar to the above, create a discount factor matrix for costs and multiply this with the undiscounted costs for AZT. Again, store and print total costs for AZT, both undiscounted and discounted.
 
-Once you have done this, you should have calculated total undiscounted costs of £```round(undisc.cost.AZT,2)``` and discounted costs of £```round(disc.cost.AZT,2)```. 
-
+Once you have done this, you should have calculated total undiscounted costs of __£`r format(round(undisc.cost.AZT,2), scientific=FALSE)`__ and discounted costs of __£`r format(round(disc.cost.AZT,2), scientific=FALSE)`__. 
 
 (@) **Adapting the model for combination therapy**
 
@@ -180,7 +185,7 @@ iii) Calculate life years and costs as before. Remember to add in the cost of la
 
 (@) **Cost-effectiveness estimates**
 
-The final task is simply to create an output matrix in the **Analysis** section (L206) and to calculate the appropriate incremental costs and life years, and the ICER.
+The final task is simply to create an output matrix in the <Analysis> section and to calculate the appropriate incremental costs and life years, and the ICER.
 
 
 **Congratulations!** You have now replicated the Markov model.  Compare your result for the ICER to that given in the solution (£9,971). The results are also printed below:  
@@ -190,12 +195,3 @@ print(output)
 ```
 
 Is any debugging required?  If it is, then you may want to compare your Markov trace and stage costs for monotherapy against those reported in the solutions script.
-
-
-
-<script>
-   $(document).ready(function() {
-     $head = $('#header');
-     $head.prepend('<img src=\"logo.png\" style=\"float: right;width: 150px;\"/>')
-   });
-</script>
