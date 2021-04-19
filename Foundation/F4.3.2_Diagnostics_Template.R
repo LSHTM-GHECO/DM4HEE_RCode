@@ -20,7 +20,7 @@ parameter.values <- data.frame(outcome.names, expected.cost, expected.qaly,
                               nmb = NA)
 
 # Estimate the NMB associted with each outcome status: 
-parameter.values$nmb <- (expected.qaly * lambda) - expected.cost
+parameter.values$nmb <- 
 
 # here you can see the expected costs, QALYs and NMB for each possible outcome
 parameter.values
@@ -30,15 +30,15 @@ parameter.values
 
 treat.cost <- prevalence * expected.cost[1] + (1 - prevalence) * expected.cost[3]
 notreat.cost <- prevalence * expected.cost[2] + (1 - prevalence) * expected.cost[4]
-treat.qaly <- prevalence * expected.qaly[1] + (1 - prevalence) * expected.qaly[3]
-notreat.qaly <- prevalence * expected.qaly[2] + (1 - prevalence) * expected.qaly[4]
+treat.qaly <- 
+notreat.qaly <- 
 
 expected.values <- data.frame(strategy =  c("Treat all", "Treat none"),
                            expected.cost = c(treat.cost, notreat.cost), 
                            expected.qaly = c(treat.qaly, notreat.qaly), 
                            nmb = NA)
 
-expected.values$nmb <- (expected.values$expected.qaly * lambda) - expected.values$expected.cost 
+expected.values$nmb <-  
 
 # You can view the expected cost, QALY and NMB values at the prevalence defined
 expected.values
@@ -84,15 +84,15 @@ est.nmb <- function(prev, parameters = parameter.values, lam = lambda){
 
 ## We can now estimate the NMB of treating or not treating at any prevalence 
 # At a low prevalence (10%), NMB is higher for not treating
-# But at higher prevalence NMB is higher for treating everyone
+# Try a higher prevalence and see what the impact on NMB is 
 est.nmb(prev = 0.1)
-est.nmb(prev = 0.4)
+est.nmb(prev = )
 
-# Now pass a vector of prevalence values into the function
-prevalence.vector <- seq(from = 0, to = 1, by = 0.05)
+# Now pass a vector of prevalence values into the function (note than seq function needs you to specify from, to and by values)
+prevalence.vector <- seq(from = , to = , by = )
 
 # estimate the NMB across prevalence values, and save this 
-no.test.nmb <- est.nmb(prev = prevalence.vector)
+no.test.nmb <- est.nmb(prev = )
 no.test.nmb
 
 
@@ -122,28 +122,28 @@ est.nmb.perfect.test <- function(prev, parameters = parameter.values, lam = lamb
   qaly.sick <-  parameters$expected.qaly[1] 
   qaly.healthy <-  parameters$expected.qaly[4] 
   
-  cost <- prev * cost.sick + (1-prev) * cost.healthy
-  qaly <- prev * qaly.sick + (1-prev) * qaly.healthy
+  cost <-    ## Estimate the costs for the sick and healthy here
+  qaly <-    ## Estimate the QALYs for the sick and healthy here
   
-  nmb.perfect <- (qaly * lam) - cost
+  nmb.perfect <-     # Calculate the NMB of the perfect test
   
 
   return(data.frame(prevalence = prev, 
                     nmb = nmb.perfect))
 }
 
-## Next, run the function and check the results 
+## Next, run the function and check the results  
   # First run the function with the 30% prevalence, then use the prevalence.values previously stored
   
-est.nmb.perfect.test(prev = 0.1)
-est.nmb.perfect.test(prev = prevalence.vector)
+est.nmb.perfect.test()
+est.nmb.perfect.test()
 
-perfect.test.nmb <- est.nmb.perfect.test(prev = prevalence.vector)
-
+# Now save the results using the prevalence values vector 
+perfect.test.nmb <- est.nmb.perfect.test()
 
 
 ## Compare the results of no.test.nmb (calculated using the est.nmb function) 
-# and the perfect.test.nmb (calcualted from the est.nmb.perfect.test function)
+  # and the perfect.test.nmb (calcualted from the est.nmb.perfect.test function)
 no.test.nmb
 perfect.test.nmb
 
@@ -175,7 +175,7 @@ perfect.test.nmb
 
 
 ## We can now compare this to the values expected from a perfect test
-evpdi <- perfect.test.nmb$nmb - no.test.nmb$nmb.max
+evpdi <- 
 
 # and create a data.frame to store the results
 evpdi.table <- data.frame(prevalence = prevalence.vector, evpdi = evpdi)
@@ -196,7 +196,7 @@ test.char
 
 
 # Set a range of diagnostic threshold values
-diagnostic.threshold <- seq(from = -4, to = 4, by = 0.25)
+diagnostic.threshold <- 
 
 # Diagnostic positive and negative values, at different diagnostic thresholds
 # These are estimated using the normal distribution 
@@ -214,9 +214,9 @@ plot(diagnostic.threshold, dis.pos, type="l", col = "blue", ylim = c(0, 0.3))
 lines(diagnostic.threshold, dis.neg, col = "red")
 
 
-## True Positive Rate and False Positive Rate 
-TPR <- 1 - pnorm(diagnostic.threshold, test.char[1], test.char[2])
-FPR <- 1 - pnorm(diagnostic.threshold, test.char[3], test.char[4])
+## True Positive Rate and False Positive Rate - You must add the appropriate parameters to the normal distribution
+TPR <- 1 - pnorm()
+FPR <- 1 - pnorm()
 
 # We can view these alongside the diagnostic thresholds 
 positive.rate <- data.frame(diagnostic.threshold, TPR, FPR)
@@ -251,7 +251,7 @@ nmb.test.vec <- rep(0, length(diagnostic.threshold))
 # Next, we can create a loop to multiply NMB payoffs with diagnostic accuracy, and save the sum of
 # these values, at each diagnostic threshold
 for(i in 1:length(diagnostic.threshold)){
-  nmb.test.vec[i] <- sum(diag.accuracy[i,] * parameter.values$nmb)
+  nmb.test.vec[i] <- sum(diag.accuracy[i,] * )
 }  
 
 ## Note: An alternative method is to write a function into apply      
@@ -262,13 +262,11 @@ nmb.test.vec <- apply(diag.accuracy, 1, function(x) sum(x * parameter.values$nmb
 # This is the NMB associated with the imperfect diagnostic test
 data.frame(diagnostic.threshold, nmb.test.vec)    
 
-# We can add these results onto the diagnostic accuracy data.frame 
-diag.accuracy$nmb <- nmb.test.vec
+# You can add these results onto the diagnostic accuracy data.frame 
+diag.accuracy$nmb <- 
 
 
-# Calculate the EVCI
-
-# First, remind yourself of the est.nmb() function from earlier
+# Calculate the Expected Value of Clinical Information (EVCI)
 
 est.nmb(prev = prevalence.vector)
 
@@ -317,11 +315,11 @@ est.evci <- function(prev, diag = diagnostic.threshold, test = test.char,
 
 
 # Try the est.EVCI at the 30% prevalence 
-est.evci(prev = 0.3)
+est.evci()
 
 
 # Save the EVCI results across a range of prevalence
-evci <- est.evci(prev = prevalence.vector)
+evci <- est.evci()
 
 # You can view the results using the round function 
 round(evci, 2)
