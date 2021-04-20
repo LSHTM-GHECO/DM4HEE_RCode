@@ -1,6 +1,6 @@
-#  DM4HEE 
-#  Foundation Exercise 4 - Value of Diagnostics
-#  Author: Jack Williams and Nichola Naylor
+#  Decision Modelling for Health Economic Evaluation
+#  Foundation Course Exercise 4: SOLUTIONS FILE
+#  Authors: Jack Williams and Nichola Naylor 
 
 
 #### Model Parameters #### 
@@ -10,8 +10,8 @@ prevalence <- 0.3 # This is the prevalence of the condition
 
 # Here are the outcomes, and the expected costs and QALYs for sick and healthy individuals, treated and not treated. 
 
-outcome.names <- c("Sick per treated", "Sick person not treated", 
-                   "Healthy person treated", "Health person not treated")
+outcome.names <- c("Sick person treated", "Sick person not treated", 
+                   "Healthy person treated", "Healthy person not treated")
 expected.cost <- c(6000, 5000, 3000, 1000)
 expected.qaly <- c(0.8, 0.5, 0.95, 1)
 
@@ -49,32 +49,43 @@ expected.values
 
 ## We can create a function to calcualte NMB for sick and healthy patients (across prevalence values)  
 est.nmb <- function(prev, parameters = parameter.values, lam = lambda){
+  ## FUNCTION: a function that calculates net monetary benefit for sick and health patients
+  ## INPUTS: prev - a numeric values of prevalence, 
+  ##         parameters - a data.frame containing "expected.cost" and "expected.qaly" columns
+  ##         and row order corresponds to sick person treated, sick person not treated, healthy person treated, healthy person not treated
+  ##         lam = a numeric value representing a willingness-to-pay threshold value
+  ## OUTPUTS: a data.frame outputting the prevalence used and the calculated
+  ##          net monetary benefit for treated and not treated
   
   # Treatment - look up correct costs and outcomes for treated
+  cost.sick <-  parameters$expected.cost[1]
+  cost.healthy <-  parameters$expected.cost[3]
 
-  cost.sick <-  parameters$expected.cost[1] 
-  cost.healthy <-  parameters$expected.cost[3] 
-  
-  qaly.sick <-  parameters$expected.qaly[1] 
-  qaly.healthy <-  parameters$expected.qaly[3] 
-  
+  qaly.sick <-  parameters$expected.qaly[1]
+  qaly.healthy <-  parameters$expected.qaly[3]
+
   cost.treat <- prev * cost.sick + (1-prev) * cost.healthy
   qaly.treat <- prev * qaly.sick + (1-prev) * qaly.healthy
-  
+
   nmb.treat <- (qaly.treat * lam) - cost.treat
-  
+
   # No treatment- look up correct costs and outcomes for not treated
 
-  cost.sick <-  parameters$expected.cost[2] 
-  cost.healthy <-  parameters$expected.cost[4] 
-  
-  qaly.sick <-  parameters$expected.qaly[2] 
-  qaly.healthy <-  parameters$expected.qaly[4] 
-  
+  cost.sick <-  parameters$expected.cost[2]
+  cost.healthy <-  parameters$expected.cost[4]
+
+  qaly.sick <-  parameters$expected.qaly[2]
+  qaly.healthy <-  parameters$expected.qaly[4]
+
   cost.notreat <- prev * cost.sick + (1-prev) * cost.healthy
   qaly.notreat <- prev * qaly.sick + (1-prev) * qaly.healthy
-  
+
   nmb.notreat <- (qaly.notreat * lam) - cost.notreat
+  
+  ## Alternative if NMB already estimated 
+  # nmb.treat <- prev * parameters$nmb[1] + (1-prev)*parameters$nmb[3]
+  # nmb.notreat <- prev * parameters$nmb[2] + (1-prev)*parameters$nmb[4]
+  
   
   return(data.frame(prevalence = prev, 
                     nmb.treat = nmb.treat, 
@@ -111,6 +122,13 @@ plot(no.test.nmb$prevalence, no.test.nmb$nmb.treat, type="l", col = "blue", ylim
 
 
 est.nmb.perfect.test <- function(prev, parameters = parameter.values, lam = lambda){
+  ## FUNCTION: a function that calculates net monetary benefit for  a perfect test
+  ## INPUTS: prev - a numeric values of prevalence, 
+  ##         parameters - a data.frame containing "expected.cost", "expected.qaly" and "nmb" columns
+  ##         and row order corresponds to sick person treated, sick person not treated, healthy person treated, healthy person not treated
+  ##         lam = a numeric value representing a willingness-to-pay threshold value
+  ## OUTPUTS: a data.frame outputting the prevalence used and the calculated
+  ##          net monetary benefit from a perfect test at that prevalence level
   
   # Perfect test means sick is treated (i.e. row value 1 for expected values table)
   # whilst healthy is not treated (i.e. row value 4 from expected values table)
@@ -127,6 +145,8 @@ est.nmb.perfect.test <- function(prev, parameters = parameter.values, lam = lamb
   
   nmb.perfect <- (qaly * lam) - cost
   
+  # # Alternative if NMB already estimated
+  # nmb.perfect <- prev * parameters$nmb[1] + (1-prev)*parameters$nmb[4]
 
   return(data.frame(prevalence = prev, 
                     nmb = nmb.perfect))
@@ -135,12 +155,10 @@ est.nmb.perfect.test <- function(prev, parameters = parameter.values, lam = lamb
 ## Next, run the function and check the results 
   # First run the function with the 30% prevalence, then use the prevalence.values previously stored
   
-est.nmb.perfect.test(prev = 0.1)
+est.nmb.perfect.test(prev = 0.3)
 est.nmb.perfect.test(prev = prevalence.vector)
 
 perfect.test.nmb <- est.nmb.perfect.test(prev = prevalence.vector)
-
-
 
 ## Compare the results of no.test.nmb (calculated using the est.nmb function) 
 # and the perfect.test.nmb (calcualted from the est.nmb.perfect.test function)
@@ -254,9 +272,8 @@ for(i in 1:length(diagnostic.threshold)){
   nmb.test.vec[i] <- sum(diag.accuracy[i,] * parameter.values$nmb)
 }  
 
-## Note: An alternative method is to write a function into apply      
-nmb.test.vec <- apply(diag.accuracy, 1, function(x) sum(x * parameter.values$nmb))
-
+# ## Note: An alternative method is to write a function into apply      
+# nmb.test.vec <- apply(diag.accuracy, 1, function(x) sum(x * parameter.values$nmb))
 
 # We can view the output of the calculation here
 # This is the NMB associated with the imperfect diagnostic test
@@ -272,15 +289,19 @@ diag.accuracy$nmb <- nmb.test.vec
 
 est.nmb(prev = prevalence.vector)
 
-# The est.evci function below calculates the diagnostic accuracy and associated NMB 
-# of an imperfect test (similar to calculations above) and also estimates the NMB 
-# in the absense of any test, to estimate the Expected Value of Clinical Information 
-# The function also does this at different prevalence values (by passing the prevalence)
-# to the function (indicated by 'prev' argument)
-
 est.evci <- function(prev, diag = diagnostic.threshold, test = test.char, 
                      nmb.input = parameter.values$nmb, nmb.notest = no.test.nmb){
-
+  ## FUNCTION:  calculates the diagnostic accuracy and associated NMB 
+  ##            of an imperfect test (similar to calculations above) and also estimates the NMB 
+  ##            in the absense of any test, to estimate the Expected Value of Clinical Information 
+  ## INPUTS: prev - a numeric values of prevalence, 
+  ##         diagnostic threshold - a vector of diagnostic threshold numeric values
+  ##         test - a vector of test characteristics 
+  ##         nmb.input - numeric vector of NMB values from different treatment pathways
+  ##         nmb.notest - data.frame output similar structure to no.test.nmb
+  ## OUTPUTS: a data.frame outputting the prevalence used and the calculated
+  ##          net monetary benefit from a perfect test at that prevalence level
+  
   # true and false positive rate
   TPR <- 1 - pnorm(diag, test[1], test[2])
   FPR <- 1 - pnorm(diag, test[3], test[4])
@@ -334,11 +355,7 @@ lines(evci$prev, evci$evci, col = "red")
 legend("topright", legend=c("EVPDI", "EVCI"), col=c("blue", "red"), 
        lty = 1, cex = 0.8)
 
-
-
-
-
-## ggplots code (for those interested)
+### Additional ggplot Graphs ####
 
 library(reshape2)
 library(ggplot2)
@@ -363,7 +380,6 @@ nmb.plot  <-  ggplot(nmb.plot.data.long) +
 
 nmb.plot
 
-
 # EVDI plot
 
 evci.plot.data <- cbind(evpdi.table, evci$evci)
@@ -384,8 +400,6 @@ evdi.plot  <-  ggplot(evci.plot.data.long) +
 
 evdi.plot
 
-
-
 # Diagnostic threshold
 
 head(biomarker.dist)
@@ -404,8 +418,6 @@ diag.plot  <-  ggplot(biomarker.dist.long) +
   scale_x_continuous(expand = c(0, 0.1)) 
   
 diag.plot
-
-
 
 # ROC plot 
 
