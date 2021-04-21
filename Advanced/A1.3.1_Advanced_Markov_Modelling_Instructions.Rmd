@@ -18,6 +18,10 @@ linkcolor: red
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r, include = FALSE}
+source("A1.3.3_Advanced_Markov_Modelling_Solutions.R", local = knitr::knit_global())
+```
+
 ## Overview 
 
 In this exercise we will build a Markov model in R. Of particular interest is the use of time dependent transition functions to represent probabilities.  The exercise will get you to construct two types of time varying transition probabilities: (i) time-varying transitions from a life-table, and (ii) time-varying transitions estimated from a parametric survival model.
@@ -31,12 +35,30 @@ In this exercise we will be focusing on:
 5. Adapting the model for a new prosthesis
 6. Estimating cost-effectiveness (deterministically)
 
-
 Before beginning the exercise take a moment to familiarise yourself with the R template for the exercise, ‘A1.3.1_Advanced_Markov_Modelling_Template.R' and the figure below. Figure A1.3.1a contains the overall structure of the model you are about to build and it will be worth you spending a little time familiarising yourself with this figure.  It contains state transition diagram of the four-state Markov model you will be building and contains a key to the different parameters of the model, which are seperated into three categories: transition probabilities, state costs and state utilities.  
 The model itself is constructed across a number of sections with separate sections for the parameters of the model and the final analysis, for the survival analysis used to estimate prosthesis failure rates, for each of the Markov model arms and for the life tables used for mortality rates.  Of course, there are many ways to structure models – much being down to personal preference.  However, we hope that you will find that our chosen way of presenting the model does not deviate too much from your own preferences!
 
 **Figure A1.3.1a** 
 ![](markov_diagram.png)
+
+To work through this exercise, you will need to have the following csv files available within the same working-directory folder as the template and solution files:
+
+* "hazardfunction.csv"
+* "life-tables.csv"
+
+Here we use 3 useful packages for data manipulation - datatable, tidyr, and dplyr.  You can have a look on the internet (e.g. via Google) for more information on these. The following cheat sheets are available:
+
+* Data table : https://s3.amazonaws.com/assets.datacamp.com/img/blog/data+table+cheat+sheet.pdf 
+
+* dyplr and tidyr: https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf 
+
+Therefore please ensure these packages are installed before running the template and/or solution files for this exercise:
+```{r , echo=TRUE, warning=FALSE}
+
+install.packages("data.table")
+install.packages("tidyr")
+install.packages("dplyr")
+```
 
 ## Step by step guide  
 
@@ -60,9 +82,18 @@ On opening the section you will see that some of the work has been done for you,
 
 i) We will start with the three transition probabilities that will be assumed to be constant in the model: the operative mortality rates and the re-revision rate parameters, which are named as “`tp.`” variables. We will assume that the operative mortality is 2% for both primary and revision procedures and that the re-revision rate is 4% per annum.  Enter these values now.
 
-ii) Now we deal with the costs in the model.  Note that the costs of the prostheses (standard and new) have already been entered for you.  That leaves the costs for the states of the model.  However, the state cost for the primary procedure is assumed to be the same irrespective of the implant – we therefore leave this out (since it is received by both arms and nets out of the analysis, but would be important if you were interested in total costs for each arm).  We also assume for the purposes of this model that there is no ongoing cost to the health service if people have a successful implant in place.  Therefore the only cost to consider at this point is the cost of the revision procedure itself.  This has been estimated as £5,294 and this should be entered into `c.revision`. Afterwards, create a vector (`state.costs`) that combines all of these costs, remember that the order is important and should match the order of states that you will use in the state transition matrix [this order should match the order of states listed in `state.names`]
+ii) Now we deal with the costs in the model.  Note that the costs of the prostheses (standard and new) have already been entered for you.  That leaves the costs for the states of the model.  However, the state cost for the primary procedure is assumed to be the same irrespective of the implant – we therefore leave this out (since it is received by both arms and nets out of the analysis, but would be important if you were interested in total costs for each arm).  We also assume for the purposes of this model that there is no ongoing cost to the health service if people have a successful implant in place.  Therefore the only cost to consider at this point is the cost of the revision procedure itself.  This has been estimated as £5,294 and this should be entered into `c.revision`. Afterwards, create a vector (`state.costs`) that combines all of these costs, remember that the order is important and should match the order of states that you will use in the state transition matrix [this order should match the order of states listed in `state.names`]. 
 
-iii) Create two effect vectors; one for the life year effects of each health state and one for quality-adjusted life years. The quality of life utilities of a year spent in each of the model health states has been estimated to be 0.85, 0.75 and 0.30 for the Successful primary, Successful revision and Revision states respectively.  Enter these values into the respective “`u.`” variables. Pull this information together by creating a utility vector (remember this should match the same state order for costs as previously defined).
+iii) Create two effect vectors; one for the life year effects of each health state and one for quality-adjusted life years. The quality of life utilities of a year spent in each of the model health states has been estimated to be 0.85, 0.75 and 0.30 for the Successful primary, Successful revision and Revision states respectively.  Enter these values into the respective “`u.`” variables. Pull this information together by creating a utility vector (remember this should match the same state order for costs as previously defined). 
+
+You should now have the following vectors defined as follows:
+
+```{r, echo = TRUE}
+print(seed)
+print(state.costs)
+print(state.lys)
+print(state.utilities)
+```
 
 \  
 
@@ -82,6 +113,8 @@ ii) We now want to calculate the lambda value of Weibull distribution (this, tog
 
 iii) Exponentiate the NP1 coefficient to get the Relative risk of revision for new prosthesis 1 compared to standard 
 
+Your gamma value should be equal to __`r gamma`__ , your lambda value should be equal to __`r format(lambda, scientific=FALSE)`__ and your relative risk of revision for new prosthesis 1 compared to standard  __`r RR.NP1`__ .
+
 \  
 
 (@) **Life-table transitions for background mortality** 
@@ -93,6 +126,7 @@ Go to the <Life tables> section and familiarise yourself with the contents.  Vie
 i) Create a vector (current.age) which combines the initial age of the cohort and their ages throughout the model
 
 ii) Using the data.table package function `roll()` we can create, we have done this for you, but take a look at the functions used and the `death.risk` data.table created to understand the process. You can find more information on the data.table package in the package manual: https://cran.r-project.org/web/packages/data.table/data.table.pdf
+
 
 (@) **Building a Markov model for the standard prosthesis** 
 
@@ -110,7 +144,13 @@ $$ tp(t) = 1 - exp \{\lambda [(t-1)^{\gamma} - t^{\gamma}]\} $$
 
 i) Go to the <Standard> section. Use the above formula to calculate the time-dependent transition probability for the standard prosthesis (referred to in the script as `revision.risk`) using the cycle number for the time variable (`cycle`) and the lambda and gamma parameters already defined in this exercise. Do the same for the NP1 treatment arm.
 
-ii) Now combine age and sex dependent risk of death (from `death.risk`), and age dependent risk of revision (which we have just defined for SP0 and NP1), into one data.table. Based on the column numbers we set a column key which switches between pulling risk of death from the “Men” or “Women” values. 
+ii) Now combine age and sex dependent risk of death (from `death.risk`), and age dependent risk of revision (which we have just defined for SP0 and NP1), into one data.table (`tdtps`). Based on the column numbers we set a column key which switches between pulling risk of death from the “Men” or “Women” values. 
+
+For example, setting the column key to 3 means we are selecting column from the data.table (first 6 rows displayed below), i.e. selecting the Male values for risk of death.
+
+```{r, echo = TRUE}
+head(tdtps)
+```
 
 What you have just implemented is a relatively sophisticated use of survival analysis to model a time dependent transition within a Markov model.  Note that it only works because we will be using this time dependent transition from the initial state of the model – i.e. we know exactly how long subjects have spent in the initial model state.  Take a moment to make sure you understand what you have just implemented and the limitations on its use in a Markov framework.
 
@@ -118,7 +158,11 @@ You have now implemented all three key types of transition probability: constant
 
 Having specified the time dependent transition parameters on we can now proceed to construct the Markov model proper. To begin with we need to create an array of time dependent state transition matrices. 
 
-i) Start by creating an empty array of an empty array of dimensions (number of states, number of states, number of cycles) [Hint: putting 0s instead of NAs allows for 0 values to be pre-filled for where transitions can’t occur]. It is recommended to provide dimension names (where the transition matrix column and row names match state names).
+i) Start by creating an empty array of an empty array of dimensions (number of states, number of states, number of cycles). *[Hint: putting 0s instead of NAs allows for 0 values to be pre-filled for where transitions can’t occur.]* It is recommended to provide dimension names (where the transition matrix column and row names match state names). See below to give an idea of the structure of what this should look like (with only cycle 1 and 2 results displayed below).
+
+```{r, echo = TRUE}
+tm.SP0[,,1:2]
+```
 
 ii) Create a for loop that for cycle 1 to cycle 60 creates the correct transition matrix for each corresponding cycle. Refamiliarise yourself with the diagram of the model to highlight which transitions need to be filled. 
 
@@ -126,26 +170,32 @@ We then are concerned with generating the Markov trace: that is showing the numb
 
 i) First create the first cycle trace by multiplying the seed population (cycle0) by the transition matrix for cycle1
 
-ii) Create a for loop for cycle 2 to cycle 60 that multiplies populations within cycles with the correct transition matrix [Hint: you will have to “look back” if starting from cycle2]
+ii) Create a for loop for cycle 2 to cycle 60 that multiplies populations within cycles with the correct transition matrix *[Hint: you will have to “look back” if starting from cycle2]*
 
 iii) Take a look at the trace that you’ve constructed, provide a check (for example, check the sum across rows must always equal the size of the original cohort).
 
 Now that we have the Markov trace we can calculate the cost and effects for each cycle of the model.
 
-i) Calculate the life years for the standard treatment arm using the trace outputs and the life year vector.  By doing this without quality adjustment or discounting, this column can be used to calculate life-expectancy (which is often useful – but not particularly in this example). [Hint: `%*%` is a useful matrix multiplier]
+i) Calculate the life years for the standard treatment arm using the trace outputs and the life year vector.  By doing this without quality adjustment or discounting, this column can be used to calculate life-expectancy (which is often useful – but not particularly in this example). _[Hint: `%*%` is a useful matrix multiplier]_
 
-ii) Now calculate quality adjusted life years (QALYs).  However, this is undiscounted.  Therefore, we need to apply the standard discount formula, you can do this by creating a matrix (discount.factor.o) which specifies the discount factor that needs to be applied for each cycle. Then multiply discount.factor.o with undisc.QALYs.SP0 to get the discounted QALYs for the standard treatment arm. 
+ii) Now calculate quality adjusted life years (QALYs).  However, this is undiscounted.  Therefore, we need to apply the standard discount formula, you can do this by creating a matrix (`discount.factor.o`) which specifies the discount factor that needs to be applied for each cycle. This should look like this:
+
+```{r, echo = FALSE}
+print(discount.factor.o)
+```
+
+Then multiply `discount.factor.o` with `undisc.QALYs.SP0` to get the discounted QALYs for the standard treatment arm. 
 
 iii) Calculate the costs in a similar manner (but this time with the state cost vector).  Don’t forget to incorporate the cost discount rate (which is different to the outcome discount rate).
 
-iv) We want to include the cost of the original prosthesis, there are many ways to do this, but since it is a one off cost occurring in `cycle0`, here we can add on at the end.
+iv) We also now want to include the cost of the original prosthesis, there are many ways to do this, but since it is a one off cost occurring in `cycle0`, here we can add on at the end.
 
 v) Finally, sum the columns to get the per patient predictions of cost, life expectancy and QALYs for this arm of the model.  
 
-Now perform the same processes for the NP1 treatment arm within the <NP1> section, then create an output matrix storing the differences in treatment costs and effects, and incremental cost-effectiveness ratio in the <Analysis> section. 
+Now perform the same processes for the NP1 treatment arm within the <NP1> section, then create an output matrix storing the differences in treatment costs and effects, and incremental cost-effectiveness ratio in the <Analysis> section. You should have an incremental cost-effectiveness ratio of __£`r round(output[3])`__ per QALY gained.
 
 Congratulations! Your Markov model is now complete.  
 
-Try re-running the model for a different sex and age groups (between 40 and 90 years), and/or different discount rates, and see differences in the results produced. 
+Try re-running the model for a different sex and age groups (between 40 and 90 years), and/or different discount rates, and see differences in the results produced. *Hint:go back to the top of your model R script and adapt the`age` and `male` assignments and rerun.*
 
 

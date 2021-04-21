@@ -54,7 +54,7 @@ state.utilities <- c(0,u.success.p,u.revision,u.success.r,0) ## a vector with th
 
 #### HAZARD FUNCTION & ASSOCIATED PARAMETERS #####
 
-hazards <- read.csv("Advanced/A0.2_R_Starting Material_for_Advanced_Course/hazardfunction.csv") ## importing the hazard inputs from the regression analysis
+hazards <- read.csv("hazardfunction.csv") ## importing the hazard inputs from the regression analysis
 
 ## Coefficients - on the log hazard scale
 r.lnlambda <- hazards$coefficient[1] ## Ancilliary parameter in Weibull distribution - equivalent to lngamma coefficient
@@ -69,7 +69,7 @@ RR.NP1 <- exp(r.NP1)
 
 ##### LIFE TABLES #####
 #  Read in the life table
-life.table <- read.csv("Advanced/A0.2_R_Starting Material_for_Advanced_Course/life-table.csv") ## importing the life table csv inputs
+life.table <- read.csv("life-table.csv") ## importing the life table csv inputs
 colnames(life.table) <- c("Age","Index","Males","Female") ## making sure column names are correct
 
 cycle.v <- 1:cycles ## a vector of cycle numbers 1 - 60
@@ -114,7 +114,7 @@ for (i in 1:cycles) {
   tm.SP0["P-THR","Death",i] <- tp.PTHR2dead ## Primary THR either enter the death state or.. or..
   tm.SP0["P-THR","successP-THR",i] <- 1 - tp.PTHR2dead ## they go into the success THR state 
   ## transitions out of success-P-THR
-  tm.SP0["successP-THR","R-THR",i] <- revision.risk.sp0[i]
+  tm.SP0["successP-THR","R-THR",i] <- revision.risk.sp0[i] ## you could also refer to the corersponding tdtps column
   tm.SP0["successP-THR","Death",i] <- mortality
   tm.SP0["successP-THR","successP-THR",i] <- 1-revision.risk.sp0[i] - mortality
   ## transitions out of R-THR 
