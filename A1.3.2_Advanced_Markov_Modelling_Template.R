@@ -54,7 +54,7 @@ state.utilities <-        ## a vector with the utilities for each state
 
 #### HAZARD FUNCTION & ASSOCIATED PARAMETERS #####
 
-hazards <- read.csv("Advanced/A0.2_R_Starting Material_for_Advanced_Course/hazardfunction.csv") ## importing the hazard inputs from the regression analysis
+hazards <- read.csv("hazardfunction.csv") ## importing the hazard inputs from the regression analysis
 
 ## Coefficients - on the log hazard scale
 r.lnlambda <- hazards$coefficient[1] ## Ancilliary parameter in Weibull distribution - equivalent to lngamma coefficient
@@ -70,7 +70,7 @@ RR.NP1 <-
 
 ##### LIFE TABLES #####
 #  Read in the life table
-life.table <- read.csv("Advanced/A0.2_R_Starting Material_for_Advanced_Course/life-table.csv") ## importing the life table csv inputs
+life.table <- read.csv("life-table.csv") ## importing the life table csv inputs
 colnames(life.table) <- c("Age","Index","Males","Female") ## making sure column names are correct
 
 cycle.v <- 1:cycles ## a vector of cycle numbers 1 - 60

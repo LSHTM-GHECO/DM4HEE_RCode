@@ -3,14 +3,9 @@
 # This is a series of functions that use ggplot to create graphs
 # ggplot is more flexible than base R plots, and allows users to specify many of options
 
-
-
 # Install package and load library
 if(!require(ggplot2)) install.packages('ggplot2')
 library(ggplot2)
-
-
-
 
 ## Cost-effectiveness plane (for one comparator, using incremetnal costs and outcomes)
 
@@ -36,19 +31,16 @@ ce.plane <- function(results, transparency = 0.75){
 }
 
 
-
-
-
 ## Cost-effectiveness plane (for multiple comparators) - this is essentially the same, except that 
 # the colour of the circles relates to the comparator
 
 ce.plane.all <- function(results,  transparency = 0.75){
-  
+  ## results must have "qaly", "cost" and "comparator" columns defined
   xlabel = "QALYs"
   ylabel = "Costs"
-
+  
   plot = ggplot(results) + 
-    geom_point(shape = 21, size = 2, colour = "black", fill = NA, alpha = 0.5, aes(x=outcomes, y=costs, colour = group)) + 
+    geom_point(shape = 21, size = 2, aes(x=qaly, y=cost, colour = comparator)) + 
     labs(x = xlabel, text = element_text(size=10)) + 
     labs (y = ylabel, text = element_text(size=10)) + theme_classic() +
     theme(legend.title = element_blank(), axis.title=element_text(face="bold"), 
@@ -61,7 +53,6 @@ ce.plane.all <- function(results,  transparency = 0.75){
   return(plot)
   
 }
-
 
 # Cost-effectiveness acceptability curve (CEAC) for one comparator
 
