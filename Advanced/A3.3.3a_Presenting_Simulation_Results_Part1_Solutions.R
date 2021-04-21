@@ -10,9 +10,9 @@ library(ggplot2)
 library(reshape2) 
 
 #  Reading the data needed from csv files
-hazards <- read.csv("Advanced/A0.2_R_Starting Material_for_Advanced_Course/hazardfunction.csv", header=TRUE) ## importing the hazard inputs from the regression analysis
-cov.55 <- read.csv("Advanced/A0.2_R_Starting Material_for_Advanced_Course/cov55.csv",row.names=1,header=TRUE) ## importing the covariance matrix
-life.table <- read.csv("Advanced/A0.2_R_Starting Material_for_Advanced_Course/life-table.csv", header=TRUE)
+hazards <- read.csv("hazardfunction.csv", header=TRUE) ## importing the hazard inputs from the regression analysis
+cov.55 <- read.csv("cov55.csv",row.names=1,header=TRUE) ## importing the covariance matrix
+life.table <- read.csv("life-table.csv", header=TRUE)
 life.table<- as.data.table(life.table)
 
 ####***** THR MODEL FUNCTION ****#####
@@ -310,7 +310,7 @@ head(sim.runs)
 plot(simulation.results$inc.qalys,simulation.results$inc.cost)
 
 ## using pre-created ggplot2 functions for nicer cost-effectiveness plane graphs
-source("Advanced/A0.2_R_Starting Material_for_Advanced_Course/ggplot_CEA_functions.R")
+source("ggplot_CEA_functions.R")
 ce.plane(simulation.results)
 
 ## Estimating average ICER from the simulation
