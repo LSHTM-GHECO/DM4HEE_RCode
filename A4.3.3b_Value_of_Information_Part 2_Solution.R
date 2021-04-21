@@ -20,6 +20,9 @@ for(i in 1:10){
 
 simulation.results[[1]]
 
+# then you can access the vectors needed through e.g.;
+simulation.results[[1]]$utilities
+
 ### then create an adapted version of the model.THR function 
 # where you specify to use the one in the outputs and use the
 # rest of the code you've written? 
