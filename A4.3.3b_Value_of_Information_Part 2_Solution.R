@@ -1,12 +1,41 @@
-#  Decision Modelling for Economic Evaluation
-#  Advanced Course Exercise 4b (Part 2): TEMPLATE FILE
+#  Decision Modelling for Health Economic Evaluation
+#  Advanced Course Exercise 4b (Part 2): SOLUTION FILE
 #  Authors: Andrew Briggs, Jack Williams & Nichola Naylor
 
-## !! to do
 
+## test new code
+# just source function that also returns the parameter's we're interested in
+source("A4.3.3b_THRfunctionforVOI.R")
+
+#### RUNNING THE SIMULATIONS ########
+sim.runs <- 1000 ## the number of simulation runs
+
+## creating an empty data.frame for simulation results to fill:
+simulation.results <- list()
+
+## running the simulations and filling the simulation.results data.frame:
+for(i in 1:10){
+  simulation.results[[i]] <- model.THR.voi() ## running the model 1,000 times
+}
+
+simulation.results[[1]]
+
+# then you can access the vectors needed through e.g.;
+simulation.results[[1]]$utilities
+
+### then create an adapted version of the model.THR function 
+# where you specify to use the one in the outputs and use the
+# rest of the code you've written? 
+## need to go through 
+
+## or alternatively adapt your previous code to have lots of notation
+# keep part 1 as is, but then read in that for part 2 and they can go through 
+# it that way?
+
+##### previous code
 # The source function runs the EVPI model - so that data / model are avaialable here
 
-source('R_solutions/Exercise 6.6a.R')
+source('A4.3.3a_PREVIOUS_VOI.R')
 
 
 

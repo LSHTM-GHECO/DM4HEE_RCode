@@ -8,11 +8,11 @@ library(tidyr)
 library(dplyr)
 
 #  Reading the data needed from csv files
-hazards <- read.csv("Advanced/A0.2_R_Starting Material_for_Advanced_Course/hazardfunction.csv", header=TRUE) ## importing the hazard inputs from the regression analysis
+hazards <- read.csv("hazardfunction.csv", header=TRUE) ## importing the hazard inputs from the regression analysis
 
-cov.55<-read.csv("Advanced/A0.2_R_Starting Material_for_Advanced_Course/cov55.csv",row.names=1,header=TRUE) ## importing the 
+cov.55 <- read.csv("cov55.csv",row.names=1,header=TRUE) ## importing the covariance data
 
-life.table <- read.csv("Advanced/A0.2_R_Starting Material_for_Advanced_Course/life-table.csv", header=TRUE)
+life.table <- read.csv("life-table.csv", header=TRUE) ## importing the life table 
 life.table<- as.data.table(life.table)
 
 #########**** PARAMETERS *****######
@@ -320,6 +320,6 @@ disc.QALYs.NP1
 output <- c(inc.cost = disc.cost.NP1 - disc.cost.SP0,
             inc.qalys = disc.QALYs.NP1 - disc.QALYs.SP0,
             icer = NA)
-output["icer"] <- output["inc.cost"]/output["inc.lys"]
+output["icer"] <- output["inc.cost"]/output["inc.qalys"]
 
 round(output,2)

@@ -1,5 +1,5 @@
 #  Decision Modelling for Health Economic Evaluation
-#  Advanced Course Exercise 3a (Part 1): TEMPLATE FILE
+#  Course Exercise 3a (Part 1): TEMPLATE FILE
 #  Authors: Andrew Briggs, Jack Williams & Nichola Naylor
 
 ### Loading useful packages
@@ -10,9 +10,9 @@ library(ggplot2)
 library(reshape2) 
 
 ###  Reading in the data needed from csv files
-hazards <- read.csv("Advanced/A0.2_R_Starting Material_for_Advanced_Course/hazardfunction.csv", header=TRUE) ## importing the hazard inputs from the regression analysis
-cov.55 <- read.csv("Advanced/A0.2_R_Starting Material_for_Advanced_Course/cov55.csv",row.names=1,header=TRUE) ## importing the covariance matrix
-life.table <- read.csv("Advanced/A0.2_R_Starting Material_for_Advanced_Course/life-table.csv", header=TRUE)
+hazards <- read.csv("hazardfunction.csv", header=TRUE) ## importing the hazard inputs from the regression analysis
+cov.55 <- read.csv("cov55.csv",row.names=1,header=TRUE) ## importing the covariance matrix
+life.table <- read.csv("life-table.csv", header=TRUE)
 life.table<- as.data.table(life.table)
 
 
@@ -238,7 +238,7 @@ for(i in 1:sim.runs){
 }
 
 ## have a look at what you've created so far:
-head(sim.runs)
+head(simulation.results)
 
 #### PLOTTING THE COST-EFFECTIVENESS PLANE #####
 
@@ -246,7 +246,7 @@ head(sim.runs)
 plot(simulation.results$inc.qalys,simulation.results$inc.cost)
 
 ## using pre-created ggplot2 functions for nicer cost-effectiveness plane graphs
-source("A0.2_R_Starting Material_for_Advanced_Course/ggplot_CEA_functions.R")
+source("ggplot_CEA_functions.R")
 ce.plane(simulation.results) 
 
 ## Estimating average ICER from the simulation:

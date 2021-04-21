@@ -10,9 +10,9 @@ library(ggplot2)
 library(reshape2) 
 
 #  Reading the data needed from csv files
-hazards <- read.csv("Advanced/A0.2_R_Starting Material_for_Advanced_Course/hazardfunction_NP2.csv", header=TRUE) ## importing the hazard inputs from the regression analysis
-cov.55 <- read.csv("Advanced/A0.2_R_Starting Material_for_Advanced_Course/cov55_NP2.csv",row.names=1,header=TRUE) ## importing the covariance matrix
-life.table <- read.csv("Advanced/A0.2_R_Starting Material_for_Advanced_Course/life-table.csv", header=TRUE)
+hazards <- read.csv("hazardfunction_NP2.csv", header=TRUE) ## importing the hazard inputs from the regression analysis
+cov.55 <- read.csv("cov55_NP2.csv",row.names=1,header=TRUE) ## importing the covariance matrix
+life.table <- read.csv("life-table.csv", header=TRUE)
 life.table<- as.data.table(life.table)
 
 ####***** THR MODEL FUNCTION ****#####
@@ -357,6 +357,8 @@ simulation.results <- data.frame("cost.SP0" = rep(as.numeric(NA), sim.runs), ## 
 
 ## adding a progress bar to the simulatio runs allows you to keep track of where the simulation is
 # this is particularly useful for more complex models that may take longer to run
+# we left this out of the template for this exercise, but we will be using this for exercise 4 
+# so please see how it is implemented in the solutions for this exercise
 pb = txtProgressBar(min = 0, max = sim.runs, initial = 0, style = 3)
 
 for(i in 1:sim.runs) {
@@ -372,6 +374,10 @@ mean.results <- apply(simulation.results, 2, mean)
 mean.results
 
 #### PLOTTING THE COST-EFFECTIVENESS PLANE #####
+## loading our predefined functions 
+# feel free to take a look at the script and see the code itself
+# just open up the "ggplot_CEA_functions.R" file
+source("ggplot_CEA_functions.R")
 
 ## need to format the data to get into the correct format
 # want costs and outcomes for each group for each run
@@ -381,38 +387,24 @@ NP1.sims <- simulation.results[,c("cost.NP1","qalys.NP1")]
 NP1.sims$comparator <- "NP1"
 NP2.sims <- simulation.results[,c("cost.NP2","qalys.NP2")]
 NP2.sims$comparator <- "NP2"
+colnames(standard.sims) <- c("cost", "qaly","comparator")
+colnames(NP1.sims) <- c("cost", "qaly","comparator")
+colnames(NP2.sims) <- c("cost", "qaly","comparator")
+ltemp <- list(standard.sims, NP1.sims, NP2.sims)
+plane.sims <- rbindlist(ltemp)
 
-### !!! got to here 
-
-ce.plane.all <- function(results,  transparency = 0.75){
-  
-  xlabel = "QALYs"
-  ylabel = "Costs"
-  
-  plot = ggplot(results) + 
-    geom_point(shape = 21, size = 2, colour = "black", fill = NA, alpha = 0.5, aes(x=outcomes, y=costs, colour = group)) + 
-    labs(x = xlabel, text = element_text(size=10)) + 
-    labs (y = ylabel, text = element_text(size=10)) + theme_classic() +
-    theme(legend.title = element_blank(), axis.title=element_text(face="bold"), 
-          axis.title.x = element_text(margin = margin(t = 7, r = 0, b = 3, l = 0)), 
-          axis.title.y = element_text(margin = margin(t = 0, r = 7, b = 0, l = 3)), 
-          panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-          legend.key.width=unit(1.8,"line"), text = element_text(size=12),
-          plot.margin=unit(c(1.2,0.5,0,1.2),"cm"))
-  
-  return(plot)
-  
-}
-
+## plotting this using predefined functions:
+ce.plane.all(plane.sims)
 
 #### PLOTTING THE COST-EFFECTIVENESS ACCEPTABILITY CURVE #####
+
 # Generate CEAC table
 WTP.values <- seq(from = 0, to = 50000, by = 10) ## use the seq() function to get a vector of specified numeric values
+
 CEAC <- data.frame(WTP = WTP.values, 
                    Standard= rep(as.numeric(NA),length(WTP.values)),
                    NP1= rep(as.numeric(NA),length(WTP.values)),
                    NP2= rep(as.numeric(NA),length(WTP.values)))
-
 
 pCE.3b <-function(WTP, simulation.results) {
   ## a function that estimates the probability of the new intervention
@@ -433,13 +425,12 @@ pCE.3b <-function(WTP, simulation.results) {
   max.nmb <- apply(nmb, 1, max) # selecting max value indication by row within nmb
   
   ## creating an indication of TRUE/FALSE as to whether each treatment column == that max value:
-  CE <- nmb[1:nrow(simulation.results),] == max.nmb[1:nrow(simulation.results)]
+  CE <- nmb[1:nrow(simulation.results),] == max.nmb[1:nrow(simulation.results)] 
   probCE<- apply(CE, 2, mean) ## averaging over TRUE (=1) and FALE (=0) for each column
   
   return(probCE)
   
 }
-
 
 for (i in 1:length(WTP.values)) {
   CEAC[i,"WTP"] <- WTP.values[i]
@@ -453,12 +444,9 @@ tail(CEAC)
 
 # Plotting the CEAC with a plot function
 # reshape to show all in on plot
-
 CEAC.long <- reshape2::melt(CEAC, id.vars = c("WTP"))
 colnames(CEAC.long) <- c("WTP", "comparator", "pCE")
 head(CEAC.long)
-
-source("Advanced/A0.2_R_Starting Material_for_Advanced_Course/ggplot_CEA_functions.R")
 
 plot.ceac.all(CEAC.long)
 
