@@ -1,16 +1,11 @@
-#  DM4HEE 
 #  Cholesky Decomposition by hand
-#  Author: Nichola Naylor
-#  Date created: 22 February 2021
-#  Date last edit: 12 March 2021
-
 
 library(data.table)
 
 #  Read in the lcovariance table
-hazards <- read.csv("inputs/hazardfunction.csv", header=TRUE) ## importing the hazard inputs from the regression analysis
+hazards <- read.csv("hazardfunction.csv", header=TRUE) ## importing the hazard inputs from the regression analysis
 
-cov.55<-read.csv("inputs/cov55.csv",row.names=1,header=TRUE) ## importing the 
+cov.55<-read.csv("cov55.csv",row.names=1,header=TRUE) ## importing the 
 
 ## Coefficients - on the log hazard scale
 mn.lngamma <- hazards$coefficient[1] ## Ancilliary parameter in Weibull distribution - equivalent to lngamma coefficient
