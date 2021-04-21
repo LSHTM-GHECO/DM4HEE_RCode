@@ -6,5 +6,7 @@ Markdown Exercises/*.html
 Markdown Exercises/*.pdf
 Foundation/*.html
 Foundation/*.pdf
+Foundation/*/*.pdf
 Advanced/*.html
 Advanced/*.pdf
+Advanced/*/*.pdf
