@@ -10,9 +10,9 @@ library(ggplot2)
 library(reshape2) 
 
 ###  Reading in the data needed from csv files
-hazards <- read.csv("/hazardfunction.csv", header=TRUE) ## importing the hazard inputs from the regression analysis
-cov.55 <- read.csv("/cov55.csv",row.names=1,header=TRUE) ## importing the covariance matrix
-life.table <- read.csv("/life-table.csv", header=TRUE)
+hazards <- read.csv("hazardfunction.csv", header=TRUE) ## importing the hazard inputs from the regression analysis
+cov.55 <- read.csv("cov55.csv",row.names=1,header=TRUE) ## importing the covariance matrix
+life.table <- read.csv("life-table.csv", header=TRUE)
 life.table<- as.data.table(life.table)
 
 
@@ -238,7 +238,7 @@ for(i in 1:sim.runs){
 }
 
 ## have a look at what you've created so far:
-head(sim.runs)
+head(simulation.results)
 
 #### PLOTTING THE COST-EFFECTIVENESS PLANE #####
 

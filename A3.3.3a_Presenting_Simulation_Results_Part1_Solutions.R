@@ -302,7 +302,7 @@ for(i in 1:sim.runs){
 }
 
 ## have a look at what you've created so far:
-head(sim.runs)
+head(simulation.results)
 
 #### PLOTTING THE COST-EFFECTIVENESS PLANE #####
 

@@ -2,18 +2,14 @@
 #  Advanced Course Exercise 4a (Part 1): SOLUTION FILE
 #  Authors: Andrew Briggs, Jack Williams & Nichola Naylor
 
-
 # Load packages 
 library(data.table)
-
 
 # Run pre-set functions for ggplot graphics 
 source('graphs/ggplot functions.R')
 
-
 # Define the number of model simulations (for PSA) 
 sim.runs <- 1000
-
 
 #########**** PARAMETERS *****######
 
@@ -26,12 +22,10 @@ dr.c <- 0.06
 dr.o <- 0.015
 
 
-
-
 #  Read in the life table and covariance table
-life.table <- read.csv("inputs/life-table.csv")
+life.table <- read.csv("life-table.csv")
 life.table <- data.table(life.table)
-cov.55 <- read.csv("inputs/cov55.csv",row.names=1,header=TRUE) 
+cov.55 <- read.csv("cov55.csv",row.names=1,header=TRUE) 
 
 
 #  Set the total number of cycles to run and name the states
@@ -68,7 +62,7 @@ transitions <- data.frame(omrPTHR = omrPTHR, omrRTHR = omrRTHR, rrr = rrr)
 
 #### HAZARD FUNCTION & ASSOCIATED PARAMETERS #####
 
-hazards <- read.csv("inputs/hazardfunction.csv") ## importing the hazard inputs from the regression analysis
+hazards <- read.csv("hazardfunction.csv") ## importing the hazard inputs from the regression analysis
 
 r.lnlambda <- hazards$coefficient[1] ## Ancilliary parameter in Weibull distribution - equivalent to lngamma coefficient
 r.cons<- hazards$coefficient[2] ##Constant in survival analysis for baseline hazard
@@ -156,8 +150,6 @@ uPrimary <- rep(0, sim.runs)
 uDead <- rep(0, sim.runs)
 
 state.utilities <- data.frame(uPrimary,uSuccessP,uRevision,uSuccessR,uDead)
-
-
 
 #  Create revision and death risk as function of age
 
@@ -294,9 +286,6 @@ model.THR <- function(revision = revision.vec, death = death.risk.vector,
 
 # The PSA is more complex now, as we need to feed to correct data samples into the model for each run  
 
-
-
-
 # Use a loop to run simulations
 
 # Set the number of simulations to run
@@ -322,11 +311,8 @@ for(i in 1:sim.runs) {
   
 }
 
-
 # Mean results 
 colMeans(simulation.results)
-
-
 
 incremental.results <- data.frame(matrix(0, nrow = sim.runs, ncol = 2))
 incremental.results[,1] <- simulation.results[,3] - simulation.results[,1]
