@@ -38,11 +38,13 @@ In this exercise we will be focusing on:
 Before beginning the exercise take a moment to familiarise yourself with the R template for the exercise, ‘A1.3.1_Advanced_Markov_Modelling_Template.R' and the figure below. Figure A1.3.1a contains the overall structure of the model you are about to build and it will be worth you spending a little time familiarising yourself with this figure.  It contains state transition diagram of the four-state Markov model you will be building and contains a key to the different parameters of the model, which are seperated into three categories: transition probabilities, state costs and state utilities.  
 The model itself is constructed across a number of sections with separate sections for the parameters of the model and the final analysis, for the survival analysis used to estimate prosthesis failure rates, for each of the Markov model arms and for the life tables used for mortality rates.  Of course, there are many ways to structure models – much being down to personal preference.  However, we hope that you will find that our chosen way of presenting the model does not deviate too much from your own preferences!
 
+\newpage 
+
 **Figure A1.3.1a** 
 
 ![](markov_diagram.png)
 
-\  
+
 
 To work through this exercise, you will need to have the following csv files available within the same working-directory folder as the template and solution files:
 
