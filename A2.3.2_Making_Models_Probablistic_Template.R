@@ -19,22 +19,22 @@ life.table<- as.data.table(life.table)
 #  Start by defining parameters
 
 ##### DETERMINISTIC PARAMETERS ######
-age <-   ## set age group for analyses
-male <-   ## set sex identified, 0 = female and 1 = male
+age <- 60 ## set age group for analyses
+male <- 0 ## set sex identified, 0 = female and 1 = male
 ## the specific number (0,1) becomes important for reasons you'll see further down the script
-dr.c <-    ## set the discount rate for costs 
-dr.o <-    ## set the discount rate for outcomes 
+dr.c <- 0.06 ## set the discount rate for costs (6%)
+dr.o <- 0.015 ## set the discount rate for outcomes (15%)
 
-cycles <-   ## number of cycles running the model
+cycles <- 60 ## number of cycles running the model
 
 state.names <- c("P-THR","successP-THR","R-THR","successR-THR","Death")
 n.states <- length(state.names)
 
-c.SP0 <-  ## Cost of standard prosthesis
-c.NP1 <-  ## Cost of new prosthesis 1
+c.SP0 <- 394 ## Cost of standard prosthesis
+c.NP1 <- 579 ## Cost of new prosthesis 1
 
 #  Seed the starting states of the model
-seed <-       ## set in which states people start in cycle 0
+seed <- c(1,0,0,0,0)
 
 #### PROBABLISTIC PARAMETERS #####
 
@@ -75,7 +75,7 @@ se.cRevision <-    ## standard error of cost of revision surgery
 
 a.cRevision <-      ## alpha value for cost of revision surgery 
 b.cRevision <-      ## beta value for cost of revision surgery
-c.revision <-       ## Gamma distribution draw for cost of revision surgery
+c.revision <- rgamma(n =  ,shape =  , scale =  )    ## Gamma distribution draw for cost of revision surgery
 
 c.success <- 0 ## Cost of one cycle in a 'success' state (primary or revision)
 ## Note for c.sucess There are assumed to be no ongoing monitoring costs for successful THR.  However, this parameter is included in case users want to change this assumption.
@@ -133,7 +133,7 @@ z <-   ## 5 random draws from the normal distribution
 
 Tz <-    ## Tz which is the Cholesky matrix multiplied by the 5 random draws
 
-x <-     ## mu plus Tz
+x <-   ## mn plus Tz
 
 r.lngamma<-x[1,1] 
 r.cons<-x[2,1]
@@ -184,6 +184,23 @@ tm.SP0 <-     ## an empty array of dimenions (number of states, number of states
 ### create a loop that creates a time dependent transition matrix for each cycle
 for (i in 1:cycles) {
   
+  mortality <- as.numeric(tdtps[i,..col.key]) 
+  ## tranisitions out of P-THR
+  tm.SP0["P-THR","Death",i] <- 
+  tm.SP0["P-THR","successP-THR",i] <-
+  ## transitions out of success-P-THR
+  tm.SP0["successP-THR","R-THR",i] <-
+  tm.SP0["successP-THR","Death",i] <- 
+  tm.SP0["successP-THR","successP-THR",i] <- 
+  ## transitions out of R-THR 
+  tm.SP0["R-THR","Death",i] <- 
+  tm.SP0["R-THR","successR-THR",i] <- 
+  ## transitions out of success-THR
+  tm.SP0["successR-THR","R-THR",i] <- 
+  tm.SP0["successR-THR","Death",i] <- 
+  tm.SP0["successR-THR","successR-THR",i] <-
+  
+  tm.SP0["Death","Death",i] <- 1 ## no transitions out of death
 }
 
 tm.SP0
@@ -219,6 +236,24 @@ colnames(trace.NP1) <- state.names
 trace.NP1[1,] <- 
 
 for (i in 2:cycles) {
+  
+  mortality <- 
+  ## tranisitions out of P-THR
+  tm.NP1["P-THR","Death",i] <-    ## Primary THR either enter the death state or.. or..
+  tm.NP1["P-THR","successP-THR",i] <-    ## they go into the success THR state 
+  ## transitions out of success-P-THR
+  tm.NP1["successP-THR","R-THR",i] <-    ## revision risk with NP1 treatment arm 
+  tm.NP1["successP-THR","Death",i] <-  
+  tm.NP1["successP-THR","successP-THR",i] <-  
+  ## transitions out of R-THR 
+  tm.NP1["R-THR","Death",i] <-   
+  tm.NP1["R-THR","successR-THR",i] <- 1 -   
+  ## transitions out of success-THR
+  tm.NP1["successR-THR","R-THR",i] <-   
+  tm.NP1["successR-THR",5,i] <- 
+  tm.NP1["successR-THR","successR-THR",i] <-
+  
+  tm.NP1["Death","Death",i] <- 1 ## no transitions out of death
   
 }
 trace.NP1
