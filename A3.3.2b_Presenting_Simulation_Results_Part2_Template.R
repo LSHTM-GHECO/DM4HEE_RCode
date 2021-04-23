@@ -10,7 +10,7 @@ library(ggplot2)
 library(reshape2) 
 
 #  Reading the data needed from csv files
-hazards <- read.csv("hazardfunction.csv", header=TRUE) ## importing the hazard inputs from the regression analysis
+hazards <- read.csv("hazardfunction_NP2.csv", header=TRUE) ## importing the hazard inputs from the regression analysis
 cov.55 <- read.csv("cov55_NP2.csv",row.names=1,header=TRUE) ## importing the covariance matrix
 life.table <- read.csv("life-table.csv", header=TRUE)
 life.table<- as.data.table(life.table)
@@ -18,6 +18,7 @@ life.table<- as.data.table(life.table)
 ####***** THR MODEL FUNCTION ****#####
 
 #########**** PARAMETERS *****######
+
 # SETTING CONSTANT PARAMETERS OUTSIDE THE FUNCTION 
 ##### DETERMINISTIC PARAMETERS ######
 dr.c <- 0.06 ## set the discount rate for costs (6%)
@@ -344,20 +345,14 @@ source("ggplot_CEA_functions.R")
 
 ## need to format the data to get into the correct format
 # want costs and outcomes for each group for each run
-standard.sims <- simulation.results[,c("cost.SP0","qalys.SP0")]
-standard.sims$comparator <- "standard"
-NP1.sims <- simulation.results[,c("cost.NP1","qalys.NP1")]
-NP1.sims$comparator <- "NP1"
-NP2.sims <- simulation.results[,c("cost.NP2","qalys.NP2")]
-NP2.sims$comparator <- "NP2"
-colnames(standard.sims) <- c("cost", "qaly","comparator")
-colnames(NP1.sims) <- c("cost", "qaly","comparator")
-colnames(NP2.sims) <- c("cost", "qaly","comparator")
-ltemp <- list(standard.sims, NP1.sims, NP2.sims)
-plane.sims <- rbindlist(ltemp)
+standard.sims <- data.frame(comparator = "SP0", cost = simulation.results$cost.SP0, qaly = simulation.results$qalys.SP0)
+NP1.sims <- data.frame(comparator = "NP1", cost = simulation.results$cost.NP1, qaly = simulation.results$qalys.NP1)
+NP2.sims <- data.frame(comparator = "NP2", cost = simulation.results$cost.NP2, qaly = simulation.results$qalys.NP2)
+plane.sims <- rbind(standard.sims, NP1.sims, NP2.sims)
 
 ## plotting this using predefined functions:
 ce.plane.all(plane.sims)
+
 
 #### PLOTTING THE COST-EFFECTIVENESS ACCEPTABILITY CURVE #####
 
