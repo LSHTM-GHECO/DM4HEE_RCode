@@ -179,7 +179,7 @@ Using the same approach taken in Module 1 build the time-dependent transition pr
 
 This time we will order the building of the transition matrices for each arm, then build the cost and effect matrices to multiply through (but the order doesn’t really matter in terms of construction and is down to preference).
 
-(@) **Estimating cost-effectiveness (deterministically)**
+(@) **Estimating cost-effectiveness**
 
 The final section of this exercise is very straightforward. Calculate the incremental cost, incremental effect and the ICER within the `output` data.frame.
 
