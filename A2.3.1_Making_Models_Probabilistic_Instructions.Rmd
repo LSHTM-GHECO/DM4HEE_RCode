@@ -19,7 +19,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r, include = FALSE}
-source("A2.3.3_Making_Models_Probablistic_Solutions.R", local = knitr::knit_global())
+source("A2.3.3_Making_Models_Probabilistic_Solutions.R", local = knitr::knit_global())
 ```
 
 
