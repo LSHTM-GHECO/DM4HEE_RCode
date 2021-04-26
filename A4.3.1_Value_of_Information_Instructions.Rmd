@@ -45,11 +45,15 @@ In the "A4.3.2a..." template file you will see that we've begun the exercise by 
 Recall that, under a decision theoretic approach, it is the expected outcome that should guide the decision.  That is, we will use the new prosthesis if it has an expected net benefit that is greater than that of the standard prosthesis.  However, due to uncertainty, sometimes we will make the wrong decision and the losses associated with the wrong decision are the net-benefits forgone. 
 
 So we first need to estimate the EVPI for individual patients. 
-(i) First define the WTP threshold at £100,000 per QALY gained
-(ii) Estimate the NMB for SP0 and NP1 for each run using columns of the `simulation.results` data.table and your defined WTP
-(iii) Estimate the the mean value of maximum NMB for each run (`av.perfect`) and the maximum of the simulation mean NMB (`max.sim.mean`) values via using the `apply()` function. We've given some further hints on the template. 
 
-(2) **Calculating the effective population and population EVPI**
+(i) First, define a WTP threshold of your choice, to assess the EVPI (we show an example using £100,000 per QALY gained).
+(ii) Estimate the NMB for SP0 and NP1 for each run using columns from the `simulation.results` data.frame, and your defined WTP. Once you have estimated the NMB for each model simulation, ensure that you have these in a data.frame (one column for each treatment).
+(iii) Using the `apply()` function, estimate the the mean NMB for both treatments, across all simulations. This is the average NMB under current information. We can save this as `av.current`.  
+(iv) Next, to consider the decision making under perfect information, estimate the maximum NMB for each treatment, acrosss each model simulation (i.e. the NMB for the favoured treatment, at that WTP) and save this as `max.nmb`. The average of all these maximum NMB values can be calculated using the `max()` function, and saved as `av.perfect`. This represents the average NMB across all simulations, if the correct was chosen every time. 
+(v) Calculate the maximum NMB out of the two treatments under current knowledge, and call this (`max.current`). 
+(vi) Finally, you can calculate the difference between the NMB from the preferred treatment across all simulations, versus the NMB if the best treatment was chosen across every simulation. This is the EVPI for each individual, and you can save this as `EVPI.indiv`. We've given some further hints in the template to help you through this, but remember that these results are all specific to the WTP defined above. 
+
+(2) **Calculating the effective population**
 
 Of course, there will be more than one patient eligible for a particular treatment.  Therefore, the individual patient EVPI must be inflated by the effective population, which is a function of the eligible patients per annum and the expected lifetime of the technology.  
 
@@ -59,16 +63,16 @@ Of course, there will be more than one patient eligible for a particular treatme
 (ii) We've then define a discounted population sequence for you, estimate the effective population by summing across this (i.e. summing across `population.seq`).
 (iii) Estimate the population level EVPI by multiplying the effective population (`effective.population`) by the `EVPI.indiv` we calculated earlier on in the exercise.
 
-(3)	**Calculating the effective population and population EVPI**
+(3)	**Calculating the population EVPI, using a function**
 
-Since EVPI is calculated using net-benefit and net-benefit is a function of the unknown ceiling ratio it is important to estimate EVPI as a function of the ceiling ratio. We therefore need to wrap up what we've done previously into a function, and run it across different WTP values.
+Since EVPI is calculated using net-benefit and net-benefit is a function of the unknown ceiling ratio it is important to estimate EVPI as a function of the ceiling ratio. We therefore need to wrap up what we've done in step 1 into a function, and run it across different WTP values.
 
-(i) Define a new `WTP.values` vector running from 0 to 100,000 in increments of 100.
-(ii) Based on what we've done so far, fill in the blanks left in the function `est.EVPI.pop()`. 
-(iii) create a data frame to capture the WTP values and subsequent population EVPI results (the latter can be set to NA first).
+(i) Define a new `WTP.values` vector running from 0 to 50,000 in increments of 100.
+(ii) Based on what we've done so far, fill in the blanks left in the function `est.EVPI.pop()`. *(Hint: use the calculations in step 1 to help you)*
+(iii) Create a data frame to capture the WTP values and subsequent population EVPI results (the latter can be set to NA first).
 (iv) Fill in the rest of the for loop we've started to run the `est.EVPI.pop()` along different `WTP.values`.
 
-Congratulations! You've completed your first EVPI in R. Take a look at the results you've got. 
+Congratulations! You've completed your first EVPI in R. Take a look at the results you've got.
 
 Now plot these results using the predefined functions given. 
 Notice the peak in EVPI – where does this occur?
