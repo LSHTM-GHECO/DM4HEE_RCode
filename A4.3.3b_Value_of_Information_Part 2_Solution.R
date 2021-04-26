@@ -5,52 +5,37 @@
 
 ## test new code
 # just source function that also returns the parameter's we're interested in
-source("A4.3.3b_THRfunctionforVOI.R")
+source("A4_VoI_Model_JW.R")
+source("ggplot_CEA_functions.R")
 
-#### RUNNING THE SIMULATIONS ########
-sim.runs <- 1000 ## the number of simulation runs
+# ### First, let's check that the new model can run a PSA and gives the results we expect...
+# 
+# psa.sims <- 1000
+# sim.results <- matrix(0, nrow = psa.sims, ncol = 4)
+# 
+# for (i in 1:psa.sims){
+# sim.results[i,] <- model.THR.voi(RR.vec[i], lambda.vec[i], gamma.vec[i], omr[i,], 
+#                                  c.revision.vec[i], tp.rrr.vec[i], state.utilities.df[i,]) 
+# }
+# 
+# # Check PSA results
+# apply(sim.results, 2, mean)
 
-## creating an empty data.frame for simulation results to fill:
-simulation.results <- list()
+# The results are the same as in previous exercises (e.g. Exercise 3b) - so now we can focus on the EVPPI 
 
-## running the simulations and filling the simulation.results data.frame:
-for(i in 1:10){
-  simulation.results[[i]] <- model.THR.voi() ## running the model 1,000 times
-}
-
-simulation.results[[1]]
-
-# then you can access the vectors needed through e.g.;
-simulation.results[[1]]$utilities
-
-### then create an adapted version of the model.THR function 
-# where you specify to use the one in the outputs and use the
-# rest of the code you've written? 
-## need to go through 
-
-## or alternatively adapt your previous code to have lots of notation
-# keep part 1 as is, but then read in that for part 2 and they can go through 
-# it that way?
-
-##### previous code
-# The source function runs the EVPI model - so that data / model are avaialable here
-
-source('A4.3.3a_PREVIOUS_VOI.R')
-
-
+#### EVPPI #### 
 
 ## Enter inner and outer loop numbers - note these must be higher than sim.runs 
 inner.loops <- 100
 outer.loops <- 100
-
 
 # Note that these need to be less than or equal to sim.runs - since that determins the parameter samples
 sim.runs >= inner.loops
 sim.runs >= outer.loops
 
 
-
 # Generate matrices to store EVPPI results 
+lambda.values <- seq(0, 50000, 1000)
 
 inner.results <- matrix(0, inner.loops, 4)
 colnames(inner.results) <- c("QALY SP0", "Cost SP0", "QALY NP1", "Cost NP1")
@@ -60,17 +45,17 @@ colnames(evppi.results.SP0) <- as.character(lambda.values)
 evppi.results.NP1 <- evppi.results.SP0 
 
 
+
 # Estimate NMB across all the lambda values 
 nmb.function <- function(lambda, results){
   
   nmb.table <- matrix(lambda, ncol = length(lambda), nrow = dim(results)[1],  byrow = TRUE) 
   
-  SP0 <- ((results[,1] * nmb.table) - results[,2])  
-  NP1 <- ((results[,3] * nmb.table) - results[,4])
+  SP0 <- ((results[,2] * nmb.table) - results[,1])  
+  NP1 <- ((results[,4] * nmb.table) - results[,3])
   
   nmb.p <- apply(SP0, 2, mean)
   nmb.t <- apply(NP1, 2, mean) 
-  
   
   return(list(nmb.t, nmb.p))
   
@@ -108,39 +93,24 @@ gen.evppi.results <- function(evppi.results1 = evppi.results.SP0, evppi.results2
 
 # EVPPI Sampling
 
-## Note that the parameter values have already been sampled for the PSA 
-## e.g. the survival parameters to estimate revision rates
-
-head(revision.LP)
-tail(revision.LP)
-
 
 ## Now the EVPPI loops will be run - each selected different values for inner and outer loops
 
-## EVPPI loops - NP1 parameter (excl survial parameters)
+
+
+#### EVPPI loops - NP1 parameter   ####
 
 pb = txtProgressBar(min = 0, max = outer.loops, initial = 0, style = 3)
 
 for(a in 1:outer.loops){
   
-  ## 1. Select the 'partial' parameter from the outer loop 
-  
-  revision.vec <- revision.LP[a,]
-  
-  
   for(b in 1:inner.loops){
     
-    # 2. Select traditional parameters, minus the outer loop parameter
-    
-    # revision.vec <- revision.LP[a,]
-    utilities.vec <- as.numeric(state.utilities[b,])
-    state.costs.vec <- as.numeric(state.costs[b,])
-    transition.vec <- as.numeric(transitions[b,])
-    revision.vec[1] <- revision.LP[b,1]
-    revision.vec[3] <- revision.LP[b,3]
-    revision.vec[2] <- revision.LP[b,1] + revision.LP[a,4] # NP1 parameter only changes on outer loop (so select 'a' row)
-    
-    inner.results[b,] <- model.THR() 
+    # Select traditional parameters, minus the outer loop parameter
+      # So the inner loop parameters are subset using 'b' and the outer loop by 'a'
+
+    inner.results[b,] <-  model.THR.voi(RR.NP1 = RR.vec[a], lambda = lambda.vec[b], gamma = gamma.vec[b], omr = omr[b,], 
+                                     c.revision = c.revision.vec[b], tp.rrr = tp.rrr.vec[b], state.util = state.utilities.df[b,]) 
     
   }
   
@@ -159,30 +129,16 @@ NP1.evppi <- gen.evppi.results()
 
 
 
-## EVPPI loops - Survival parameters
+#### EVPPI loops - Survival parameters  ####
 
 pb = txtProgressBar(min = 0, max = outer.loops, initial = 0, style = 3)
 
 for(a in 1:outer.loops){
-  
-  ## 1. Select the 'partial' parameter from the outer loop 
-  
-  revision.vec <- revision.LP[a,]
-  
-  
+
   for(b in 1:inner.loops){
-    
-    # 2. Select traditional parameters, minus the outer loop parameter
-    
-    # revision.vec <- revision.LP[a,]
-    utilities.vec <- as.numeric(state.utilities[b,])
-    state.costs.vec <- as.numeric(state.costs[b,])
-    transition.vec <- as.numeric(transitions[b,])
-    #revision.vec[1] <- revision.LP[a,1] - this has been done in the outer loop
-    #revision.vec[3] <- revision.LP[a,3]
-    revision.vec[2] <- revision.LP[a,1] + revision.LP[b,4] # NP1 parameter is in the inner loop (not in EVPPI)
-    
-    inner.results[b,] <- model.THR() 
+
+    inner.results[b,] <-  model.THR.voi(RR.vec[b], lambda.vec[a], gamma.vec[a], omr[b,], 
+                                        c.revision.vec[b], tp.rrr.vec[b], state.utilities.df[b,]) 
     
   }
   
@@ -199,38 +155,21 @@ surv.evppi <- gen.evppi.results()
 
 
 
-
-
-## EVPPI loops - Utilities
+#### EVPPI loops - Utilities  ####
 
 pb = txtProgressBar(min = 0, max = outer.loops, initial = 0, style = 3)
 
 for(a in 1:outer.loops){
   
-  ## 1. Select the 'partial' parameter from the outer loop 
-  
-  utilities.vec <- as.numeric(state.utilities[a,])
-  
   for(b in 1:inner.loops){
-    
-    # 2. Select traditional parameters, minus the outer loop parameter
-    
-    revision.vec <- revision.LP[b,]
-    #utilities.vec <- as.numeric(state.utilities[b,])
-    state.costs.vec <- as.numeric(state.costs[b,])
-    transition.vec <- as.numeric(transitions[b,])
-    
-    
-    inner.results[b,] <- model.THR() 
-    
+  inner.results[b,] <-  model.THR.voi(RR.vec[b], lambda.vec[b], gamma.vec[b], omr[b,], 
+                                        c.revision.vec[b], tp.rrr.vec[b], state.utilities.df[a,]) 
   }
   
   #after each inner loop PSA, calculate the mean NMB for each tx and store the results
   nmb <- nmb.function(lambda.values, inner.results)
-  
   evppi.results.SP0[a,] <- nmb[[1]]
   evppi.results.NP1[a,] <- nmb[[2]]
-  
   setTxtProgressBar(pb,a)
 }
 
@@ -239,36 +178,21 @@ utilities.evppi <- gen.evppi.results()
 
 
 
-## EVPPI loops - Cost revision
+#### EVPPI loops - Cost revision  ####
 
 pb = txtProgressBar(min = 0, max = outer.loops, initial = 0, style = 3)
 
 for(a in 1:outer.loops){
-  
-  ## 1. Select the 'partial' parameter from the outer loop 
-  
-  state.costs.vec <- as.numeric(state.costs[a,])
-  
+
   for(b in 1:inner.loops){
-    
-    # 2. Select traditional parameters, minus the outer loop parameter
-    
-    revision.vec <- revision.LP[b,]
-    utilities.vec <- as.numeric(state.utilities[b,])
-    #state.costs.vec <- as.numeric(state.costs[b,])
-    transition.vec <- as.numeric(transitions[b,])
-    
-    
-    inner.results[b,] <- model.THR() 
-    
+    inner.results[b,] <-  model.THR.voi(RR.vec[b], lambda.vec[b], gamma.vec[b], omr[b,], 
+                                        c.revision.vec[a], tp.rrr.vec[b], state.utilities.df[b,]) 
   }
   
   #after each inner loop PSA, calculate the mean NMB for each tx and store the results
   nmb <- nmb.function(lambda.values, inner.results)
-  
   evppi.results.SP0[a,] <- nmb[[1]]
   evppi.results.NP1[a,] <- nmb[[2]]
-  
   setTxtProgressBar(pb,a)
 }
 
@@ -276,36 +200,21 @@ cRevision.evppi <- gen.evppi.results()
 
 
 
-## EVPPI loops - OMR transition parameters
+#### EVPPI loops - OMR transition parameters  ####
 
 pb = txtProgressBar(min = 0, max = outer.loops, initial = 0, style = 3)
 
 for(a in 1:outer.loops){
-  
-  ## 1. Select the 'partial' parameter from the outer loop 
-  
-  transition.vec <- as.numeric(transitions[a,])
-  
-  for(b in 1:inner.loops){
-    
-    # 2. Select traditional parameters, minus the outer loop parameter
-    
-    revision.vec <- revision.LP[b,]
-    utilities.vec <- as.numeric(state.utilities[b,])
-    state.costs.vec <- as.numeric(state.costs[b,])
-    #transition.vec <- as.numeric(transitions[b,])
-    transition.vec[3] <- as.numeric(transitions[b,3]) # overwrite the RRR value so included in PSA
-    
-    inner.results[b,] <- model.THR() 
-    
+
+    for(b in 1:inner.loops){
+    inner.results[b,] <-  model.THR.voi(RR.vec[b], lambda.vec[b], gamma.vec[b], omr[a,], 
+                                        c.revision.vec[b], tp.rrr.vec[b], state.utilities.df[b,]) 
   }
   
   #after each inner loop PSA, calculate the mean NMB for each tx and store the results
   nmb <- nmb.function(lambda.values, inner.results)
-  
   evppi.results.SP0[a,] <- nmb[[1]]
   evppi.results.NP1[a,] <- nmb[[2]]
-  
   setTxtProgressBar(pb,a)
 }
 
@@ -313,38 +222,23 @@ omr.evppi <- gen.evppi.results()
 
 
 
-
-
-## EVPPI loops - Re-revision risk parameter
+#### EVPPI loops - Re-revision risk parameter ####
 
 pb = txtProgressBar(min = 0, max = outer.loops, initial = 0, style = 3)
 
 for(a in 1:outer.loops){
-  
-  ## 1. Select the 'partial' parameter from the outer loop 
-  
-  transition.vec <- as.numeric(transitions[a,])
-  
+
   for(b in 1:inner.loops){
     
-    # 2. Select traditional parameters, minus the outer loop parameter
-    
-    revision.vec <- revision.LP[b,]
-    utilities.vec <- as.numeric(state.utilities[b,])
-    state.costs.vec <- as.numeric(state.costs[b,])
-    #transition.vec <- as.numeric(transitions[b,])
-    transition.vec[1:2] <- as.numeric(transitions[b,1:2]) # overwrite the OMR values within inner loop
-    
-    inner.results[b,] <- model.THR() 
+    inner.results[b,] <-  model.THR.voi(RR.vec[b], lambda.vec[b], gamma.vec[b], omr[b,], 
+                                        c.revision.vec[b], tp.rrr.vec[a], state.utilities.df[b,]) 
     
   }
   
   #after each inner loop PSA, calculate the mean NMB for each tx and store the results
   nmb <- nmb.function(lambda.values, inner.results)
-  
   evppi.results.SP0[a,] <- nmb[[1]]
   evppi.results.NP1[a,] <- nmb[[2]]
-  
   setTxtProgressBar(pb,a)
 }
 
@@ -352,6 +246,7 @@ rrr.evppi <- gen.evppi.results()
 
 
 
+#### Analysis of EVPPI results #### 
 
 # Create a data frame with all EVPPI results
 
@@ -366,7 +261,6 @@ colnames(evppi.wide.patient) <- c("lambda", "NP1 parameter", "Survival parameter
 
 # The wide format is because there is a column for each parameter set included in the EVPPI 
 head(evppi.wide.patient)
-
 
 # Transform from per patient EVPPI to population EVPPI 
 evppi.wide.pop <- evppi.wide.patient * effective.population
