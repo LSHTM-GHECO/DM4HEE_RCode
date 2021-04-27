@@ -97,11 +97,26 @@ est.nmb.perfect.test(prev = prevalence)
 
 iii) Now run the function using the vector of prevalence values that you created eaerlier (`prevalence.vector`), to get the NMB of a perfect test, across different prevalences. Make sure to save this as a data.frame - you can save this as `perfect.test.nmb`.
 
-v) Next, compare the results generated in the `perfect.test.nmb` to the results saved earlier in the `no.test.nmb` data frame. You should be able to see that the NMB for the perfect test is higher than the treat all or treat none strategies (except when the prevalence is 0 or 1). Add another line to the line plot created previously (again using `plot()` and `lines()` for now), and should look like this (don't worry if the formatting is slighlty different):. 
+v) Next, compare the results generated in the `perfect.test.nmb` to the results saved earlier in the `no.test.nmb` data frame. You should be able to see that the NMB for the perfect test is higher than the treat all or treat none strategies (except when the prevalence is 0 or 1). Add another line to the line plot created previously (again using `plot()` and `lines()` for now), and should look like this (don't worry if the formatting is slighlty different): 
 
 
 ```{r, echo=FALSE}
+### recoding evdpi plot to correct for knitting error with y-axis - \u00A3 for £
+
+nmb.plot  <-  ggplot(nmb.plot.data.long) + 
+  geom_line(aes(x=Prevalence, y=value, colour = variable), size=1) + 
+  labs(x = "Prevalence", text = element_text(size=10)) + 
+  labs(y = "Net Monetary Benefit (\u00A3)", text = element_text(size=10)) + theme_classic() +
+  theme(legend.title = element_blank(), axis.title=element_text(face="bold"), 
+        axis.title.x = element_text(margin = margin(t = 7, r = 0, b = 3, l = 0)), 
+        axis.title.y = element_text(margin = margin(t = 0, r = 7, b = 0, l = 3)), 
+        panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+        legend.key.width=unit(1.8,"line"), text = element_text(size=12)) + 
+  scale_x_continuous(expand = c(0, 0.1)) + 
+  scale_y_continuous(limits = c(0,30000), breaks=seq(0,30000,5000),  expand = c(0, 0))
+
 nmb.plot
+
 ```
 
 The final step will involve estimating the Expected Value of Perfect Diagnostic Information (EVPDI) - which is simply the difference between the expected value of a perfect test and the expected value of the optimal course of action ('Treat All' or 'Treat None') in the absence of a test. 
@@ -121,9 +136,9 @@ head(evpdi.table)
 
 ### 3. Test accuracy for imperfect tests
 
-Diagnostic tests typically measure the value of a biomarker that is present in both health and sick individuals – for example blood glucose levels in diabetes.  However, it is rare that such biomarkers perfectly distinguish those with the condition from those without.
+Diagnostic tests typically measure the value of a biomarker that is present in both healthy and sick individuals – for example blood glucose levels in diabetes.  However, it is rare that such biomarkers perfectly distinguish those with the condition from those without.
 
-We can define the test characteristics, using a mean and standard deviation for the biomarker. These are provided in the `test.char` vector within the template file, and also shown in the table below. These are (highly) stylised distribution parameters for a biomarker in the disease positive and disease negative populations. These parameters assume the biomarker is distributed normally in both populations given the mean and standard deviation parameters defined, and the prevalence of disease. 
+We can define the test characteristics, using a mean and standard deviation for the biomarker. These are provided in the `test.char` vector within the template file, and also shown in the table below. The hypothetical numbers given in the table below (such as a mean value of "biomarker indicator" in positive disease = 1) are (highly) stylised distribution parameters for a biomarker in the disease positive and disease negative populations. These parameters assume the biomarker is distributed normally in both populations given the mean and standard deviation parameters defined, and the prevalence of disease. 
 
 
 |   | Mean  | SD |
@@ -143,7 +158,7 @@ Plot the distributions on a chart and verify you get the same as those presented
 diag.plot
 ```
 
-iii) Assuming a diagnostic threshold of 0, ensure you can identify the True Positives, True Negatives, False Positives and False Negatives as per the video presentation. 
+iii) Assuming a diagnostic threshold of 0 (as indicated by the dotted, vertical line in the above plot), ensure you can identify the True Positives, True Negatives, False Positives and False Negatives as per the video presentation. 
 
 iv) Now we can estimate the TPR - True Positive Rate  (i.e. sensitivity) and the FPR - False Positive Rate  (1- specificity), using the cumulating normal distribution, which is `pnorm()` function in R. The function requires you to add the same data for the normal distribution (the diagnostic thresholds, and the mean and SD of the test characteristics). Save these as 'TPR' and 'FPR'. _(Hint: make sure you understand why the cumulative normal distribution is used here)_
 
@@ -187,6 +202,20 @@ vii) After checking the EVCI results at different levels of prevalence, pass the
 viii) Finally, you can produce a plot to compare the Expected Value of Clinical Information (EVCI) with the Expected Value of Perfect Diagnostic Information (EVPDI) that was estimated with the perfect test. Remember that both of these are the value compared to no test. The plot will look like this:
 
 ```{r, echo=FALSE}
+### recoding evdpi plot to correct for knitting error with y-axis - \u00A3 for £
+
+evdi.plot  <-  ggplot(evci.plot.data.long) + 
+  geom_line(aes(x=Prevalence, y=value, colour=variable), size=1) + 
+  labs(x = "Prevalence", text = element_text(size=10)) + 
+  labs(y = "Expected Value of Diagnostic Information (\u00A3)", text = element_text(size=10)) + theme_classic() +
+  theme(legend.title = element_blank(), axis.title=element_text(face="bold"), 
+        axis.title.x = element_text(margin = margin(t = 7, r = 0, b = 3, l = 0)), 
+        axis.title.y = element_text(margin = margin(t = 0, r = 7, b = 0, l = 3)), 
+        panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+        legend.key.width=unit(1.8,"line"), text = element_text(size=12)) + 
+  scale_x_continuous(expand = c(0, 0)) + 
+  scale_y_continuous(limits = c(-1,3000), expand = c(0, 0))
+
 evdi.plot
 ```
 
