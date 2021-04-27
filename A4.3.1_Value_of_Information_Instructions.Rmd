@@ -28,19 +28,34 @@ The purpose of this exercise is to show how the model you have already developed
 
 The step-by-step guide below will take you through the following stages for calculating expected value of information for the overall decision problem and for the parameters of the decision model. There are 2 parts to this exercise:
 
-**Part 1**: We will be using the "A4.3.2a_Value_of_Information_Part 1_Template.R" and "A4.3.3a_Value_of_Information_Part 1_Solutions.R" template and solution files respectively. In this part of the exercise we will be:
+**Part 1**: The following two scripts relate to this part of this exercise:
+* "A4.3.2a_Value_of_Information_Part 1_Template.R"
+* "A4.3.3a_Value_of_Information_Part 1_Solutions.R" 
+
+The exercise will involve completing the following tasks:
 
 1. Calculating per patient EVPI from simulation output
 2. Calculating the effective population and population EVPI
 3. Plotting EVPI as a function of the willingness to pay threshold
 
-**Part 2**: We will be using the "A4.3.2b_Value_of_Information_Part 2_Template.R" and "A4.3.3b_Value_of_Information_Part 2_Solutions.R" template and solution files respectively. These files will also source a version of the model developed to perform the EVPPI analyses, called **'A4.3.3b_VoI_Model_Script'**. In this part of the exercise we will be:
+**Part 2**: We will be using three different scripts here 
 
-1. Walking through how the model function can be adapted to allow for parameters to provided as arguments. 
-2. Selecting the appropriate parameter values to perform EVPPI analyses for each parameter (or group of parameters)
-2. Plotting EVPPI results across a range of willingness to pay thresholds.
+* "A4.3.2b_Value_of_Information_Part 2_Template.R" 
+* "A4.3.3b_Value_of_Information_Part 2_Solutions.R" 
+* "A4.3.3b_VoI_Model_Script" 
+
+The last template and solutions scripts will run the main model code from another script ('A4.3.3b_VoI_Model_Script') so as to avoid the code becoming too long. 
+
+In this part of the exercise you will:
+
+1. Look at the adaptations to the model, to see how the model function has been developed to allow for parameters to provided as arguments in the function. 
+2. Working through an EVPPI manually, to ensure that you understand the process involved in each step
+3. Looking through the EVPPI analyses coded for each parameter (or group of parameters), and ensuring you understand how the appropraite parameters are being selected.
+4. Plotting EVPPI results across a range of willingness to pay thresholds.
 
 Across the whole exercise we will be using the data inputs and packages discussed in previous exercises. No new data and/or packages will be used. 
+
+\newpage 
 
 ## PART 1: Step-by-step guide
 
@@ -101,7 +116,7 @@ Notice the peak in EVPI – where does this occur?
 
 The overall EVPI for the model is a useful upper limit on returns to future research.  However, of crucial importance is which particular parameters (or groups of related parameters) are most important in terms of having the greatest value of information.  Partial EVPI approaches are designed to look at just that.  They work by looking at the value of information of the remaining parameters of the model if we assume perfect information for the parameter of interest. 
 
-Begin by loading up **'A4.3.3b_VoI_Model_Script'** using the `source()` function. This is an adapted version of the model, which includes a function to run the Markov model - which we have labelled `model.THR.voi()`. Take a look at the script and the function. We have annoted the script to highlight changes that have been made in the script. You will notice that in this version of the model, rather than proabilistic parameters being included within the model function (i.e. sampling one value within each model simulation), these parameters are now sampled and stored before the model function is run. 
+Begin by loading up 'A4.3.3b_VoI_Model_Script' using the `source()` function. This is an adapted version of the model, which includes a function to run the Markov model - which we have labelled `model.THR.voi()`. Take a look at the script and the function. We have annoted the script to highlight changes that have been made in the script. You will notice that in this version of the model, rather than proabilistic parameters being included within the model function (i.e. sampling one value within each model simulation), these parameters are now sampled and stored before the model function is run. 
 
 The main change here is that now instead of running the function and these parameters being automatically sampled, we instead have to pass the probabilistic parameter samples into the model function as an argument. The function will then use these parameters to generate the transition matrices and the Markov trace, and estimate the costs and QALYs for the two treatments. This is done in the same way as previous versions (except in some areas we have tried to speed up some of the code by avoiding loops). The reason we have done this is so that we can control which parameters are sampled, and when, by selecting the appropriate data in our inner and outer loops of the EVPPI. 
 
@@ -200,7 +215,7 @@ Remember the results generated at this point are per patient, not for the popula
 
 (iv) Next, it's time to visualise the results! Run the `plot.evppi()` function (remember this has been loaded in at the top of the script) to see the EVPPI results across the WTP thresholds, for the six sets of parameters. If you want to view the plot in more detail, click the 'zoom' button above the plot in the 'Plots' pane of R. The plot should look similar to this:
 
-```{r evppi plot, echo = FALSE}
+```{r evppi plot, echo = FALSE, warning=FALSE, message=FALSE, error=FALSE}
 plot.evppi(evppi.long.pop)
 ```
 
