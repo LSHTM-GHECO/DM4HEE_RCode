@@ -82,9 +82,9 @@ a.uRevision<-mn.uRevision*ab.uRevision ## alpha (a)
 b.uRevision<-a.uRevision*(1-mn.uRevision)/mn.uRevision ## beta(b)
 
 ## discount matrices
-cycle.v <- 1:cycles ## a vector of cycle numbers 1 - 60
 discount.factor.c <- 1/(1+dr.c)^cycle.v ## the discount factor matrix
 discount.factor.o <- 1/(1+dr.o)^cycle.v  ## discount factor matrix for utility 
+
 
 model.THR <- function(age=60, male=0) {
   ### A function running the THR model, setting age and sex
@@ -94,6 +94,7 @@ model.THR <- function(age=60, male=0) {
   ## LIFE TABLE DATA 
   # This is included within the function as it varies by age and sex (which are inputs into the function)
   colnames(life.table) <- c("Age","Index","Males","Female") ## making sure column names are correct
+  cycle.v <- 1:cycles ## a vector of cycle numbers 1 - 60
   current.age <- age + cycle.v ## a vector of cohort age throughout the model
   life.table <- as.data.table(life.table) ## turning life.table into a data.table 
   death.risk <- as.data.table(current.age) ## turning current age into a data.table 

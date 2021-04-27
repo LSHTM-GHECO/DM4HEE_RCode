@@ -82,10 +82,7 @@ a.uRevision<-mn.uRevision*ab.uRevision ## alpha (a)
 b.uRevision<-a.uRevision*(1-mn.uRevision)/mn.uRevision ## beta(b)
 
 # Discount factor matrices
-cycle.v <- 1:cycles ## a vector of cycle numbers 1 - 60
-
 discount.factor.c <-     ## the discount factor matrix for costs
-
 discount.factor.o <-       ## discount factor matrix for utility 
 
 
