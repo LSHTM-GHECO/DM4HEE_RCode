@@ -82,8 +82,8 @@ a.uRevision<-mn.uRevision*ab.uRevision ## alpha (a)
 b.uRevision<-a.uRevision*(1-mn.uRevision)/mn.uRevision ## beta(b)
 
 # Discount factor matrices
-discount.factor.c <-     ## the discount factor matrix for costs
-discount.factor.o <-       ## discount factor matrix for utility 
+discount.factor.c <- 1/(1+dr.c)^cycle.v ## the discount factor matrix
+discount.factor.o <- 1/(1+dr.o)^cycle.v  ## discount factor matrix for utility 
 
 
 model.THR <- function(age=60, male=0) {

@@ -24,7 +24,7 @@ source("A3.3.3a_Presenting_Simulation_Results_Part1_Solutions.R", local = knitr:
 
 
 ## Overview
-There are 2 parts to this exercise:The purpose of this exercise is to show how R can be used to run simulations drawing from the distributions chosen for the previously constructed probabilistic model of THR (Advanced Course Module 2 Exercise) using functions to record the results.
+There are 2 parts to this exercise, and the purpose of these is to show how R can be used to run simulations drawing from the distributions chosen for the previously constructed probabilistic model of THR (Advanced Course Module 2 Exercise) using functions to record the results.
 
 **PART 1**: We will be using the "A3.3.2a" template and "A3.3.3a" solution files. The step-by-step guide covers five main areas:
 
@@ -53,7 +53,7 @@ The final 2 packages mentioned above are needed as we have added some additional
 
 * Please ensure you have the "ggplot_CEA_functions.R" script stored in the same folder as your template/solution files, with the working directory set to that same folder. Or alternatively make sure you set an appropriate file path to load the script.  
 
-**PART 2**: We will be using the "A3.3.2b" template and "A3.3.3b" solution files. The purpose of this exercise is to introduce a further prosthesis into the THR model in order to illustrate the approach to calculating multiple CEACs for multiple treatment options.The step-by-step guide covers two main tasks: 
+**PART 2**: We will be using the "A3.3.2b" template and "A3.3.3b" solution files. The purpose of this exercise is to introduce a further prosthesis into the THR model in order to illustrate the approach to calculating multiple CEACs for multiple, mutually exclusive treatment options.The step-by-step guide covers two main tasks: 
 
 1. Adding in a third prosthesis option
 2. Multiple curves for mutually exclusive treatment options.
@@ -70,21 +70,21 @@ All of R packages listed above for Part 1 are also needed for Part 2. Additional
 
 (1) **Creating the model function**
 
-In the template file for this exercise you will find a new section labelled 'THR Model Function'. The aim of this function is wrap the main parts of the Markov model into a function, so that we can repeat and record the results of the probabilistic analysis constructed in Module 2. 
+In the template file for this exercise you will find a new section labelled 'THR Model Function'. The aim of this function is to wrap the main parts of the Markov model into a function, so that we can repeat and record the results of the probabilistic analysis constructed in Module 2. 
 
 As part of the previous module, we added an additional resource 'THR Model with simulation' (file name  "A2.3.4_Additional_Information_THR_Model_with_simulation.R") which just created a function that re-ran the whole of the R script to run the model 1,000 times. Whilst this is a very easy way to write code to re-run the model many times, many parts of the script will be uneccesaryily repeated. For example, the discount rates, and the mean and stadard error inputs for parameters will be assigned the same value in every moodel iteration, which takes time. This becomes particularly important when running high numbers of simulations (this becomes a particular issue when performing the model is very complex, or you need to run a large number of simulations, running through many subgroups, or performing value of information analyses, which you learn about in the next module).
 
 In this exercise we will aim to structure the model function to be more efficient (i.e. run through the code at a faster speed) by trying to avoid repeating some of the unnecesary parts of the code multiple times. We've started off by loading the packages and data files needed, and allow for characteristics within the model to be easily changed whilst using the model function.
 
-* First, assign all the model parameters that are fixed throughout the model runs (i.e. those that aren’t sampled in the probabilistic analyses) outside of the model function. We’ve provided the fixed parameters for you, including the discount rates, starting distribution, and for the mean, alpha and beta values for the transition probabilities (and hazard function), costs and utilities. Make sure you understand why these are outside of the model function.  *Hint: You can go through the Module 2 solutions, to find the value assignments that aren’t probabilistic to see what can be outside of the model function* 
+* First, assign all the model parameters that are fixed throughout the model runs (i.e. those that aren’t sampled in the probabilistic analyses) outside of the model function (these are in lines 21 to 86). We’ve provided the fixed parameters for you, including the discount rates, starting distribution, and for the mean, alpha and beta values for the transition probabilities (and hazard function), costs and utilities. Make sure you understand why these are outside of the model function.  
 
-* Now code a function `model.THR()` that can be run across a probabilistic THR model. Assume, for now, that we are always running across the same sex (female) and age (60) groups for now. You can set this as the default in hte model function by defining these, when writing the function. Later in the exercise we will alter this to allow for varying age/sex groups, and we can pass these arguments into the function. *(Note: if you aren't familiar with writing functions, passing values to arguments in functions, and having default values for arguments, then you should familiarise yourself with this to ensure that you can understand the code).* 
+* Now you can develop a function `model.THR()` that can be run across a probabilistic THR model. Assume, for now, that we are always running across the same sex (female) and age (60) groups. You can set this as the default in the model function by defining these, when writing the function. Later in the exercise we will alter this to allow for varying age/sex groups, and we can pass these arguments into the function. *(Note: if you aren't familiar with writing functions, passing values to arguments in functions, and having default values for arguments, then you should familiarise yourself with this to ensure that you can understand the code).* 
 
 This function should return a named vector (this should include discounted costs and outcomes of the standard treatment, the discounted costs and outcomes of new treatment, and the incremental costs and outcomes). We have layed out the structure of this function, with gaps that need filling before running (based on the work you did for Module 2, you may copy and paste parts of the code from the Module 2 Exercise R script into this one, but be sure to define all variables needed/used within the model outlined in the template, and try to understand what each part is doing).
 
 ** (Jack note - I wonder whether we could give them the model that they have essentially already built, and try to focus more time on the novel aspects of this exercise, but not sure if providing everything means that some people will gloss over / not fully understand why the model is a fucntion and how it differs - would be good to get some feedback on this!)**
 
-* Try running `model.THR()` to check it runs before moving to the next stage (remember that runs the model for a female population, with mean age of 60). This may still take a fair few seconds to run so be patient on first running. You should have similar results to the below (remember actual numbers will differ):
+* Try running `model.THR()` function to check it provides the correct results before moving to the next stage (remember the model currently assumes a female population, with mean age of 60, unless arguments are provided otherwise). You can run the model a few times to see the differences in the results generated across probabilistic runs. This may still take a fair few seconds to run so be patient on first running. You should have similar results to the below (remember actual numbers will differ):
 
 ```{r, echo=FALSE}
 model.THR()
