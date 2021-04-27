@@ -3,27 +3,97 @@
 #  Authors: Andrew Briggs, Jack Williams & Nichola Naylor
 
 
-## test new code
-# just source function that also returns the parameter's we're interested in
+## For this exercise, we will seperate out the model code and the script to run the EVPPI, 
+  # so as to avoid  having a script that is too long
+
+# Here, we can source the adapted model (i.e. run the whole script in the background) 
+  # this will load all of the parameter samples of interest, and will load the 
+  # model function within the script. 
+  # Make sure you have a look at the script, following the exercise instructions as a guide.
 source("A4_VoI_Model_JW.R")
+
+# Source functions for plots
 source("ggplot_CEA_functions.R")
 
-# ### First, let's check that the new model can run a PSA and gives the results we expect...
-# 
-# psa.sims <- 1000
-# sim.results <- matrix(0, nrow = psa.sims, ncol = 4)
-# 
-# for (i in 1:psa.sims){
-# sim.results[i,] <- model.THR.voi(RR.vec[i], lambda.vec[i], gamma.vec[i], omr[i,], 
-#                                  c.revision.vec[i], tp.rrr.vec[i], state.utilities.df[i,]) 
-# }
-# 
-# # Check PSA results
-# apply(sim.results, 2, mean)
 
-# The results are the same as in previous exercises (e.g. Exercise 3b) - so now we can focus on the EVPPI 
+#### EVPPI example walkthrough #### 
 
-#### EVPPI #### 
+evppi.results.SP0.test <- matrix(0, ncol = 1, nrow = 10)
+colnames(evppi.results.SP0) <- as.character("£2,200")
+evppi.results.NP1.test <- evppi.results.SP0.test 
+
+inner.results <- matrix(0, inner.loops, 4)
+colnames(inner.results) <- c("Cost SP0", "QALY SP0", "Cost NP1", "QALY NP1")
+
+WTP = 2200
+  
+## The parameter values (10,000 of them each) sampled in the model script 
+  # this is the model script sourced above
+
+head(RR.vec)
+head(lambda.vec)
+head(gamma.vec)
+head(omr)
+head(c.revision.vec)
+head(tp.rrr.vec)
+head(state.utilities.df)
+
+# Note that the model function requires that data is selected from the above
+ # parameters, and passed as arguments to the function 
+
+model.THR.voi(RR.NP1 = RR.vec[1], lambda = lambda.vec[1], gamma = gamma.vec[1], 
+              omr = omr[1,], c.revision = c.revision.vec[1], tp.rrr = tp.rrr.vec[1], 
+              state.util = state.utilities.df[1,])
+
+
+model.THR.voi(RR.NP1 = RR.vec[2], lambda = lambda.vec[2], gamma = gamma.vec[2], 
+              omr = omr[2,], c.revision = c.revision.vec[2], tp.rrr = tp.rrr.vec[2], 
+              state.util = state.utilities.df[2,])
+  
+  # check the value of RR.vec selected (which goes into the model function)
+  RR.vec[a]
+  
+  for(b in 1:100){
+    
+    # The 'partial' parameter will be included in the outer loop - so we can select that using 'a' in the outer loop
+    # The parameters included in the inner loop remain are selected using 'b'
+    
+    inner.results[b,] <-  model.THR.voi(RR.NP1 = RR.vec[a], lambda = lambda.vec[b], gamma = gamma.vec[b], omr = omr[b,], 
+                                        c.revision = c.revision.vec[b], tp.rrr = tp.rrr.vec[b], state.util = state.utilities.df[b,]) 
+    
+  }
+  
+  ## Calculate the NMB (at £2,200, as this has a high EVPPI)
+  
+
+  
+  # Calculate the results of the inner loop - similar to the PSA calculation - estimating NMB
+  SP0.nmb <- ((inner.results[,2] * WTP) - inner.results[,1])  
+  NP1.nmb <- ((inner.results[,4] * WTP) - inner.results[,3])
+  
+  # Use the mean NMB for each treatment and save
+  evppi.results.SP0.test[a,] <- mean(SP0.nmb)
+  evppi.results.NP1.test[a,] <- mean(NP1.nmb)
+
+
+# Check the results here
+head(evppi.results.SP0.test)
+head(evppi.results.NP1.test)
+
+
+## After doing 10 outer loops 
+
+evppi.df <- data.frame(evppi.results.SP0.test, evppi.results.NP1.test)
+current.info <- max(apply(evppi.df, 2, mean))
+perfect.info <- mean(apply(evppi.df, 1, max))
+
+evppi <- perfect.info - current.info
+
+
+
+
+
+#### EVPPI Model runs #### 
 
 ## Enter inner and outer loop numbers - note these must be higher than sim.runs 
 inner.loops <- 100
@@ -35,14 +105,25 @@ sim.runs >= outer.loops
 
 
 # Generate matrices to store EVPPI results 
-lambda.values <- seq(0, 50000, 1000)
+lambda.values <- seq(0, 50000, 100)
 
 inner.results <- matrix(0, inner.loops, 4)
-colnames(inner.results) <- c("QALY SP0", "Cost SP0", "QALY NP1", "Cost NP1")
+colnames(inner.results) <- c("Cost SP0", "QALY SP0", "Cost NP1", "QALY NP1")
 
 evppi.results.SP0 <- matrix(0, ncol = length(lambda.values), nrow = outer.loops)
 colnames(evppi.results.SP0) <- as.character(lambda.values)
 evppi.results.NP1 <- evppi.results.SP0 
+
+
+## Calculate the effective population, to estimate the population EVPPI 
+ # note these parameters are the same as used in Part 1 of the exercise
+
+population <- 40000 
+years <- 10
+evpi.disc <- 0.06
+population.seq <- sum(population * (1/(1+evpi.disc) ^ c(0:(years-1))))
+effective.population <- sum(population.seq)
+
 
 
 
@@ -97,7 +178,6 @@ gen.evppi.results <- function(evppi.results1 = evppi.results.SP0, evppi.results2
 ## Now the EVPPI loops will be run - each selected different values for inner and outer loops
 
 
-
 #### EVPPI loops - NP1 parameter   ####
 
 pb = txtProgressBar(min = 0, max = outer.loops, initial = 0, style = 3)
@@ -106,8 +186,8 @@ for(a in 1:outer.loops){
   
   for(b in 1:inner.loops){
     
-    # Select traditional parameters, minus the outer loop parameter
-      # So the inner loop parameters are subset using 'b' and the outer loop by 'a'
+    # The 'partial' parameter will be included in the outer loop - so we can select that using 'a' in the outer loop
+    # The parameters included in the inner loop remain are selected using 'b'
 
     inner.results[b,] <-  model.THR.voi(RR.NP1 = RR.vec[a], lambda = lambda.vec[b], gamma = gamma.vec[b], omr = omr[b,], 
                                      c.revision = c.revision.vec[b], tp.rrr = tp.rrr.vec[b], state.util = state.utilities.df[b,]) 
@@ -119,13 +199,11 @@ for(a in 1:outer.loops){
   
   evppi.results.SP0[a,] <- nmb[[1]]
   evppi.results.NP1[a,] <- nmb[[2]]
-  
   setTxtProgressBar(pb,a)
+  
 }
 
 NP1.evppi <- gen.evppi.results()
-
-
 
 
 
@@ -139,15 +217,12 @@ for(a in 1:outer.loops){
 
     inner.results[b,] <-  model.THR.voi(RR.vec[b], lambda.vec[a], gamma.vec[a], omr[b,], 
                                         c.revision.vec[b], tp.rrr.vec[b], state.utilities.df[b,]) 
-    
   }
   
   #after each inner loop PSA, calculate the mean NMB for each tx and store the results
   nmb <- nmb.function(lambda.values, inner.results)
-  
   evppi.results.SP0[a,] <- nmb[[1]]
   evppi.results.NP1[a,] <- nmb[[2]]
-  
   setTxtProgressBar(pb,a)
 }
 
@@ -278,5 +353,7 @@ head(evppi.long.pop)
 ## ggplot - this function has been imported from the ggplot functions sheet (in graphs folder)
 plot.evppi(evppi.long.pop)
 
+# If you want to retrieve the EVPPI at a specific point
+subset(evppi.long.pop, lambda==2200)
 
 
