@@ -47,6 +47,7 @@ The exercise will be split into four parts:
 3) Test accuracy for imperfect tests
 4) Expected value of clinical information (EVCI)
 \  
+
 ### 1. Setting up the model parameters and estimating NMB
 
 We start by defining the consequences / payoffs for the simple decision tree model presented in the videos. Please use the "F4.3.2_Diagnostics_Template.R" file.  

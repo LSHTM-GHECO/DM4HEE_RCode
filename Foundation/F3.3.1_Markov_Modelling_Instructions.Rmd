@@ -30,7 +30,7 @@ The basic structure of the model is given in the figure below, which shows that 
 
 The cycle length of the model is one year and the model is evaluated over 20 years (after which more than 95% of patients are expected to have died).
 
-In this exercise you will use the data given below to populate the model and calculate the incremental cost-effectiveness ratio (ICER) for AZT monotherapy. Ultimately, you should be able to calcualte an ICER of £9,971.
+In this exercise you will use the data given below to populate the model and calculate the incremental cost-effectiveness ratio (ICER) for AZT monotherapy. Ultimately, you should be able to calcualte an ICER of £9,791.
 
 
 **1. Transition probabilities**
@@ -82,7 +82,7 @@ A meta-analysis of four trials is reported in the paper giving a pooled relative
 
 We will use the current discount rates in use in the UK – 3.5% for both costs and outcomes.  Note that the original analysis was based on discounting the costs at 6% but not discounting the estimates of life years – which gives an ICER of £6,276.
 
-\  
+\newpage
 
 ## Step by step guide to constructing the model
 
@@ -121,7 +121,7 @@ Once you have completed the transition matrix, it should look like this:
 
   We now need to generate the Markov trace: that is showing the proportions of patients that are in any one state at any one time.  Start by making sure that you understand the above transition matrix. In particular, make sure you can replicate it from the information given in the diagram of the model structure above.
 
-i) First create an empty trace matrix of the right dimensions - we can call this `trace.AZT` (L98 in the template document). The data, number of rows, and number of columns have been left blank for you to add in. 
+i) First create an empty trace matrix of the right dimensions - we can call this `trace.AZT` (Line 98 in the template document). The data, number of rows, and number of columns have been left blank for you to add in. 
 
 ii) Next, calculate the transitions for cycle1, by multiplying the transition matrix by the starting distribution of patients _(hint: use `%*%` for matrix multiplication in R for this)._
 
@@ -133,7 +133,7 @@ head(trace.AZT, 1)
 
 iii) Now that you have calculated the first cycle, use the transition matrix to populate the rest of the Markov model by using a loop (we’ve started the outline of this for you).  This will involve looping through each row of the trace matrix and multiplying it with the transition matrix. _(Hint: to calculate the each row of results in the trace, use the row above to multiply with the transition matrix)._ Once this is done you can run the code to label each row, and check the trace to see check the numbers make sense. 
 
-iv) Use the `rowSums()` function to provide a sense check, since the sum across columns for each row must always equal the size of the original cohort – which is set to 1 in this exercise, such that the Markov trace represents proportions of patients. _(Hint: if the numbers of patients in the model in each cycle is changing then there may be a mistake in the calculations done inthe previous step)._ 
+iv) Use the `rowSums()` function to provide a sense check, since the sum across columns for each row must always equal the size of the original cohort – which is set to 1 in this exercise, such that the Markov trace represents proportions of patients. _(Hint: if the numbers of patients in the model in each cycle is changing then there may be a mistake in the calculations done in the previous step)._ 
 
 v) Check the printed version of the transition matrix to see the way people transition across the states over time. The first few cycle results should look like this:
 
@@ -171,14 +171,15 @@ i) Start by redefining the transition matrix for combination therapy, incorporat
 
 | Transition matrix | A  | B | C | D |
 |:------|:-----|:--------|:------|:-----| 
-|   A  |  1 - tpA2B\*RR - tpA2C\*RR- tpA2D\*RR   |  tpA2B\*RR  |    tpA2C\*RR  |  tpA2D\*RR |
+|   A  |  1 - tpA2B\*RR -    |  tpA2B\*RR  |    tpA2C\*RR  |  tpA2D\*RR |
+|      |    tpA2C\*RR- tpA2D\*RR        |       |             |           |
 |  B   |  0      | 1 - tpB2C\*RR - tpB2D\*RR   |    tpB2C\*RR  |  tpB2D\*RR |
 |    C |    0    |     0   |    1 - tpC2D\*RR  |  tpC2D\*RR |
 |    D |    0    |     0   |     0     |  tpD2D |
 
 When creating the transition probability matrix for the combination therapy, use the same approach as earlier, by creating a vector of transitions from each state, and then combining these to create a matrix. 
 
-ii) Now that you have the transition matrix, create the corresponding trace matrix using the same process as for AZT. **Note that AZT is only given for 2 years, after which AZT is assumed to be given (and wherby which the transition probabilities will revert back to those associated with AZT only).**
+ii) Now that you have the transition matrix, create the corresponding trace matrix using the same process as for AZT. *Note that AZT is only given for 2 years, after which AZT is assumed to be given (and wherby which the transition probabilities will revert back to those associated with AZT only).*
 
 iii) Calculate life years and costs as before. Remember to add in the cost of lamivudine for these two years only, since the drug is assumed to be given for only 2 years. _(Hint: remember to include everyone who is in states A - C in those calculations)._
 

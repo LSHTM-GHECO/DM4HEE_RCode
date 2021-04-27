@@ -345,7 +345,7 @@ library(ggplot2)
 
 # NMB plot
 
-nmb.plot.data <- cbind(no.test.nmb, perfect.test.nmb[,2])
+nmb.plot.data <- cbind(no.test.nmb[,1:3], perfect.test.nmb[,2])
 colnames(nmb.plot.data) <- c("Prevalence", "Treat all", "Treat none", "Perfect test")
 nmb.plot.data.long <- reshape2::melt(nmb.plot.data, id.vars = c("Prevalence"))
 

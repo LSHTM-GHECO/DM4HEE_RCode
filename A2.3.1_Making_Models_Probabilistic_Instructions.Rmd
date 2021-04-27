@@ -19,7 +19,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r, include = FALSE}
-source("A2.3.3_Making_Models_Probablistic_Solutions.R", local = knitr::knit_global())
+source("A2.3.3_Making_Models_Probabilistic_Solutions.R", local = knitr::knit_global())
 ```
 
 
@@ -29,7 +29,7 @@ The aim of this exercise is to demonstrate how a deterministic Markov model can 
 
 The step-by-step guide below will take you through a number of stages of making the model probabilistic:
 
-1. Setting up the <Parameters> section for probabilistic analysis
+1. Setting up the 'Parameters' section for probabilistic analysis
 2. Fitting Beta distributions to (constant) probability parameters
 3. Fitting Gamma distributions to cost parameters
 4. Fitting Beta distributions to utility parameters
@@ -46,9 +46,9 @@ To work through this exercise, you will need to have the following csv files ava
 
 ## Step by step guide 
 
-(@) **Setting up the <Parameters> section for probabilistic analysis**
+(@) **Setting up the 'Parameters' section for probabilistic analysis**
 
-Before working on the code within this section, reacquaint yourself with the “hazardfunction” data - these are the results from the regression analysis used in Module 1. You can also open the “cov55”  CSV files, which is the corresponding covariance matrix. Take a moment familiarise yourself with these data. You’ll first need to read in these data files using the read.csv functions. We've converted the life-table from a data.frame into a data.table (as we will need to use data.table functionality for these data later on).
+Before working on the code within this section, reacquaint yourself with the 'hazardfunction' data - these are the results from the regression analysis used in Module 1. You can also open the 'cov55'  CSV files, which is the corresponding covariance matrix. Take a moment familiarise yourself with these data. You’ll first need to read in these data files using the read.csv functions. We've converted the life-table from a data.frame into a data.table (as we will need to use data.table functionality for these data later on).
 
 Firstly, start by defining all parameters that are not drawn from distributions for the probabilistic analysis: patient characteristics (age & sex), discount rates and prosthesis costs - these are to be left deterministic.  Before starting on the exercise, ensure that you are totally happy with why these parameters will not form part of the probabilistic analysis.
 
@@ -60,7 +60,11 @@ The following information has been provided to you concerning operative mortalit
 
 1) Use this information to specify the parameters (alpha and beta) of a beta distribution for the probability of operative mortality during primary surgery. These are noted by "`a.`" and "`b.`" respectively. Your beta values for operative mortality should be equivalent to __`r b.PTHR2dead`__  (but make sure you understand how the number was derived!).
 
-ii) Use the `rbeta()` function to generate a random draw from this distribution to define `tp.PTHR2dead`.
+ii) Use the `rbeta()` function to generate a random draw from this distribution to define `tp.PTHR2dead`. Note that the rbeta function takes 3 arguments, first the number of draws or samples, the alpha parameter (named shape1) and the beta parameter (named shape2). Check the following code to see a demonstration. 
+
+```{r, echo=TRUE}
+rbeta(n = 5, shape1 = 50, shape2 = 100)
+```
 
 iii) Since no information is available on operative mortality following a revision procedure, use the same distribution again for this parameter (`tp.RTHR2dead`).
 
@@ -87,18 +91,19 @@ Since the costs of prostheses are handled deterministically, the cost of the pri
 
 You are given the following information regarding the cost of revising a failed primary THR:
 
-*'A number of units involved in THR were reviewed and the average cost of a revision procedure was found to be £5,294 with a standard error of £1,487.*'
+*'A number of units involved in THR were reviewed and the average cost of a revision procedure was found to be £5,294 with a standard error of £1,487.'*
 
 
 i) Define the mean and standard error values for costs of a revision procedure. 
 
 ii) Use the method of moments approach described in the presentation to calculate the parameters (alpha and beta) of a Gamma distribution that has the corresponding mean and standard error.
 
-iii) Use the `rgamma()` function to generate a random draw from this distribution.
+iii) Use the `rgamma()` function to generate a random draw from this distribution. *(Hint: the base R functions for distributions tend to use the same arguments: number of draws or samples, followed by the shape and/or scale parameters)*
+
+An alternative approach would have been to fit a normal distribution for this parameter – do you think this would be valid in this case?
 
 iv) Create a vector of costs that holds the costs for each state within the model (remember to match the order defined by `state.names`). 
 
-An alternative approach would have been to fit a normal distribution for this parameter – do you think this would be valid in this case?
 
 (@) **Fitting Beta distributions to utility parameters**
 
@@ -133,7 +138,7 @@ print(state.utilities)
 
 (@) **Application of Cholesky to the regression model for prosthesis survival**
 
-We now implement the Cholesky decomposition matrix method in the model.  Look at the <Hazard function> section, which gives the results of a regression analysis for the hazard ratio.  You have used these results before when constructing the deterministic model, but now we have added the covariance matrix for the parameters.  It should be clear that, while some parameters do not have a strong relationship, there are strong relationships within this set of parameters – particularly between the regression constant and the other parameters.
+We now implement the Cholesky decomposition matrix method in the model.  Look at the 'Hazard function' section, which gives the results of a regression analysis for the hazard ratio.  You have used these results before when constructing the deterministic model, but now we have added the covariance matrix for the parameters.  It should be clear that, while some parameters do not have a strong relationship, there are strong relationships within this set of parameters – particularly between the regression constant and the other parameters.
 
 
 i) Note that the covariance matrix you have been given is a  matrix in `cov55.csv`.  To turn this into a lower triangular Cholesky decomposition of the covariance matrix we have presented 2 options; in the main script the `chol()` function [as a note you have to transpose the cov55 matrix before reading in and then transpose back to get the format of the lower triangular Cholesky decomposition due to the way the function reads in and outputs data], but to understand what is actually happening take a look at the `cholesky_decomposition.R` script provided within this course. Take a few moments to understand how this was obtained.
@@ -144,7 +149,7 @@ iii) Enter the solution of the `Tz` matrix calculation: that is the Cholesky dec
 
 iv) Now add the estimated mean values from the regression to `Tz` to create `x`.
 
-v) You have now created a vector of five multivariate normal parameters that are correlated according to the estimated covariance matrix. See below (again, the actual numbers will be different given that Tz is based on z, which is from a random draw):
+v) You have now created a vector of five multivariate normal parameters that are correlated according to the estimated covariance matrix. Below is a data frame showing the numbers from the three vectors you have created; `Tz`, `mn` and `x` (again, the actual numbers will be different given that Tz is based on z, which is from a random draw):
 
 ```{r, echo=FALSE}
 temp <- cbind(Tz,mn)
@@ -163,18 +168,18 @@ vi) Remember that we have been working on the log hazard scale for the Weibull r
 We can still employ time dependent transitions in other model state providing the time dependency relates to time in the model rather than time in the state itself.  This is the case for a background mortality rate, for example, which depends on the age of a subject rather than which state of the model they are in.  In this section we will illustrate the use of a time dependent transition to model background mortality in the model from a life-table.
 
 
-Open the <Life tables> section of the code and familiarise yourself with the contents. This is similar to what was done in the Advanced Module 1. View the imported lifetable data.frame, containing the age-sex specific mortality rates taken from a standard life-table, published as deaths per thousand per year.  
+Open the 'Life tables' section of the code and familiarise yourself with the contents. This is similar to what was done in the Advanced Module 1. View the imported lifetable data.frame, containing the age-sex specific mortality rates taken from a standard life-table, published as deaths per thousand per year.  
 
 Refer to the solutions from the Module 1 and try to complete the definitions currently blank, trying to understand the process of each step.
 
 
-(@) **Buidling the Markov model**
+(@) **Building the Markov model**
 
 Using the same approach taken in Module 1 build the time-dependent transition probability data.table for standard and new prosthesis pathways.
 
 This time we will order the building of the transition matrices for each arm, then build the cost and effect matrices to multiply through (but the order doesn’t really matter in terms of construction and is down to preference).
 
-(@) **Estimating cost-effectiveness (deterministically)**
+(@) **Estimating cost-effectiveness**
 
 The final section of this exercise is very straightforward. Calculate the incremental cost, incremental effect and the ICER within the `output` data.frame.
 
@@ -184,8 +189,12 @@ That’s it!  Your Markov model is now complete.  Re-run the script a few times 
 
 ## Additional notes 
 
-We’ve turned this probabilistic model into a simulation model in the R script “A2.3.4_Additional_Information_THR_Model_with_simulation.R”. In this example, the THR model is wrapped up in a function  - so that the function can run the whole model script, the model code within the function  is the same as that in this exercise. Once the model is in the function, the function can be called to easily produce the model results. 
+We’ve turned this probabilistic model into a simulation model in the R script following R script: 
 
-We can then create a loop to perform a large number of model simulations, and store the results of these simulations, for the probabilistic sensitivity analysis. It’s worth looking through the structure of this, we’ll be doing something similar in the next course exercises. As with many things in R, there will be many ways to run the probabilistic models over a number of runs. "A2.3.4_Additional_Information_THR_Model_with_simulation.R" starts off by simply wrapping the models into a function, in later exercises we will start to try and increase the efficiency of the model runs by structuring our scripts and functions differently. Run the function a few times to see the different results. 
+* A2.3.4_Additional_Information_THR_Model_with_simulation.R”
+
+In this example, the THR model is wrapped up in a function  - so that the function can run the whole model script, the model code within the function  is the same as that in this exercise. Once the model is in the function, the function can be called to easily produce the model results. 
+
+We can then create a loop to perform a large number of model simulations, and store the results of these simulations, for the probabilistic sensitivity analysis. It’s worth looking through the structure of this, we’ll be doing something similar in the next course exercises. As with many things in R, there will be many ways to run the probabilistic models over a number of runs. "A2.3.4_Additional_Information_THR_Model_with_simulation.R" starts off by simply wrapping the models into a function. This is perhaps the easiest, but least efficient way to run many simulations, but is an ideal starting point for this course. In later exercises we will show you alternative ways in which this can be done to increase the efficiency of the model runs by structuring our scripts and functions differently. Run the function a few times to see the different results. 
 
 

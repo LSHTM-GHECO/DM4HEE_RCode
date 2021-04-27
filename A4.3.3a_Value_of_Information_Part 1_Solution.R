@@ -30,17 +30,22 @@ for(i in 1:sim.runs){
 
 ### Estimating EVPI for individuals ####
 
-WTP <- 100000 
+WTP <- 100000
 
-simulation.results <- as.data.table(simulation.results)
-simulation.results[ , nmbSP0 := qalys.SP0*WTP - cost.SP0]
-simulation.results[ , nmbNP1 := qalys.NP1*WTP - cost.NP1]
+# simulation.results <- as.data.table(simulation.results)
+# simulation.results[ , nmbSP0 := qalys.SP0*WTP - cost.SP0]
+# simulation.results[ , nmbNP1 := qalys.NP1*WTP - cost.NP1]
 
-sim.means <- apply(simulation.results[ ,7:8],2,mean)
-max.nmb <- apply(simulation.results[ ,7:8], 1, max) 
+nmb.SP0 <- simulation.results$qalys.SP0 * WTP - simulation.results$cost.SP0
+nmb.NP1 <- simulation.results$qalys.NP1 * WTP - simulation.results$cost.NP1
+nmb.table <- data.frame(nmb.SP0, nmb.NP1)
+
+av.current <- apply(nmb.table, 2, mean)
+max.nmb <- apply(nmb.table, 1, max) 
 av.perfect <- mean(max.nmb)
+max.current <-  max(av.current)
 
-EVPI.indiv <- av.perfect-max(sim.means)
+EVPI.indiv <- av.perfect - max.current
 
 
 #### ESTIMATING POPULATION EVPI #####
@@ -57,8 +62,8 @@ pop.EVPI <- effective.population*EVPI.indiv
 
 ## with unknown WTP 
 
-## create a vector from 0 to 100,000 in increments of 100 
-WTP.values <- seq(from = 0, to = 100000, by = 100)
+## create a vector from 0 to 50,000 in increments of 100 
+WTP.values <- seq(from = 0, to = 50000, by = 100)
 
 est.EVPI.pop <-function(WTP, effective.population,
                         simulation.results) {
@@ -68,24 +73,24 @@ est.EVPI.pop <-function(WTP, effective.population,
   ###          results - data.table object from simulation.runs with 
   ###          qalys.SP0 and cost.SP0 columns
   ###  OUTPUTS: A numeric value for population EVPI
-  
-  temp <- as.data.table(simulation.results)
-  
-  temp[ , nmbSP0 := qalys.SP0*WTP - cost.SP0]
-  temp[ , nmbNP1 := qalys.NP1*WTP - cost.NP1]
-  
-  sim.means <- apply(temp[ ,7:8],2,mean)
-  max.nmb <- apply(temp[ ,7:8], 1, max) 
+
+  nmb.SP0 <- simulation.results$qalys.SP0 * WTP - simulation.results$cost.SP0
+  nmb.NP1 <- simulation.results$qalys.NP1 * WTP - simulation.results$cost.NP1
+  nmb.table <- data.frame(nmb.SP0, nmb.NP1)
+
+  av.current <- apply(nmb.table, 2, mean)
+  max.nmb <- apply(nmb.table, 1, max) 
   av.perfect <- mean(max.nmb)
   
-  EVPI.indiv <- av.perfect-max(sim.means)
-  pop.EVPI <- effective.population*EVPI.indiv
-  
+  EVPI.indiv <- av.perfect - max(av.current)
+  pop.EVPI <- effective.population * EVPI.indiv
+
   return(pop.EVPI)
   
 }
 
-## create a data frame to capture the WTP values and subsequent population EVPI results
+## create a data frame to capture the WTP values and subsequent population EVPI results 
+
 EVPI.results <- data.frame(WTP=WTP.values, 
                            EVPI=rep(as.numeric(NA),length(WTP.values)))
 
@@ -97,12 +102,16 @@ for (i in 1:length(WTP.values)) {
                                     simulation.results)
 }
 
-head(EVPI)
-### NEED TO UPDATE THE GRAPHS TO WORK?
-# ce.plane(incremental.results)
-# 
-# plot.ceac(CEAC)
-# 
-# plot.evpi(EVPI.patient)
-# 
-# plot.evpi(EVPI.population)
+head(EVPI.results)
+
+## ggplot to observe results (the functions created are from from the ggplot functions script)
+
+# Cost-effectiveness plane 
+incremental.results <- simulation.results[,c(6,5)]
+ce.plane(incremental.results)
+
+# Cost-effectiveness acceptability curve 
+plot.ceac(CEAC)
+
+# EVPI, per population
+plot.evpi(EVPI.results)

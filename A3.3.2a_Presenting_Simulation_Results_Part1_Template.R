@@ -20,30 +20,66 @@ life.table<- as.data.table(life.table)
 
 # SETTING CONSTANT PARAMETERS OUTSIDE THE FUNCTION 
 ##### DETERMINISTIC PARAMETERS ######
-dr.c <-  ## set the discount rate for costs 
-dr.o <-  ## set the discount rate for outcomes
-cycles <-  ## set the number of cycles running the model
-state.names <-   ## a vector of state names
-n.states <-   ## number of states in the model
-seed <-   ## Seed the starting states of the model (a vector of 1 and 0s for this exercise)
+dr.c <- 0.06 ## set the discount rate for costs (6%)
+dr.o <- 0.015 ## set the discount rate for outcomes (15%)
+cycles <- 60 ## number of cycles running the model
+state.names <- c("P-THR","successP-THR","R-THR","successR-THR","Death") ## a vector of state names
+n.states <- length(state.names) ## number of states in the model
+seed <- c(1,0,0,0,0) #  Seed the starting states of the model (a vector of 1 and 0s for this exercise)
 
 ## Cost of standard prosthesis and new prosthesis
-c.SP0 <-  ## Cost of standard prosthesis
-c.NP1 <-  ## Cost of new prosthesis 1
+c.SP0 <- 394 ## Cost of standard prosthesis
+c.NP1 <- 579 ## Cost of new prosthesis 1
 
 ### alpha and beta values :
   
 # FOR TRANSITION PROBABILITY ESTIMATION
-## define here any alpha and beta values for transition probability estimation:
-  
+a.PTHR2dead <- 2 ## alpha value for operative mortality from primary surgery
+b.PTHR2dead <- 100- a.PTHR2dead ## beta value for operative mortality from primary surgery
+
+a.rrr <- 4 ## alpha value for revision risk 
+b.rrr <- 100-a.rrr ## beta value for revision risk
+
 # HAZARD FUNCTION PARAMETERS
-## define here the log-hazard coefficients and the Cholesky decomposition
+
+## Coefficients - on the log hazard scale
+mn.lngamma <- hazards$coefficient[1] ## Ancilliary parameter in Weibull distribution - equivalent to lngamma coefficient
+mn.cons <- hazards$coefficient[2] ##Constant in survival analysis for baseline hazard
+mn.ageC <- hazards$coefficient[3] ## Age coefficient in survival analysis for baseline hazard
+mn.maleC <- hazards$coefficient[4] ## Male coefficient in survival analysis for baseline hazard
+mn.NP1 <- hazards$coefficient[5]
+mn<-c(mn.lngamma, mn.cons,mn.ageC,mn.maleC,mn.NP1) ## vector of mean values from the regression analysis
+
+cholm <- t(chol(t(cov.55))) ## lower triangle of the Cholesky decomposition
 
 # FOR COST ESTIMATION
-## define here the mean cost and related alpha and beta values
+c.primary <- 0  ## Cost of a primary THR procedure - 
+## Note that the cost of the primary procedure is excluded (set to 0): since both arms have this procedure it is assumed to net out of the incremental analysis.  However, if the model was to be used to estimate lifetime costs of THR it would be important to include.
+mn.cRevision <- 5294 ## mean cost of revision surgery
+se.cRevision <- 1487 ## standard error of cost of revision surgery
+a.cRevision <- (mn.cRevision/se.cRevision)^2 ## alpha value for cost of revision surgery 
+b.cRevision <- (se.cRevision^2)/mn.cRevision ## beta value for cost of revision surgery
+c.success <- 0 ## Cost of one cycle in a 'success' state (primary or revision)
 
 # FOR UTILITY ESTIMATION
-## define here the mean utility and related alpha and beta values
+## during the revision period 
+mn.uSuccessP <- 0.85 ## mean utility value for successful primary prosthesis
+se.uSuccessP <- 0.03 ## standard errror utility value for successful primary prosthesis
+ab.uSuccessP <- mn.uSuccessP*(1-mn.uSuccessP)/(se.uSuccessP^2) ## estimating alpha plus beta (ab)
+a.uSuccessP<-mn.uSuccessP*ab.uSuccessP ## estimating alpha (a)
+b.uSuccessP<-a.uSuccessP*(1-mn.uSuccessP)/mn.uSuccessP ## estimating beta (b)
+
+mn.uSuccessR<-0.75 ## mean utility value for having a successful Revision THR
+se.uSuccessR<-0.04 ## standard error utility value for having a successful Revision THR
+ab.uSuccessR<-mn.uSuccessR*(1-mn.uSuccessR)/(se.uSuccessR^2) ## alpha + beta (ab)
+a.uSuccessR<-mn.uSuccessR*ab.uSuccessR ## alpha (a)
+b.uSuccessR<-a.uSuccessR*(1-mn.uSuccessR)/mn.uSuccessR ## beta(b)
+
+mn.uRevision<-0.30 ## mean utility score during the revision period
+se.uRevision<-0.03 ## standard error utility score during the revision period
+ab.uRevision<-mn.uRevision*(1-mn.uRevision)/(se.uRevision^2) ## alpha + beta (ab)
+a.uRevision<-mn.uRevision*ab.uRevision ## alpha (a)
+b.uRevision<-a.uRevision*(1-mn.uRevision)/mn.uRevision ## beta(b)
 
 # Discount factor matrices
 cycle.v <- 1:cycles ## a vector of cycle numbers 1 - 60
@@ -298,6 +334,7 @@ plot() ## fill in accordingly
 plot.ceac(CEAC)
 
 ##### SUBGROUP ANALYSES ######
+
 # CREATE ARRAY TO STORE THE RESULTS OF THE MODEL IN EACH SUBGROUP
 subgroups.names <- c("Male 40", "Male 60", "Male 80", "Female 40", "Female 60", "Female 80")
 subgroups.n <- length(subgroups.names)
@@ -314,14 +351,15 @@ for(i in 1:sim.runs){
 # Create a CEAC table with lambda value sequence
 WTP.values <- seq(from = 0, to = 50000, by = 50)
 
-CEAC.subgroups <- data.frame(matrix(data= as.numeric(NA), nrow=length(WTP.values), ncol=subgroups.n + 1))
+CEAC.subgroups <- matrix(data= as.numeric(NA), nrow=length(WTP.values), ncol=subgroups.n + 1)
+CEAC.subgroups <- as.data.frame(CEAC.subgroups)
 colnames(CEAC.subgroups) <- c("WTP", subgroups.names)
 
 
 # Estimate probability cost-effective for all subgroups
 for (i in 1:length(WTP.values)) {
   
-  CEAC.subgroups[i,1]<-WTP.values[i]
+  CEAC.subgroups[i,1] <- WTP.values[i]
   ### using the p.CE function define the reat of CEAC.subgroups values for i here
   
   
@@ -332,7 +370,12 @@ head(CEAC.subgroups)
 
 ## Base R plot (col indicates colour, lty indicates linetype, where 1 = fill and 2 = dasshed) 
 
-plot() ## use the lines() function with plot()
+plot(CEAC.subgroups$WTP, CEAC.subgroups$`Male 40`, type="l", ylim = c(0,1), col = "red", lty = 2)
+lines(CEAC.subgroups$WTP, CEAC.subgroups$`Male 60`, col = "blue", lty = 2)
+lines(CEAC.subgroups$WTP, CEAC.subgroups$`Male 80`, col = "green", lty = 2)
+lines(CEAC.subgroups$WTP, CEAC.subgroups$`Female 40`, col = "red", lty = 1)
+lines(CEAC.subgroups$WTP, CEAC.subgroups$`Female 60`, col = "blue", lty = 1)
+lines(CEAC.subgroups$WTP, CEAC.subgroups$`Female 80`, col = "green", lty = 1) ## use the lines() function with plot() to generate 
 
 ## Alternative ggplot function for CEAC  
 

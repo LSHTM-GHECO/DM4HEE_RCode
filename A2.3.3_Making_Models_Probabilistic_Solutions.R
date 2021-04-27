@@ -136,6 +136,7 @@ Tz <- cholm%*%z ## Tz which is the Cholesky matrix multiplied by the 5 random dr
 x <- mn+Tz ## mu plus Tz
 
 r.lngamma<-x[1,1] 
+
 r.cons<-x[2,1]
 r.ageC<-x[3,1]
 r.maleC<-x[4,1]
@@ -203,7 +204,7 @@ for (i in 1:cycles) {
   tm.SP0["R-THR","successR-THR",i] <- 1 - tp.RTHR2dead - mortality 
   ## transitions out of success-THR
   tm.SP0["successR-THR","R-THR",i] <- tp.rrr
-  tm.SP0["successR-THR",5,i] <- mortality
+  tm.SP0["successR-THR","Death",i] <- mortality
   tm.SP0["successR-THR","successR-THR",i] <- 1 - tp.rrr - mortality
   
   tm.SP0["Death","Death",i] <- 1 ## no transitions out of death
@@ -245,7 +246,7 @@ for (i in 1:cycles) {
   tm.NP1["R-THR","successR-THR",i] <- 1 - tp.RTHR2dead - mortality 
   ## transitions out of success-THR
   tm.NP1["successR-THR","R-THR",i] <- tp.rrr
-  tm.NP1["successR-THR",5,i] <- mortality
+  tm.NP1["successR-THR","Death",i] <- mortality
   tm.NP1["successR-THR","successR-THR",i] <- 1 - tp.rrr - mortality
   
   tm.NP1["Death","Death",i] <- 1 ## no transitions out of death
