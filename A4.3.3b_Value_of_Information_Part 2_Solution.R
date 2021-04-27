@@ -10,7 +10,7 @@
   # this will load all of the parameter samples of interest, and will load the 
   # model function within the script. 
   # Make sure you have a look at the script, following the exercise instructions as a guide.
-source("A4_VoI_Model_JW.R")
+source("A4.3.3b_VoI_Model_Script.R")
 
 # Source functions for plots
 source("ggplot_CEA_functions.R")
