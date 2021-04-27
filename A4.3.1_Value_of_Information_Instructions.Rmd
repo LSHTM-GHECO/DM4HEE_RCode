@@ -2,7 +2,7 @@
 title: "Value of Informaton"
 subtitle: Advanced Course Module 4
 author: "Jack Williams & Nichola Naylor"
-date: "18 April 2021"
+date: "May/June 2021 Course"
 output:
   pdf_document: default
   html_document: default

@@ -1,7 +1,7 @@
 ---
 title: "R Stream of Decision Modelling for Health Economic Evaluation Reader - Foundation Course"
 author: "Nichola Naylor & Jack Williams"
-date: "19 April 2021"
+date: "May/June 2021 Course"
 output:
   pdf_document: default
   html_document: default

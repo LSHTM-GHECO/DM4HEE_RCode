@@ -2,7 +2,7 @@
 title: "Making Models Probablistic"
 subtitle: Advanced Course Module 2
 author: "Nichola Naylor & Jack Williams"
-date: "12 April 2021"
+date: "May/June 2021 Course"
 output:
   pdf_document: default
   html_document: default

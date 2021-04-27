@@ -2,7 +2,7 @@
 title: "Presenting Simulation Results"
 subtitle: "Advanced Course Module 3"
 author: "Nichola Naylor & Jack Williams"
-date: "14 April 2021"
+date: "May/June 2021 Course1"
 output:
   pdf_document: default
   html_document: default
