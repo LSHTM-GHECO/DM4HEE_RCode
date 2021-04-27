@@ -387,7 +387,8 @@ for(i in 1:sim.runs){
 # Create a CEAC table with lambda value sequence
 WTP.values <- seq(from = 0, to = 50000, by = 50)
 
-CEAC.subgroups <- data.frame(matrix(data= as.numeric(NA), nrow=length(WTP.values), ncol=subgroups.n + 1))
+CEAC.subgroups <- matrix(data= as.numeric(NA), nrow=length(WTP.values), ncol=subgroups.n + 1)
+CEAC.subgroups <- as.data.frame(CEAC.subgroups)
 colnames(CEAC.subgroups) <- c("WTP", subgroups.names)
 
 

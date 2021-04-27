@@ -30,20 +30,27 @@ for(i in 1:sim.runs){
 
 ### Estimating EVPI for individuals ####
 
-WTP <-    ## define a WTP value of 100,000
+WTP <-    ## define a WTP value 
 
-## we turn simulation.results into a data.table 
-simulation.results <- as.data.table(simulation.results)
 
-simulation.results[ , nmbSP0 :=     ] ## estimate the NMB for SP0 
-simulation.results[ , nmbNP1 :=     ] ## estimate the NMB for NP1  
+nmb.SP0 <- simulation.results$qalys.SP0 * WTP - simulation.results$cost.SP0  ## estimate the NMB for SP0 
+nmb.NP1 <- simulation.results$qalys.NP1 * WTP - simulation.results$cost.NP1  ## estimate the NMB for NP1  
+nmb.table <- data.frame(nmb.SP0, nmb.NP1)
 
-sim.means <-      ## use the apply and mean functions, applying to columns 7 & 8 of simulation results
-max.nmb <-        ## use the apply and mean functions, applying to rows for columns 7 & 8 of simulation results
-av.perfect <- mean(max.nmb) ## the average maximum NMB for each run
-max.sim.mean <- max(sim.means) ## maximum of the simulation mean values
+av.current <-      ## use the apply and mean functions, applying to columns within the nmb.table
+  ## This provides the average NMB across all simulations, for each treatment  
+  
+max.nmb <-        ## use the apply and max functions, applying to rows within the nmb.table
+  ## This provides the maximum NMB for each simulations (hence the apply functions moves across rows) 
+  ## This selects the NMB for whichever treatment has the highest NMB in each simulation
 
-EVPI.indiv <-   ## use 2 of the variables defined above
+av.perfect <- mean(max.nmb) ## the average of the vector of maximum NMB's, derived from 
+  # having perfect information for each simulation 
+
+max.current <- max(av.current) ## this represnets the maximum NMB for SP0 or NP1 when averaging across 
+  #  the NMB for all simulations - this represents 'current knowledge'
+
+EVPI.indiv <-   ## use 2 of the variables defined above, to find the difference between perfect info and current info
 
 
 #### ESTIMATING POPULATION EVPI #####
@@ -60,7 +67,7 @@ pop.EVPI <-     ## calculate the population level EVPI based on variables we've 
 
 ## with unknown WTP 
 
-## create a vector from 0 to 100,000 in increments of 100 
+## create a vector from 0 to 50,000 in increments of 100 
 WTP.values <- 
 
 est.EVPI.pop <-function(WTP, effective.population,
@@ -68,18 +75,19 @@ est.EVPI.pop <-function(WTP, effective.population,
   #### FUNCTION: estimating EVPI for effective populations
   ###  INPUTS: WTP - numeric WTP value
   ###          effective.population - numeric effective population value
-  ###          results - data.table object from simulation.runs with 
+  ###          results - data.frame object using simulation.runs with 
   ###          qalys.SP0 and cost.SP0 columns
   ###  OUTPUTS: A numeric value for population EVPI
-  temp <- as.data.table(simulation.results)
   
-  temp[ , nmbSP0 :=   ]
-  temp[ , nmbNP1 :=   ]
+  nmb.SP0 <-    ## estimate the NMB for SP0 
+  nmb.NP1 <-    ## estimate the NMB for NP1  
+  nmb.table <- data.frame(nmb.SP0, nmb.NP1)
   
-  sim.means <- 
+  av.current <- 
   max.nmb <- 
   av.perfect <- 
-  
+  max.current <- 
+    
   EVPI.indiv <- 
   pop.EVPI <- 
   
@@ -97,13 +105,16 @@ for (i in 1:length(WTP.values)) {
   EVPI.results[i,2]<-     ## use est.EVPI.pop()
 }
 
-head(EVPI)
+head(EVPI.results)
 
-### NEED TO UPDATE THE GRAPHS TO WORK?
-# ce.plane(incremental.results)
-# 
-# plot.ceac(CEAC)
-# 
-# plot.evpi(EVPI.patient)
-# 
-# plot.evpi(EVPI.population)
+## ggplot to observe results (the functions created are from from the ggplot functions script)
+
+# Cost-effectiveness plane 
+incremental.results <- simulation.results[,c(6,5)]
+ce.plane(incremental.results)
+
+# Cost-effectiveness acceptability curve 
+plot.ceac(CEAC)
+
+# EVPI, per population
+plot.evpi(EVPI.results)
