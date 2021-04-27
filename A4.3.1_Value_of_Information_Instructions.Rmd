@@ -1,7 +1,7 @@
 ---
 title: "Value of Informaton"
 subtitle: Advanced Course Module 4
-author: "Nichola Naylor & Jack Williams"
+author: "Jack Williams & Nichola Naylor"
 date: "18 April 2021"
 output:
   pdf_document: default
@@ -19,8 +19,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r source, include=FALSE}
-#source("A4.3.3b_Value_of_Information_Part 2_Solution.R")
-x=  1
+source("A4.3.3b_Value_of_Information_Part 2_Solution.R")
 ```
 
 ## Overview
@@ -35,7 +34,7 @@ The step-by-step guide below will take you through the following stages for calc
 2. Calculating the effective population and population EVPI
 3. Plotting EVPI as a function of the willingness to pay threshold
 
-**Part 2**: We will be using the "A4.3.2b_Value_of_Information_Part 2_Template.R" and "A4.3.3b_Value_of_Information_Part 2_Solutions.R" template and solution files respectively. These files will also source a version of the model developed to perform the EVPPI analyses, called **XXXXXXX**. In this part of the exercise we will be:
+**Part 2**: We will be using the "A4.3.2b_Value_of_Information_Part 2_Template.R" and "A4.3.3b_Value_of_Information_Part 2_Solutions.R" template and solution files respectively. These files will also source a version of the model developed to perform the EVPPI analyses, called **'A4.3.3b_VoI_Model_Script'**. In this part of the exercise we will be:
 
 1. Walking through how the model function can be adapted to allow for parameters to provided as arguments. 
 2. Selecting the appropriate parameter values to perform EVPPI analyses for each parameter (or group of parameters)
@@ -102,7 +101,7 @@ Notice the peak in EVPI – where does this occur?
 
 The overall EVPI for the model is a useful upper limit on returns to future research.  However, of crucial importance is which particular parameters (or groups of related parameters) are most important in terms of having the greatest value of information.  Partial EVPI approaches are designed to look at just that.  They work by looking at the value of information of the remaining parameters of the model if we assume perfect information for the parameter of interest. 
 
-Begin by loading up **XXXXX** using the `source()` function. This is an adapted version of the model, which includes a function to run the Markov model - which we have labelled `model.THR.voi()`. Take a look at the script and the function. We have annoted the script to highlight changes that have been made in the script. You will notice that in this version of the model, rather than proabilistic parameters being included within the model function (i.e. sampling one value within each model simulation), these parameters are now sampled and stored before the model function is run. 
+Begin by loading up **'A4.3.3b_VoI_Model_Script'** using the `source()` function. This is an adapted version of the model, which includes a function to run the Markov model - which we have labelled `model.THR.voi()`. Take a look at the script and the function. We have annoted the script to highlight changes that have been made in the script. You will notice that in this version of the model, rather than proabilistic parameters being included within the model function (i.e. sampling one value within each model simulation), these parameters are now sampled and stored before the model function is run. 
 
 The main change here is that now instead of running the function and these parameters being automatically sampled, we instead have to pass the probabilistic parameter samples into the model function as an argument. The function will then use these parameters to generate the transition matrices and the Markov trace, and estimate the costs and QALYs for the two treatments. This is done in the same way as previous versions (except in some areas we have tried to speed up some of the code by avoiding loops). The reason we have done this is so that we can control which parameters are sampled, and when, by selecting the appropriate data in our inner and outer loops of the EVPPI. 
 
@@ -116,7 +115,7 @@ Before we perform the EVPPI analyses, we will show a walkthrough of the calculat
 
 (iii) Define a WTP value (the EVPPI is highest at £2,200, so that may be a good value to use)
 
-(iv) Remember from the looking through the model script above, that we need to pass the appropriate parameters into the model function. Familiarise yourself with the input parameters sampled in the **XXXX** script that you ran earlier. We have provided these in the script for you, and have also given some code to show you how these parameters can be selected and given to the model. ** It is very important that you understand how this data is being selected and passed to the model function for you to understand the rest of the exericse!** 
+(iv) Remember from the looking through the model script above, that we need to pass the appropriate parameters into the model function. Familiarise yourself with the input parameters sampled in the 'A4.3.3b_VoI_Model_Script' script that you ran earlier. We have provided these in the script for you, and have also given some code to show you how these parameters can be selected and given to the model. **It is very important that you understand how this data is being selected and passed to the model function for you to understand the rest of the exericse!** 
 
 Next, we can start to look at how the EVPPI loop works. This task may seem repetitive, but the aim is to get a full appreciation of the approach before running the full code later, which will do the same thing but many more times, and across a range of willingness to pay values. 
 
@@ -126,9 +125,10 @@ We will use the letter 'a' to indicate the outer loop number, and the letter 'b'
 
 (ii) Note that the value for the relative risk will be constant within the inner loop. Next, we can run 100 model simulations within the inner loop, and ensure that all other probabilistic parameters in the model are sampled. To do this, all other parameters inside the inner loop will be selected using 'b' so that they will change for each inner loop, whilst the relative risk value remains fixed (in each inner loop). To ensure that the relative risk remains fixed, whilst the other parameters are sampled inside the loop, the following code should be used to run the model. 
 
-```{r model run, eval = TRUE}
-model.THR.voi(RR.NP1 = RR.vec[a], lambda = lambda.vec[b], gamma = gamma.vec[b], omr = omr[b,], 
-              c.revision = c.revision.vec[b], tp.rrr = tp.rrr.vec[b], state.util = state.utilities.df[b,])
+```{r model run, echo = TRUE}
+model.THR.voi(RR.NP1 = RR.vec[a], lambda = lambda.vec[b], gamma = gamma.vec[b], 
+   omr = omr[b,], c.revision = c.revision.vec[b], tp.rrr = tp.rrr.vec[b],
+   state.util = state.utilities.df[b,])
 ```
 
 You will see that each model simulation is then saved in the `inner.results` matrix. This shows the uncertainty in decision making whilst the relative risk parameter is known (i.e. perfect information). 
@@ -139,11 +139,7 @@ You will see that each model simulation is then saved in the `inner.results` mat
 
 (v) Do this 10 times, so that you have considered 10 samples of the parameter of interest for the EVPPI analysis (the relative risk parameter in this case)
 
-(vi) Once you have done this, the NMB values for each outer loop should look similar to the following:
-
-```{r evppi example, include = FALSE}
-#evppi.df
-```
+(vi) Once you have done this, you should be able to view the NMB values for each outer loop. *(Hint: the NMB may be the same for the comparator across model runs, since the relative risk parameter selected does not influence the standard prosthesis)*
 
 Next, you will calculate the value of information in the same way as we did for the EVPI in the previous section. 
 
@@ -154,7 +150,6 @@ Next, you will calculate the value of information in the same way as we did for 
 (ix) The EVPPI is the difference between these two values. You can subtract the current NMB from the NMB with perfect information for the parameter to calculate EVPPI. 
 
 Note that in this walkthrough, the EVPPI is estimated per individual (since the model using a cohort size of 1).  Also, the results shown are only evaluating the EVPPI at one WTP value. Later on, you will see that we can evaluate the EVPPI across a range of WTP values. 
-
 
 
 (@) **Loading the parameters and model functions**
@@ -176,9 +171,19 @@ However – and this is very important – accurate estimation of partial EVPIs 
 
 (@) **Running the code for 100 inner and outer loops, for 6 parameter groups of interest**
 
-Now that you understand the process behind calculating partial EVPIs, and have created the matrices and functions to save the results appropriately, take a moment to examine the EVPPI lopps coded for you, for each of the six groups of parameters. The code is simular in structure to the walkthrough you did earlier, albeit with more simulations, and with more WTP thresholds considered. Once you've had a look at these, run the code to perform them all. We have added a progress bar for you, for each of the six groups, so that you can see how long each EVPPI simulation takes. 
+Now that you understand the process behind calculating partial EVPIs, and have created the matrices and functions to save the results appropriately, take a moment to examine the EVPPI lopps coded for you, for each of the six groups of parameters. The code is similar in structure to the walkthrough you did earlier, albeit with more simulations, and with more WTP thresholds considered. Notice that for each EVPPI analysis, the parameter of interest will be selected in the outer loop (using 'a'), and the other parameters are included in the inner loop (sampled using 'b'). 
 
-The speed will depend on your computer (and what else your computer might be doing too), as well as the complexity of the model. In this example, each EVPPI analysis should be less than a minute. Needless to say, this where the efficiency of your code can start to make a meaninful difference to how long your simulations will take to run. 
+Looking at the model code below, you should be able to recognise which EVPPI analysis this code is from:
+```{r, eval = FALSE}
+model.THR.voi(RR.vec[b], lambda.vec[b], gamma.vec[b], omr[b,], 
+              c.revision.vec[a], tp.rrr.vec[b], state.utilities.df[b,]) 
+```
+
+The above code is evaluating the EVPPI with perfect information with the cost of revision. What if you wanted to evaluate the value of partial information for two paramters that are arguments in the model function? You should be able to work out how to write the above code, but including two parameters in the outer loop, whilst all other remain in the inner loop.  
+
+Once you've had a look at all the EVPPI loops and have understood them, run the code to perform them all. We have added a progress bar for you, for each of the six groups, so that you can see how long each EVPPI simulation takes. 
+
+The speed to complete these analyses will depend on your computer (and what else your computer might be doing too), as well as the complexity of the model. In this example, each EVPPI analysis should be less than a minute. Needless to say, this where the efficiency of your code can start to make a meaninful difference to how long your simulations will take to run. 
 
 
 (@) **Plotting and selecting the results of interest**
@@ -195,19 +200,17 @@ Remember the results generated at this point are per patient, not for the popula
 
 (iv) Next, it's time to visualise the results! Run the `plot.evppi()` function (remember this has been loaded in at the top of the script) to see the EVPPI results across the WTP thresholds, for the six sets of parameters. If you want to view the plot in more detail, click the 'zoom' button above the plot in the 'Plots' pane of R. The plot should look similar to this:
 
-```{r evppi plot, echo = TRUE}
-#plot.evppi(evppi.long.pop)
+```{r evppi plot, echo = FALSE}
+plot.evppi(evppi.long.pop)
 ```
 
 (v) Finally, if you want to see the specific EVPPI results at any given WTP threshold value, you can use the `subset()` function to do this. We have provided some code to do this at £2,200 (where the EVPPI is high!)
 
 ```{r evppi subset, echo = TRUE}
-#subset(evppi.long.pop, lambda==2200)
+subset(evppi.long.pop, lambda==2200)
 ```
 
+\ 
 
-Congratulations! You have now calculate the EVPPI for six sets of parameters in the model! Although we have done this using a relatively low number of inner and outer loops (100 each), you can always go back and run these at higher numbers to ensure that the results are robust (perhaps considering how long it took to run the 100 simulations each the first time!). 
-
-
-
+**Congratulations!** You have now calculated the EVPPI for six sets of parameters in the model, and plotted them! Although we have done this using a relatively low number of inner and outer loops (100 each), you can always go back and run these at higher numbers to ensure that the results are robust (perhaps considering how long it took to run the 100 simulations each the first time!). 
 

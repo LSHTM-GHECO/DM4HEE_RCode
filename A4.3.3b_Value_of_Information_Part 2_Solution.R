@@ -22,10 +22,10 @@ source("ggplot_CEA_functions.R")
 
 
 evppi.results.SP0.test <- matrix(0, ncol = 1, nrow = 10)
-colnames(evppi.results.SP0) <- as.character("£2,200")
+colnames(evppi.results.SP0.test) <- c("£2,200")
 evppi.results.NP1.test <- evppi.results.SP0.test 
 
-inner.results <- matrix(0, inner.loops, 4)
+inner.results <- matrix(0, 100, 4)
 colnames(inner.results) <- c("Cost SP0", "QALY SP0", "Cost NP1", "QALY NP1")
 
 WTP = 2200
@@ -351,7 +351,7 @@ evppi.wide.patient <- data.frame(NP1.evppi,
                                  omr.evppi[,2],
                                  rrr.evppi[,2])
 
-colnames(evppi.wide.patient) <- c("lambda", "NP1 parameter", "Survival parameters", "Utilities", "Revision cost", "Operative mortality ratios", "Re-revision risk")
+colnames(evppi.wide.patient) <- c("lambda", "NP1 Relative risk", "Survival parameters", "Utilities", "Revision cost", "Operative mortality ratios", "Re-revision risk")
 
 # The wide format is because there is a column for each parameter set included in the EVPPI 
 head(evppi.wide.patient)
@@ -372,7 +372,9 @@ head(evppi.long.pop)
 ## ggplot - this function has been imported from the ggplot functions sheet (in graphs folder)
 plot.evppi(evppi.long.pop)
 
+# This code will also show you the plot across a smaller x-axis, help you see the results more clearly
+plot.evppi(evppi.long.pop, 10000)
+
 # If you want to retrieve the EVPPI at a specific point
 subset(evppi.long.pop, lambda==2200)
-
 
