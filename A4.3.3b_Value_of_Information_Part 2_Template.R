@@ -48,17 +48,19 @@ model.THR.voi(RR.NP1 = RR.vec[1], lambda = lambda.vec[1], gamma = gamma.vec[1],
               omr = omr[1,], c.revision = c.revision.vec[1], tp.rrr = tp.rrr.vec[1], 
               state.util = state.utilities.df[1,])
 
+## Complete the model again, but this time using an alternative group of parameters selected 
+model.THR.voi(RR.NP1 = RR.vec[], lambda = lambda.vec[], gamma = gamma.vec[], 
+              omr = omr[,], c.revision = c.revision.vec[], tp.rrr = tp.rrr.vec[], 
+              state.util = state.utilities.df[,])
 
-model.THR.voi(RR.NP1 = RR.vec[2], lambda = lambda.vec[2], gamma = gamma.vec[2], 
-              omr = omr[2,], c.revision = c.revision.vec[2], tp.rrr = tp.rrr.vec[2], 
-              state.util = state.utilities.df[2,])
+
 
 # Example of EVPPI analysis 
 
-a = 1
+a = 
   
   # check the value of RR.vec selected (this will go into the model function in the inner loop)
-  RR.vec[a]
+  RR.vec[]
   
   for(b in 1:100){
     
@@ -66,8 +68,8 @@ a = 1
     # The parameters included in the inner loop are selected using 'b', so will be sampled 100 times 
     # in the inner loop, whilst the relative risk remains constant.
     
-    inner.results[b,] <-  model.THR.voi(RR.NP1 = RR.vec[a], lambda = lambda.vec[b], gamma = gamma.vec[b], omr = omr[b,], 
-                                        c.revision = c.revision.vec[b], tp.rrr = tp.rrr.vec[b], state.util = state.utilities.df[b,]) 
+    inner.results[b,] <-  model.THR.voi(RR.NP1 = RR.vec[], lambda = lambda.vec[], gamma = gamma.vec[], omr = omr[,], 
+                                        c.revision = c.revision.vec[], tp.rrr = tp.rrr.vec[], state.util = state.utilities.df[,]) 
     
   }
   
@@ -75,11 +77,11 @@ a = 1
   
   # Calculate the results of the inner loop - similar to the PSA calculation - estimating NMB
   SP0.nmb <- ((inner.results[,2] * WTP) - inner.results[,1])  
-  NP1.nmb <- ((inner.results[,4] * WTP) - inner.results[,3])
+  NP1.nmb <- 
   
   # Use the mean NMB for each treatment and save
-  evppi.results.SP0.test[a,] <- mean(SP0.nmb)
-  evppi.results.NP1.test[a,] <- mean(NP1.nmb)
+  evppi.results.SP0.test[a,] <- 
+  evppi.results.NP1.test[a,] <- 
 
 
 ## Now return to the above to re-run the code, changing a from 2 to 10, and rerunning each time.   
@@ -102,8 +104,8 @@ current.info <- max(apply(evppi.df, 2, mean))
 # The perfect infromation for the relative risk parameter
 perfect.info <- mean(apply(evppi.df, 1, max))
 
-# The EVPPI result (per individual)
-evppi <- perfect.info - current.info
+# The EVPPI result (per individual) - this is the difference between perfect and current info
+evppi <- 
 
 
 ## Make sure that you understand what calculations are being done, and why. 
