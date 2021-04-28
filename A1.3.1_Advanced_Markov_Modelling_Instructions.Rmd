@@ -8,7 +8,7 @@ output:
 subtitle: Advanced Course Module 1
 header-includes:
 - \usepackage{titling}
-- \pretitle{\begin{center}\LARGE\includegraphics[width=12cm]{logo.png}\\[\bigskipamount]}
+- \pretitle{\begin{center}\LARGE\includegraphics[width=7.5cm]{logo.png}\\[\bigskipamount]}
 - \posttitle{\end{center}}
 urlcolor: blue
 linkcolor: red
