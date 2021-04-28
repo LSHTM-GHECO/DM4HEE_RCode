@@ -9,7 +9,7 @@
 ## Probabilities 
 p.hiv <-      # The prevalence of undetected HIV in the antenatal population 
 p.trans.control <-      # Probability of vertical transmission (unknown HIV)
-p.trans.int <-     # Probability of version transmission (known HIV mother, accepts intervention) 
+p.trans.int <-     # Probability of vertical transmission (known HIV mother, accepts intervention) 
 p.int <-      # Probability of mother accepting intervention 
 
 
@@ -27,7 +27,9 @@ cost.int <-      # Cost of the vertical transmission mitigation interventions
 test.path.1 <- p.hiv * p.int * p.trans.int 
 
 # This is the cost associated with this particular decision tree pathway:
-test.cost.1 <- cost.test * 1 + cost.int * 1
+#  for the indicator 1 below
+test.cost.1 <- cost.test * 1 +  ## where 1 is showing that they get the test (set this to 0 if they don't get the test)
+  cost.int * 1 ## where 1 is showing that they get the intervention (set this to 0 if they do not get the intervention)
 
 # This is whether a vertical transmission occurs in this pathway 
 # i.e. (1 = transmission, 0 = no transmission)
@@ -61,9 +63,14 @@ test.cases.5 <-
 # the costs and transmissions (cases). The first one has been done for you
   
 test.probs.vec <- c(test.path.1, test.path.2, test.path.3, test.path.4, test.path.5)
+
+## we can check if this sums to 1:
+sum(test.probs.vec)
+
 test.costs.vec <- 
 test.cases.vec <- 
-
+## note the cases and costs vectors do not need to sum to 1
+  
 ## Next, multiply the appropriate vectors to get each of the pathway costs
 testing.costs <-             ## expected value of costs for each pathway (hint: use vector multiplication)
 testing.costs
@@ -90,7 +97,7 @@ testing.results
 # HIV positive and transmission
 notest.path.1 <-      ## pathway probability for no test, HIV positive and transmission
 notest.cost.1 <-      ## costs associated with this pathway
-notest.cases.1 <-     ## whether vertical transmission accurs or not in this pathway
+notest.cases.1 <-     ## whether vertical transmission occurs or not in this pathway
 
 # HIV positive and no transmission
 notest.path.2 <- 

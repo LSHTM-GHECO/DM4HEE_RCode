@@ -52,6 +52,7 @@ To help visualise the decision tree model structure, we have provided the decisi
 
 ![](DecisionTreeHIV.png)
 
+It should be noted that our outcome of interest in this example is cost per HIV-infection avoided in a child, as such the decision tree ends with HIV-infection status of the child. 
 
 \  
 

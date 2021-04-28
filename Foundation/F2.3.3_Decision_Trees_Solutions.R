@@ -7,7 +7,7 @@
 ## Probabilities 
 p.hiv <- 0.05 # The prevalence of undetected HIV in the antenatal population 
 p.trans.control <- 0.26  # Probability of vertical transmission (unknown HIV)
-p.trans.int <- 0.07  # Probability of version transmission (known HIV mother, accepts intervention) 
+p.trans.int <- 0.07  # Probability of vertical transmission (known HIV mother, accepts intervention) 
 p.int <- 0.95 # Probability of mother accepting intervention 
 
 
@@ -21,8 +21,16 @@ cost.int <- 800  # Cost of the vertical transmission mitigation intervention
 ## Testing group ##  
 
 # Accepts intervention (HIV+)  - Vertical transmission
+# This is the pathway probability, based on the decision tree:
 test.path.1 <- p.hiv * p.int * p.trans.int 
-test.cost.1 <- cost.test * 1 + cost.int * 1
+
+# This is the cost associated with this particular decision tree pathway:
+#  for the indicator 1 below
+test.cost.1 <- cost.test * 1 +  ## where 1 is showing that they get the test (set this to 0 if they don't get the test)
+                      cost.int * 1 ## where 1 is showing that they get the intervention (set this to 0 if they do not get the intervention)
+
+# This is whether a vertical transmission occurs in this pathway 
+# i.e. (1 = transmission, 0 = no transmission)
 test.cases.1 <- 1
 
 # Accepts intervention (HIV+) - No vertical transmission
@@ -51,8 +59,13 @@ test.cases.5 <- 0
 # the costs and transmissions (cases)
 
 test.probs.vec <- c(test.path.1, test.path.2, test.path.3, test.path.4, test.path.5)
+
+## we can check if this sums to 1:
+sum(test.probs.vec)
+
 test.costs.vec <- c(test.cost.1, test.cost.2, test.cost.3, test.cost.4, test.cost.5)
 test.cases.vec <- c(test.cases.1, test.cases.2, test.cases.3, test.cases.4, test.cases.5)
+## note the cases and costs vectors do not need to sum to 1
 
 ## Next, multiply the appropriate vectors to get each of the pathway costs
 testing.costs <- test.probs.vec * test.costs.vec  ## expected value of costs for each pathway
@@ -75,9 +88,9 @@ testing.results
 # Here we will evaluate the pathway probabilities for the no testing group
 
 # HIV positive and transmission
-notest.path.1 <- p.hiv * p.trans.control
-notest.cost.1 <- 0
-notest.cases.1 <- 1
+notest.path.1 <- p.hiv * p.trans.control ## pathway probability for not test, HIV positive and transmission
+notest.cost.1 <- 0                ## costs associated with this pathway
+notest.cases.1 <- 1               ## whether vertical transmission occurs or not in this pathways    
 
 # HIV positive and no transmission
 notest.path.2 <- p.hiv * (1 - p.trans.control)
@@ -121,11 +134,13 @@ incremental.results
 
 ## The first four pathways can be performed using vectors in R (to create a vector of four results)
 p.hiv * c(p.int, p.int, 1-p.int, 1-p.int) * c(p.trans.int, 1-p.trans.int, p.trans.control, 1-p.trans.control)
+# our final pathways is equal to 
+1-p.hiv
 
 # If we save this vector of results, we can compare to our above results
-test.prob.vec.new <-  p.hiv * c(p.int, p.int, 1-p.int, 1-p.int) * c(p.trans.int, 1-p.trans.int, p.trans.control, 1-p.trans.control)
+test.prob.vec.new <-  c((p.hiv * c(p.int, p.int, 1-p.int, 1-p.int) * c(p.trans.int, 1-p.trans.int, p.trans.control, 1-p.trans.control)), 1-p.hiv)
 
-test.prob.vec.new[1:4]  ## This is the new results of four pathways, created from one line of code using vectors 
-test.probs.vec[1:4]     ## This is the original results from above, created from combining four pathway probability calculations into a new vector 
+test.prob.vec.new  ## This is the new results of four pathways, created from one line of code using vectors 
+test.probs.vec     ## This is the original results from above, created from combining four pathway probability calculations into a new vector 
 
 
