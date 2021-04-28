@@ -30,7 +30,7 @@ The basic structure of the model is given in the figure below, which shows that 
 
 The cycle length of the model is one year and the model is evaluated over 20 years (after which more than 95% of patients are expected to have died).
 
-In this exercise you will use the data given below to populate the model and calculate the incremental cost-effectiveness ratio (ICER) for AZT monotherapy. Ultimately, you should be able to calcualte an ICER of £9,791.
+In this exercise you will use the data given below to populate the model and calculate the incremental cost-effectiveness ratio (ICER) for AZT monotherapy. Ultimately, you should be able to calcualte an ICER of £9,791 per LY gained.
 
 
 **1. Transition probabilities**
