@@ -1,3 +1,8 @@
+#### AN EXAMPLE OF A VECTORISATION OF SPEED
+
+## in this script we just run some different run speeds
+## for different ways of performing tasks across vectors
+
 start1 <- Sys.time()
 
 SP0.tm<-array(data=0,dim=c(5,5,60))

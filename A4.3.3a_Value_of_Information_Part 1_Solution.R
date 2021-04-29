@@ -107,8 +107,8 @@ head(EVPI.results)
 ## ggplot to observe results (the functions created are from from the ggplot functions script)
 
 # Cost-effectiveness plane 
-incremental.results <- simulation.results[,c(6,5)]
-ce.plane(incremental.results)
+incremental.results <- simulation.results[,c("inc.qalys","inc.cost")]
+plot.ce.plane(incremental.results)
 
 # Cost-effectiveness acceptability curve 
 plot.ceac(CEAC)

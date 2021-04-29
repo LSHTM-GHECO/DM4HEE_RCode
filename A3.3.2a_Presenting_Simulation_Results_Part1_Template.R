@@ -82,6 +82,8 @@ a.uRevision<-mn.uRevision*ab.uRevision ## alpha (a)
 b.uRevision<-a.uRevision*(1-mn.uRevision)/mn.uRevision ## beta(b)
 
 # Discount factor matrices
+## discount matrices
+cycle.v <- 1:cycles ## a vector of cycle numbers 1 - 60
 discount.factor.c <- 1/(1+dr.c)^cycle.v ## the discount factor matrix
 discount.factor.o <- 1/(1+dr.o)^cycle.v  ## discount factor matrix for utility 
 
@@ -94,7 +96,6 @@ model.THR <- function(age=60, male=0) {
   ## LIFE TABLE DATA 
   # This is included within the function as it varies by age and sex (which are inputs into the function)
   colnames(life.table) <- c("Age","Index","Males","Female") ## making sure column names are correct
-  cycle.v <-          ## a vector of cycle numbers 1 - number of cycles
   current.age <-      ## a vector of cohort age throughout the model
   
   life.table <- as.data.table(life.table) ## turning life.table into a data.table 
@@ -280,7 +281,7 @@ plot(simulation.results$inc.qalys,simulation.results$inc.cost)
 
 ## using pre-created ggplot2 functions for nicer cost-effectiveness plane graphs
 source("ggplot_CEA_functions.R")
-ce.plane(simulation.results) 
+plot.ce.plane(simulation.results) 
 
 ## Estimating average ICER from the simulation:
 # note you don't have to do this all in one calculation/variable definition
@@ -308,7 +309,6 @@ p.CE<-function(WTP, simulation.results) {
   return(probCE)
   
 }
-
 
 # Generate CEAC table
 WTP.values <-   ## use the seq() function to get a vector of numeric values in the specified range and increments
@@ -377,8 +377,8 @@ lines(CEAC.subgroups$WTP, CEAC.subgroups$`Female 80`, col = "green", lty = 1) ##
 ## Alternative ggplot function for CEAC  
 
 ## We need to reshape the data from wide to long to use in ggplot 
-CEAC.subgroups.long <-   ## use the melt function 
-colnames(CEAC.subgroups.long) <- c("WTP", "subgroup", "pCE")
+CEAC.subgroups.long <- melt(  )  ## use the melt function 
+colnames(CEAC.subgroups.long) <- c("WTP", "group", "pCE")
 
 head(CEAC.subgroups.long) ## have a check of your long-format data
 

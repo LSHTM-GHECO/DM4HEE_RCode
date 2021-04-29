@@ -124,7 +124,7 @@ Now that we have stored the results of 1000 probabilistic trials of the model, t
 
 Next, we have used the `ggplot2` package to create more readable plots.
 
-(ii) Load in the “`ggplot_CEA_functions.R`” script using the `source()` function, within the “A0.2_R_Starting Material_for_Advanced_Course” folder and run the `ce.plane()` function we've written out for you.
+(ii) Load in the “`ggplot_CEA_functions.R`” script using the `source()` function, within the “A0.2_R_Starting Material_for_Advanced_Course” folder and run the `plot.ce.plane()` function we've written out for you.
 
 Notice the slightly strange shape of the ‘cloud’ of points.  This is due to the non-linearity relating input and output parameters inherent in the model structure.  As a consequence, the point estimates from the deterministic model (evaluated at the means of the distributions) are not the same as the expectations across the output parameters (which can be estimated by averaging the cost and QALY value estimates for each arm and estimating the ICER). 
 
