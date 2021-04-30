@@ -4,6 +4,8 @@
 
 ####**** Parameters ****####  
 
+# First, assign the appropriate values to the parameters below.  
+
 ## Probabilities 
 p.hiv <- 0.05 # The prevalence of undetected HIV in the antenatal population 
 p.trans.control <- 0.26  # Probability of vertical transmission (unknown HIV)
@@ -32,6 +34,8 @@ test.cost.1 <- cost.test * 1 +  ## where 1 is showing that they get the test (se
 # This is whether a vertical transmission occurs in this pathway 
 # i.e. (1 = transmission, 0 = no transmission)
 test.cases.1 <- 1
+
+# Now complete the remainder of the pathway probabilities using the above as a guide
 
 # Accepts intervention (HIV+) - No vertical transmission
 test.path.2 <- p.hiv * p.int * (1 - p.trans.int) 
@@ -87,6 +91,8 @@ testing.results
 
 # Here we will evaluate the pathway probabilities for the no testing group
 
+# Use the testing arm above as a guide to complete the same parts for the no testing group
+
 # HIV positive and transmission
 notest.path.1 <- p.hiv * p.trans.control ## pathway probability for not test, HIV positive and transmission
 notest.cost.1 <- 0                ## costs associated with this pathway
@@ -104,6 +110,8 @@ notest.cases.3 <- 0
   
 # No testing arm probabilities and results 
 
+# Create a vector of each of the probabilities, costs and cases for the pathways
+
 notest.probs.vec <- c(notest.path.1, notest.path.2, notest.path.3)
 notest.cost.vec <- c(notest.cost.1, notest.cost.2, notest.cost.3)
 notest.cases.vec <- c(notest.cases.1, notest.cases.2, notest.cases.3)
@@ -120,6 +128,9 @@ notesting.results
 
 ####**** Analysis: Incremental results ****#### 
 
+# Now derive the appropriate parameters assigned above to estimate the cases avoided, 
+#  the incremental costs and the cost per HIV-infected birth avoided
+
 # Reduction in probability of vertical transmission with testing and intervention 
 cases.avoided <- notesting.cases.total - testing.cases.total
 
@@ -128,7 +139,9 @@ incr.costs <- testing.costs.total - notesting.costs.total
 
 # Cost per HIV-infected birth avoided
 incremental.results <- incr.costs / cases.avoided
-incremental.results
+
+print(incremental.results)
+
 
 #### Example of using vectors to evaluate multiple pathways at once ####
 
@@ -142,5 +155,4 @@ test.prob.vec.new <-  c((p.hiv * c(p.int, p.int, 1-p.int, 1-p.int) * c(p.trans.i
 
 test.prob.vec.new  ## This is the new results of four pathways, created from one line of code using vectors 
 test.probs.vec     ## This is the original results from above, created from combining four pathway probability calculations into a new vector 
-
 
