@@ -119,7 +119,6 @@ trace.AZT
 
 rowSums() ## check that they sum to 1, if not something has gone wrong in your calculations
 
-
 ##### LIFE YEARS #####
 LY <- c(1, 1, 1, 0) ## the reward vector (i.e. benefit from being in each state)
 
