@@ -387,7 +387,7 @@ NP2.sims <- data.frame(comparator = "NP2", cost = simulation.results$cost.NP2, q
 plane.sims <- rbind(standard.sims, NP1.sims, NP2.sims)
 
 ## plotting this using predefined functions:
-ce.plane.all(plane.sims)
+plot.ce.plane.all(plane.sims)
 
 #### PLOTTING THE COST-EFFECTIVENESS ACCEPTABILITY CURVE #####
 
@@ -437,8 +437,8 @@ tail(CEAC)
 
 # Plotting the CEAC with a plot function
 # reshape to show all in on plot
-CEAC.long <- reshape2::melt(CEAC, id.vars = c("WTP"))
-colnames(CEAC.long) <- c("WTP", "comparator", "pCE")
+CEAC.long <- melt(CEAC, id.vars = c("WTP"))
+colnames(CEAC.long) <- c("WTP", "group", "pCE")
 head(CEAC.long)
 
 plot.ceac.all(CEAC.long)

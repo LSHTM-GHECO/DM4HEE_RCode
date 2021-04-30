@@ -1,14 +1,14 @@
 ---
 title: "Building a decision tree model of antenatal HIV transmission"
 author: "Jack Williams & Nichola Naylor"
-date: "19 April 2021"
+date: "May/June 2021 Course"
 output:
   pdf_document: default
   html_document: default
 subtitle: Foundation Course Exercise 2
 header-includes:
 - \usepackage{titling}
-- \pretitle{\begin{center}\LARGE\includegraphics[width=12cm]{logo.png}\\[\bigskipamount]}
+- \pretitle{\begin{center}\LARGE\includegraphics[width=7.5cm]{logo.png}\\[\bigskipamount]}
 - \posttitle{\end{center}}
 urlcolor: blue
 linkcolor: red
@@ -52,6 +52,7 @@ To help visualise the decision tree model structure, we have provided the decisi
 
 ![](DecisionTreeHIV.png)
 
+It should be noted that our outcome of interest in this example is cost per HIV-infection avoided in a child, as such the decision tree ends with HIV-infection status of the child. 
 
 \  
 

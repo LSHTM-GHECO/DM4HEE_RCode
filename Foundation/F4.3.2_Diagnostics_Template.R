@@ -2,19 +2,22 @@
 #  Foundation Course Exercise 4: TEMPLATE FILE
 #  Authors: Jack Williams and Nichola Naylor 
 
-#### Model Parameters #### 
+## For this exercise, see the script section headings 
+## to see which part of the script correspond
+## to sections 1. - 4. in the Intrusctions pdf.
+
+### 1. Setting up the model parameters and estimating NMB ####
 
 lambda <-    # This is our willingness to pay threshold
 prevalence <-    # This is the prevalence of the condition
 
 # Here are the outcomes, and the expected costs and QALYs for sick and healthy individuals, treated and not treated. 
-
 outcome.names <- c("Sick person treated", "Sick person not treated", 
                    "Healthy person treated", "Healthy person not treated")
 expected.cost <- c(6000, 5000, 3000, 1000)
 expected.qaly <- c(0.8, 0.5, 0.95, 1)
 
-# These parameters are combined into a data frame, with the NMB column left blank, to be calculated seperately.
+# These parameters are combined into a data frame, with the NMB column left blank, to be calculated separately.
 parameter.values <- data.frame(outcome.names, expected.cost, expected.qaly,
                               nmb = NA)
 
@@ -23,6 +26,9 @@ parameter.values$nmb <-
 
 # here you can see the expected costs, QALYs and NMB for each possible outcome
 parameter.values
+
+# first estimate the expected values of treating all versus treating none
+# in the complete abscence of testing:
 
 # Estimating costs and QALYs associated with treating all vs. treat none 
 treat.cost <- prevalence * expected.cost[1] + (1 - prevalence) * expected.cost[3]
@@ -42,7 +48,7 @@ expected.values
 
 # Evaluate NMB across a range of prevalence values:
 
-## We can create a function to calcualte NMB for sick and healthy patients (across prevalence values)  
+## We can create a function to calculate NMB for sick and healthy patients (across prevalence values)  
 est.nmb <- function(prev, parameters = parameter.values, lam = lambda){
   ## FUNCTION: a function that calculates net monetary benefit for sick and health patients
   ## INPUTS: prev - a numeric values of prevalence, 
@@ -103,12 +109,17 @@ no.test.nmb
 
 
 # Now we can create a line plot in base R to observe the results:
-plot() 
-lines() 
-  
-# check this against solutions here as we'll be 
+# fill in the variable names left blank in the blow
+# you want prevalence on the x-axis and nmb on the x-axis
+plot(       ,         , type="l", col = "blue", ylim = c(0, 30000))
+lines(      ,         , col = "red")
+legend(0.7, 30000, legend=c("Treat all", "Treat none"), col=c("blue", "red"), 
+       lty = 1, cex = 0.8)
 
-#### Expected value of a perfect test ####
+# check this against solutions here as we'll be using the parameters 
+# defined in this section throughout the rest of this exercise
+
+### 2. Expected value of perfect diagnostic information #####
 
 # In this example, we will assume that all sick patients are treated, and all healthy patients are not
 
@@ -148,21 +159,25 @@ est.nmb.perfect.test <- function(prev, parameters = parameter.values, lam = lamb
 # First run the function with the 30% prevalence, then use the prevalence.values previously stored
   
 est.nmb.perfect.test() ## 30% prevalence
+
 est.nmb.perfect.test() ## using the prevalence vector
 
 # Now save the results using the prevalence values vector 
 perfect.test.nmb <- 
 
 ## Compare the results of no.test.nmb (calculated using the est.nmb function) 
-# and the perfect.test.nmb (calcualted from the est.nmb.perfect.test function)
+# and the perfect.test.nmb (calculated from the est.nmb.perfect.test function) 
 no.test.nmb
 perfect.test.nmb
 
 ## We can also plot the results of the these tables
+# (take a look at previous plot functions for more help getting started)
+plot() 
+lines()  
+lines() ## an additional line is needed in this case for the prefect test scenario
+legend(0.7, 30000, legend=c("Treat all", "Treat none", "Perfect test"), col=c("blue", "red", "dark green"), 
+       lty = 1, cex = 0.8)
 
-plot()
-lines()
-lines()
 
 # Estimate the Expected Value of Perfect Diagnostic Information (EVPDI) 
 
@@ -191,7 +206,9 @@ evpdi.table
 # We can create a simple plot of the expected value of perfect diagnostic information, by prevalence:
 plot(evpdi.table, type="l", col = "blue", ylim = c(0, 3000))
 
-#### Expected Value of Clinical Information (EVCI) from an (imperfect) diagnostic test ####
+## take a moment to think about what this plot is showing
+
+### 3. Test accuracy for imperfect tests #### 
 
 test.char <- c(positive.mean = 1, positive.sd = 1, 
                negative.mean = -1, negative.sd = 1)
@@ -232,7 +249,7 @@ plot(FPR, TPR, type="l", col = "red")
 lines(c(0,1),(c(0,1)), col = "grey")
 
 
-#### Expected Value of Clinical Information #### 
+#### 4. Expected Value of Clinical Information #### 
 
 # We can now estimate the number of true and false, negatives and positives 
 true.pos <- prevalence * TPR 

@@ -1,5 +1,8 @@
-#  Cholesky Decomposition by hand
+#  Decision Modelling for Health Economic Evaluation
+#  Cholesky Decomposition by hanD
+#  Authors: Nichola Naylor & Jack Williams
 
+## importing data.table library
 library(data.table)
 
 #  Read in the lcovariance table

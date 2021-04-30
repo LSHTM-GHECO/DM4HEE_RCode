@@ -2,13 +2,13 @@
 title: "Value of Informaton"
 subtitle: Advanced Course Module 4
 author: "Jack Williams & Nichola Naylor"
-date: "18 April 2021"
+date: "May/June 2021 Course"
 output:
   pdf_document: default
   html_document: default
 header-includes:
 - \usepackage{titling}
-- \pretitle{\begin{center}\LARGE\includegraphics[width=12cm]{logo.png}\\[\bigskipamount]}
+- \pretitle{\begin{center}\LARGE\includegraphics[width=7.5cm]{logo.png}\\[\bigskipamount]}
 - \posttitle{\end{center}}
 urlcolor: blue
 linkcolor: red
@@ -19,6 +19,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r source, include=FALSE}
+source("A4.3.3a_Value_of_Information_Part 1_Solution.R")
 source("A4.3.3b_Value_of_Information_Part 2_Solution.R")
 ```
 
@@ -29,9 +30,11 @@ The purpose of this exercise is to show how the model you have already developed
 The step-by-step guide below will take you through the following stages for calculating expected value of information for the overall decision problem and for the parameters of the decision model. There are 2 parts to this exercise:
 
 **Part 1**: The following two scripts relate to this part of this exercise:
+
 * "A4.3.2a_Value_of_Information_Part 1_Template.R"
 * "A4.3.3a_Value_of_Information_Part 1_Solutions.R" 
 
+Additionally, the solution file from the previous exercise will be sourced ("A3.3.3a_Presenting_Simulation_Results_Part1_Solutions.R").
 The exercise will involve completing the following tasks:
 
 1. Calculating per patient EVPI from simulation output
@@ -44,14 +47,14 @@ The exercise will involve completing the following tasks:
 * "A4.3.3b_Value_of_Information_Part 2_Solutions.R" 
 * "A4.3.3b_VoI_Model_Script" 
 
-The last template and solutions scripts will run the main model code from another script ('A4.3.3b_VoI_Model_Script') so as to avoid the code becoming too long. 
+The last template and solutions scripts will run the main model code from another pre-filled script ('A4.3.3b_VoI_Model_Script'). This allows you to call in the model and explore the key concepts of how to use the model functions in this exercise.
 
 In this part of the exercise you will:
 
 1. Look at the adaptations to the model, to see how the model function has been developed to allow for parameters to provided as arguments in the function. 
-2. Working through an EVPPI manually, to ensure that you understand the process involved in each step
-3. Looking through the EVPPI analyses coded for each parameter (or group of parameters), and ensuring you understand how the appropraite parameters are being selected.
-4. Plotting EVPPI results across a range of willingness to pay thresholds.
+2. Work through an Expected Value of Partially Perfect Information (EVPPI) manually, to ensure that you understand the process involved in each step
+3. Look through the EVPPI analyses coded for each parameter (or group of parameters), and ensuring you understand how the appropraite parameters are being selected.
+4. Plot EVPPI results across a range of willingness to pay thresholds.
 
 Across the whole exercise we will be using the data inputs and packages discussed in previous exercises. No new data and/or packages will be used. 
 
@@ -67,9 +70,9 @@ Recall that, under a decision theoretic approach, it is the expected outcome tha
 
 So we first need to estimate the EVPI for individual patients. 
 
-(i) First, define a WTP threshold of your choice, to assess the EVPI (we show an example using £100,000 per QALY gained).
+(i) First, define a willingness-to-pay (WTP) threshold of your choice, to assess the EVPI (we show an example using £100,000 per QALY gained within the solutions).
 
-(ii) Estimate the NMB for SP0 and NP1 for each run using columns from the `simulation.results` data.frame, and your defined WTP. Once you have estimated the NMB for each model simulation, ensure that you have these in a data.frame (one column for each treatment).
+(ii) Estimate the net monetary benefit (NMB) for SP0 and NP1 for each run using columns from the `simulation.results` data.frame, and your defined WTP. Once you have estimated the NMB for each model simulation, ensure that you have these in a data.frame (one column for each treatment). [*We've coded this for you, but try to understand what is happening*]
 
 (iii) Using the `apply()` function, estimate the the mean NMB for both treatments, across all simulations. This is the average NMB under current information. We can save this as `av.current`.  
 
@@ -87,7 +90,7 @@ Of course, there will be more than one patient eligible for a particular treatme
 
 (i) Using the above information, set the population, number of years and discount rate in the template script. 
 
-(ii) We've then define a discounted population sequence for you, estimate the effective population by summing across this (i.e. summing across `population.seq`).
+(ii) We can then define a discounted population sequence for you, estimate the effective population by summing across this (i.e. summing across `population.seq`).
 
 (iii) Estimate the population level EVPI by multiplying the effective population (`effective.population`) by the `EVPI.indiv` we calculated earlier on in the exercise.
 
@@ -99,13 +102,21 @@ Since EVPI is calculated using net-benefit and net-benefit is a function of the 
 
 (ii) Based on what we've done so far, fill in the blanks left in the function `est.EVPI.pop()`. *(Hint: use the calculations in step 1 to help you)*
 
-(iii) Create a data frame to capture the WTP values and subsequent population EVPI results (the latter can be set to NA first).
+(iii) Create a data frame (`EVPI.results`) to capture the WTP values and subsequent population EVPI results (the latter can be set to NA first).
 
-(iv) Fill in the rest of the for loop we've started to run the `est.EVPI.pop()` along different `WTP.values`.
+(iv) Fill in the rest of the for loop we've started to run the `est.EVPI.pop()` along different `WTP.values`. The top of your `EVPI.results` should look similar to the below (although remember these won't be the exact same due to the sampling methods used!):
+
+```{r, echo=FALSE}
+head(EVPI.results)
+```
+
 
 Congratulations! You've completed your first EVPI in R. Take a look at the results you've got.
 
 Now plot these results using the predefined ggplot functions given. 
+
+*These don't need adapting from the code already given within the template file, just run the code and check out the plots!*
+
 Notice the peak in EVPI – where does this occur?
 
 \newpage 
@@ -114,36 +125,45 @@ Notice the peak in EVPI – where does this occur?
 
 (@) **Loading the appropriate model script and function**
 
-The overall EVPI for the model is a useful upper limit on returns to future research.  However, of crucial importance is which particular parameters (or groups of related parameters) are most important in terms of having the greatest value of information.  Partial EVPI approaches are designed to look at just that.  They work by looking at the value of information of the remaining parameters of the model if we assume perfect information for the parameter of interest. 
+The overall EVPI for the model is a useful upper limit on returns to future research.  However, of crucial importance is which particular parameters (or groups of related parameters) are most important in terms of having the greatest value of information.  Partial EVPI - also known as Expected Value of Partially Perfect Information (EVPPI)- approaches are designed to look at just that.  They work by looking at the value of information of the remaining parameters of the model if we assume perfect information for the parameter of interest. 
 
 Begin by loading up 'A4.3.3b_VoI_Model_Script' using the `source()` function. This is an adapted version of the model, which includes a function to run the Markov model - which we have labelled `model.THR.voi()`. Take a look at the script and the function. We have annoted the script to highlight changes that have been made in the script. You will notice that in this version of the model, rather than proabilistic parameters being included within the model function (i.e. sampling one value within each model simulation), these parameters are now sampled and stored before the model function is run. 
 
-The main change here is that now instead of running the function and these parameters being automatically sampled, we instead have to pass the probabilistic parameter samples into the model function as an argument. The function will then use these parameters to generate the transition matrices and the Markov trace, and estimate the costs and QALYs for the two treatments. This is done in the same way as previous versions (except in some areas we have tried to speed up some of the code by avoiding loops). The reason we have done this is so that we can control which parameters are sampled, and when, by selecting the appropriate data in our inner and outer loops of the EVPPI. 
+Therefore, we have to slightly adapt the function to pass our pre-defined parameter samples (rather than the individual parameters themselves) into the model function; notice how `model.THR.voi()` calls in vectors now rather than values. The function will then use these parameters to generate the transition matrices and the Markov trace, and estimate the costs and QALYs for the two treatments. This is done in the same way as previous versions (except in some areas we have tried to speed up some of the code by avoiding loops). The reason we have done this is so that we can control which parameters are sampled, and when, by selecting the appropriate data in our inner and outer loops of the EVPPI. 
+
+In this example we want to look at the EVPPI of six groups of parameters (where parameters are related, such as utilities or survival parameters, it makes sense to consider their partial EVPI together):
+* Relative risk of revision for new prosthesis 1 compared to standard
+* Operative mortality following primary and revision surgeries
+* Re-revision risk
+* Survival parameters (the lamda and gamma parameters derived from the hazard function outputs)
+* Costs (in this case the only probablistic cost is cost of revision surgery)
+* Utilities (utility values from successful and revision surgeries)
+
+You will see in `model.THR.voi()`, therefore, that data.frames (or vectors) containing the simulation values for these paramater groups (or individual parameters) are the inputs to the function. 
 
 (@) **EVPPI Example walkthrough**
 
-Before we perform the EVPPI analyses, we will show a walkthrough of the calculations, using the inner and outer loops and selecting the appropriate parameter values. Once you understand the calculations being performed, the next sections will set up the full EVPPI calculations, with additional complexity. Go to the 'EVPPI example walkthrough' section of the code to start this part of the exercise.
+Before we perform the EVPPI analyses, we will show a walkthrough of the calculations, using the inner and outer loops and selecting the appropriate parameter values. Once you understand the calculations being performed, the next sections will set up the full EVPPI calculations, with additional complexity. Go to the 'EVPPI example walkthrough' section of the code to start this part of the exercise:
 
-(i) First, create the `evppi.results.SP0.test` matrix. We will just use one willingness to pay threshold, so this matrix will only use one column for each treatment (note that in the full EVPPI analyses we will consider a range of WTP values). You can use this matrix to create a replicate, for the NP1 treatment. 
+(i) First, create the `evppi.results.SP0.test` matrix. We will just use one willingness to pay threshold (£2,200 for this first example), so this matrix will only use one column for each treatment (note that in the full EVPPI analyses we will consider a range of WTP values). You can use this matrix to create a replicate, for the NP1 treatment. 
 
-(ii) Next, create a matrix to store the results of the inner loop (i.e. the PSA for all other values after the partial parameter has been selected). 
+(ii) Next, create a matrix to store the results of the inner loop `inner.results` (i.e. the PSA for all other values after the partial parameter has been selected). 
 
-(iii) Define a WTP value (the EVPPI is highest at £2,200, so that may be a good value to use)
+(iii) Define a WTP value (we've set this to £2,200 this value is chosen to give a high EVPI for this part of the exercise!)
 
-(iv) Remember from the looking through the model script above, that we need to pass the appropriate parameters into the model function. Familiarise yourself with the input parameters sampled in the 'A4.3.3b_VoI_Model_Script' script that you ran earlier. We have provided these in the script for you, and have also given some code to show you how these parameters can be selected and given to the model. **It is very important that you understand how this data is being selected and passed to the model function for you to understand the rest of the exericse!** 
+(iv) Remember, from looking through the model script above, that we need to pass the appropriate parameters into the model function. Familiarise yourself with the input parameters sampled in the 'A4.3.3b_VoI_Model_Script' script that you ran earlier. We have provided these in the script for you, and have also given some code to show you how these parameters can be selected and given to the model. **It is very important that you understand how this data is being selected and passed to the model function for you to understand the rest of the exericse!** 
 
 Next, we can start to look at how the EVPPI loop works. This task may seem repetitive, but the aim is to get a full appreciation of the approach before running the full code later, which will do the same thing but many more times, and across a range of willingness to pay values. 
 
-We will use the letter 'a' to indicate the outer loop number, and the letter 'b' to indicate the inner loop number. We will use the relative risk parameter and evaluate the value of partial perfect information for this parameter (the sampled parameters are stored in the `RR.vec` vector). However, we are uncertain as to the true value of the relative risk, therefore the first step is to select a value from the samples of `RR.vec`.
+We will use the letter 'a' to indicate the outer loop number, and the letter 'b' to indicate the inner loop number. We will use the relative risk parameter first and evaluate the value of partial perfect information for this parameter (the sampled parameters are stored in the `RR.vec` vector). However, we are uncertain as to the true value of the relative risk, therefore the first step is to select a value from the samples of `RR.vec`.
 
-(i) First, define 'a' as being equal to 1 (i.e. the first outer loop). Next, select the value of `RR.vec` using the outer loop as the indicator as to which value should be used. Use 'a' to select the first RR.vec value. You do not need to assign this yet, but be aware that it will go into the model function, within the inner loop. *(Note: the use of 'a' and 'b' in selecting the appropriate parameters is importnat to ensure the correct data are provided)*
+(i) First, define 'a' as being equal to 1 (i.e. the first outer loop). Next, select the value of `RR.vec` using the outer loop as the indicator as to which value should be used. Use 'a' to select the first RR.vec value. You do not need to assign this yet, but be aware that it will go into the model function, within the inner loop. *(Note: the use of 'a' and 'b' in selecting the appropriate parameters is important to ensure the correct data are provided)*
 
 (ii) Note that the value for the relative risk will be constant within the inner loop. Next, we can run 100 model simulations within the inner loop, and ensure that all other probabilistic parameters in the model are sampled. To do this, all other parameters inside the inner loop will be selected using 'b' so that they will change for each inner loop, whilst the relative risk value remains fixed (in each inner loop). To ensure that the relative risk remains fixed, whilst the other parameters are sampled inside the loop, the following code should be used to run the model. 
 
 ```{r model run, echo = TRUE}
-model.THR.voi(RR.NP1 = RR.vec[a], lambda = lambda.vec[b], gamma = gamma.vec[b], 
-   omr = omr[b,], c.revision = c.revision.vec[b], tp.rrr = tp.rrr.vec[b],
-   state.util = state.utilities.df[b,])
+model.THR.voi(RR.vec[a], omr.df[b,],  tp.rrr.vec[b], survival.df[b,],c.revision.vec[b], state.utilities.df[b,]) 
+
 ```
 
 You will see that each model simulation is then saved in the `inner.results` matrix. This shows the uncertainty in decision making whilst the relative risk parameter is known (i.e. perfect information). 
@@ -160,38 +180,39 @@ Next, you will calculate the value of information in the same way as we did for 
 
 (vii) Calculate the average NMB across the outer loops for both treatments. Whichever treatment has the maximum NMB is preferred, so take the maximum value (from the two treatments). 
 
-(viii) For the perfect information (note that this is based on perfect information of the relative risk parameter only), take the maximum NMB of either treatment across each model simulation. This means that for every value of the relative risk parameter, the correct treatment, with the highest NMB, would be selected. Now take the mean value of these, to give the average NMB across the simulations (where the correct treatment is always selected). 
+(viii) For the scenario of perfect information (note that this is based on perfect information of the relative risk parameter only), take the maximum NMB of either treatment across each model simulation. This means that for every value of the relative risk parameter, the correct treatment, with the highest NMB, would be selected. Now take the mean value of these, to give the average NMB across the simulations (where the correct treatment is always selected due to us having perfect information). We do this by first creating a data.frame of the NMB for both treatments, then use the `apply()` function. *We've written this out for you, check the ?apply documentation for a reminder of what goes into the apply() function*
 
 (ix) The EVPPI is the difference between these two values. You can subtract the current NMB from the NMB with perfect information for the parameter to calculate EVPPI. 
 
 Note that in this walkthrough, the EVPPI is estimated per individual (since the model using a cohort size of 1).  Also, the results shown are only evaluating the EVPPI at one WTP value. Later on, you will see that we can evaluate the EVPPI across a range of WTP values. 
 
-
 (@) **Loading the parameters and model functions**
 
 Now we will walk through the code to perform EVPPI analyses for six sets of model parameters, and evaluate the EVPPI across a range of WTP thresholds. Before you start, there are parameters that need to be defined before you can complete the EVPPI analyses. Go to the 'EVPPI Model runs' section of the code to begin. 
 
-(i) Define the number of inner and outer loops to run *(Note that the number here will need to be equal to or lower than the number of samples in the model script)*. You can set these to 100 each to allow the simulations to be run fairly quickly. 
+(i) Define the number of inner and outer loops to run *(Note that the number here will need to be equal to or lower than the number of samples in the model script)*. You can set these to 100 each to allow the simulations to be run fairly quickly.
 
 However – and this is very important – accurate estimation of partial EVPIs takes many more runs than this – and we would recommend at least 1000 inner and 1000 outer loops. This is one of the advantages of using R, as doing this across each parameter in Excel would take a very long time (if it even manages to finish!). This is also one of the reasons that we should be aware of how we are coding our model in R, since a model with lots of loops and inefficient code will take a lot longer to run. Whilst this is less important when running a PSA or EVPI analysis, it will begin to have a big impact when using the nested loops used in EVPPI analyses. 
 
-(ii) Now create a vector of lambda (i.e. WTP) values, so that we can evalauate the EVPPI across a range of thresholds. Also create the matrices to evaluate the inner loop results, and the overall evppi.results, to store results. You can see that the structure of the inner.results matrix remains the same as used in the walkthrough above. However, the evppi.results matrix is equal to the outer loop number, but also have a column for each lambda value being considered. In the next steps we will see how the results can be evaluated and stored here.   
+(ii) Now create a vector of WTP values, so that we can evalauate the EVPPI across a range of thresholds. Also create the matrices to evaluate the inner loop results, and the overall `evppi.results`, to store results. You can see that the structure of the `inner.results` matrix remains the same as used in the walkthrough above. However, the `evppi.results` matrix is equal to the outer loop number, but also have a column for each WTP value being considered. In the next steps we will see how the results can be evaluated and stored here.
 
 (iii) Calculate the effective population that will benefit from the intervention over an appropriate time horizon. We have provided the information from part 1 of this exercise for you to run here. 
 
-(iv) Next, run the code that provides the functions to estimate NMB for the inner loop results. This is essentially a function that estimates the mean NMB across all inner loop simulations (as you did in the initial part of this exercise after running the inner loops), except now it does this for a range of WTP values. The mean NMB values across all WTP thresholds are saved for each treatment. 
+(iv) Next, run the code that provides the functions to estimate NMB for the inner loop results - `nmb.function`. This is essentially a function that estimates the mean NMB across all inner loop simulations (as you did in the initial part of this exercise after running the inner loops), except now it does this for a range of WTP values. The mean NMB values across all WTP thresholds are saved for each treatment. 
 
 (v) Finally, run the code to create the `gen.evppi.results()` function. You can see from the function that this estimates the current and perfect information (as you did in the walkthrough of EVPPI results), except the function has been adapted to do this across all WTP values.  
 
 
 (@) **Running the code for 100 inner and outer loops, for 6 parameter groups of interest**
 
-Now that you understand the process behind calculating partial EVPIs, and have created the matrices and functions to save the results appropriately, take a moment to examine the EVPPI lopps coded for you, for each of the six groups of parameters. The code is similar in structure to the walkthrough you did earlier, albeit with more simulations, and with more WTP thresholds considered. Notice that for each EVPPI analysis, the parameter of interest will be selected in the outer loop (using 'a'), and the other parameters are included in the inner loop (sampled using 'b'). 
+Now that you understand the process behind calculating partial EVPIs, and have created the matrices and functions to save the results appropriately, take a moment to examine the EVPPI lopps coded for you, for each of the six groups of parameters. The code is similar in structure to the walkthrough you did earlier, albeit with more simulations, and with more WTP thresholds considered. Notice that for each EVPPI analysis, the parameter of interest will be selected in the outer loop (using 'a'), and the other parameters are included in the inner loop (sampled using 'b'). We've labelled each section of the code accordingly, to help guide you through. For example, in the <EVPPI loops - Cost revision> section we are calculating the EVPPI of the cost of revision.
 
 Looking at the model code below, you should be able to recognise which EVPPI analysis this code is from:
 ```{r, eval = FALSE}
-model.THR.voi(RR.vec[b], lambda.vec[b], gamma.vec[b], omr[b,], 
-              c.revision.vec[a], tp.rrr.vec[b], state.utilities.df[b,]) 
+model.THR.voi(RR.vec[b], omr.df[b,],tp.rrr.vec[b], 
+                                        survival.df[b,],
+                                        c.revision.vec[a], 
+                                        state.utilities.df[b,])
 ```
 
 The above code is evaluating the EVPPI with perfect information with the cost of revision. What if you wanted to evaluate the value of partial information for two paramters that are arguments in the model function? You should be able to work out how to write the above code, but including two parameters in the outer loop, whilst all other remain in the inner loop.  
@@ -213,7 +234,7 @@ Remember the results generated at this point are per patient, not for the popula
 
 (iii) Now run the reshape function, to move the data from wide format to long format (so we can plot it in ggplot)
 
-(iv) Next, it's time to visualise the results! Run the `plot.evppi()` function (remember this has been loaded in at the top of the script) to see the EVPPI results across the WTP thresholds, for the six sets of parameters. If you want to view the plot in more detail, click the 'zoom' button above the plot in the 'Plots' pane of R. The plot should look similar to this:
+(iv) Next, it's time to visualise the results! Run the `plot.evppi()` function (remember this has been loaded in at the top of the script through the sourced `ggplot_CEA_functions.R` script) to see the EVPPI results across the WTP thresholds, for the six sets of parameters. If you want to view the plot in more detail, click the 'zoom' button above the plot in the 'Plots' pane of R. The plot should look similar to this:
 
 ```{r evppi plot, echo = FALSE, warning=FALSE, message=FALSE, error=FALSE}
 plot.evppi(evppi.long.pop)
@@ -222,7 +243,8 @@ plot.evppi(evppi.long.pop)
 (v) Finally, if you want to see the specific EVPPI results at any given WTP threshold value, you can use the `subset()` function to do this. We have provided some code to do this at £2,200 (where the EVPPI is high!)
 
 ```{r evppi subset, echo = TRUE}
-subset(evppi.long.pop, lambda==2200)
+sub.evppi <- subset(evppi.long.pop, WTP==2200)
+plot.sub.evppi(sub.evppi)
 ```
 
 \ 

@@ -17,8 +17,10 @@ life.table<- as.data.table(life.table)
 
 
 # Setting sampling numbers
-sim.runs <- 10000 ## the number of simulation runs (this needs to be more than or equal to sim.runs in VoI scripts)
-
+sim.runs <- 10000 ## the number of simulation runs 
+## ! note - this needs to be more than or equal to 
+## the number of inner and outer runs in VoI scripts
+## see "A4.3.3b_Value_of_Information_Part 2_Solution.R" to see their definition
 
 #########**** PARAMETERS *****######
 
@@ -26,7 +28,12 @@ age <- 60
 male <- 0
 
 # SETTING CONSTANT PARAMETERS OUTSIDE THE FUNCTION 
+
 ##### DETERMINISTIC PARAMETERS ######
+## this section is the same as Exercise 3
+## head to the "PROBABLISTIC PARAMETERS" section to see the 
+## start of the changes needed to perform EVPPI
+
 dr.c <- 0.06 ## set the discount rate for costs (6%)
 dr.o <- 0.015 ## set the discount rate for outcomes (15%)
 cycles <- 60 ## number of cycles running the model
@@ -92,7 +99,6 @@ cycle.v <- 1:cycles ## a vector of cycle numbers 1 - 60
 discount.factor.c <- 1/(1+dr.c)^cycle.v ## the discount factor matrix
 discount.factor.o <- 1/(1+dr.o)^cycle.v  ## discount factor matrix for utility 
 
-
 ## LIFE TABLE DATA  - outside of the model when age and sex are specified upfront 
 # This is included within the function as it varies by age and sex (which are inputs into the function)
 colnames(life.table) <- c("Age","Index","Males","Female") ## making sure column names are correct
@@ -108,27 +114,32 @@ mortality.vec <- unname(unlist(death.risk[,..col.key]))
 
 #########**** PROBABILISTIC PARAMETERS *****######
 
+# we now want to create vectors & data.frames of the probablistic values:
 ###  Transition probabilities
 tp.PTHR2dead <- rbeta(sim.runs, a.PTHR2dead, b.PTHR2dead) ## OMR following primary THR
 tp.RTHR2dead <- rbeta(sim.runs, a.PTHR2dead, b.PTHR2dead)  ## OMR following revision THR
-omr <- data.frame(tp.PTHR2dead, tp.RTHR2dead)
+## creating a data.frame of sampled transition probabilites
+omr.df <- data.frame(tp.PTHR2dead, tp.RTHR2dead) 
 
 tp.rrr.vec <-rbeta(sim.runs, a.rrr, b.rrr) ## Re-revision risk 
 
 ##  Costs
 c.revision.vec <- rgamma(sim.runs, shape=a.cRevision, scale=b.cRevision) ## Gamma distribution draw for cost of revision surgery
+## since this is the only probablistic cost sampled we can leave as a vector
 
 ##  Utilities
 uSuccessP <- rbeta(sim.runs, a.uSuccessP, b.uSuccessP) 
 uSuccessR <- rbeta(sim.runs, a.uSuccessR, b.uSuccessR) 
 uRevision <- rbeta(sim.runs, a.uRevision, b.uRevision) 
 ## Make a data frame to pass into the function
-state.utilities.df <- data.frame(rep(0, sim.runs), 
+state.utilities.df <- data.frame(uprimary=rep(0, sim.runs), 
                               uSuccessP, uRevision, uSuccessR,
-                              rep(0, sim.runs))
+                              udeath=rep(0, sim.runs))
 
 ##  Hazard function ####
-
+## We now need to perform the same cholesky decomposition
+## and sampling to create a hazard function data.frame to be passed
+## through the model
 z <- matrix(rnorm(5*sim.runs, 0, 1), nrow = sim.runs, ncol = 5) ## 5 random draws, by sim.runs
 r.table <- matrix(0, nrow = sim.runs, ncol = 5)
 colnames(r.table) <- c("lngamma", "cons", "age", "male", "NP1")
@@ -146,44 +157,52 @@ gamma.vec <- exp(r$lngamma)
 lambda.vec <- exp(r$cons + age * r$age + male*r$male)
 RR.vec <- exp(r$NP1)
 
+## creating a data.frame with the parameters
+## taken from the hazard function analysis
+survival.df <- data.frame(gamma.vec,lambda.vec)
+# note we just use the vector for rr.NP1 (since we want to investigate) this parameter specifically
 
-## Here are the parameters that we will need to pass to the model 
+## lets take a look at what we've created so far:
+# parameter groups: (data.frames)
+head(survival.df)
+head(state.utilities.df)
+head(omr.df)
 
-# RR (for NP1)
+# individual parameter values: (vectors)
+head(tp.rrr.vec)
 head(RR.vec)
-
-# Survival Parameters 
-head(gamma.vec)
-head(lambda.vec)
-
-# OMR
-head(omr)
-
-# Cost of Revision
 head(c.revision.vec)
 
-# Re-revision risk
-head(tp.rrr.vec)
 
-# Utilities
-head(state.utilities.df)
-
-
-# Now select the correct data to pass to the model (we have called this the same names, with '.m' after them)
-
-
-model.THR.voi <- function(RR.NP1, lambda, gamma, omr, c.revision, tp.rrr, state.util) {
-
-  ## First, need to unpack the list provided to the function 
+### now we define an adjusted model function:
+model.THR.voi <- function(RR.NP1, ## from RR.vec
+                          omr,  ## from omr.df
+                          tp.rrr, ## from tp.rrr.vector
+                          survival, ## from survival.df
+                          c.revision, ## from c.revision.vector
+                          state.util) { ## from state.utilities.df
+ ### FUNCTION: Run EVPPI on probablistic parameters wihin the THR model
+  ##           on 6 pre-specified parameter/parameter groups
+  ## INPUTS: 3 data.frame rows (1 row from omr.df, survival.df & state.utilities.df) 
+  ##        and 3 vector values (1 value from vectors; c.revision.vector, tp.rrr.vector, RR.vec)
+  ## OUTPUTS: 
+  
+  ## First, need to unpack values from the data.frames provided to the function 
   
   tp.PTHR2dead <- unlist(omr[1,1])
   tp.RTHR2dead <- unlist(omr[1,2])
   
   state.utilities <- unlist(state.util)
   
+  gamma <- unlist(survival[1,1])
+  lambda <- unlist(survival[1,2])
+  
+  
   ## Make sure the revision cost passed into function gets added into state cost vector
   state.costs<-c(c.primary, c.success, c.revision, c.success, 0) ## a vector with the costs for each state
 
+  ## Now we continue on with our previous model.THR calculations:
+  
   # Calculate revision risks 
   revision.risk.sp0 <- 1- exp(lambda * ((cycle.v-1) ^gamma-cycle.v ^gamma))
   revision.risk.np1 <- 1- exp(lambda * RR.NP1 * ((cycle.v-1) ^gamma-cycle.v ^gamma))
@@ -206,7 +225,6 @@ model.THR.voi <- function(RR.NP1, lambda, gamma, omr, c.revision, tp.rrr, state.
     tm.SP0["successR-THR","Death",] <- mortality.vec
     tm.SP0["successR-THR","successR-THR",] <- 1 - tp.rrr - mortality.vec
     tm.SP0["Death","Death",] <- 1 
-
 
   #  Create a trace for the standard prosthesis arm
   trace.SP0 <- matrix(data=0, nrow=cycles, ncol=n.states)
@@ -243,8 +261,6 @@ model.THR.voi <- function(RR.NP1, lambda, gamma, omr, c.revision, tp.rrr, state.
   
   for (i in 2:cycles) trace.NP1[i,] <- trace.NP1[i-1,]%*%tm.NP1[,,i]
 
-
-
   # COST #
 
   cost.SP0 <- trace.SP0%*%state.costs  
@@ -271,6 +287,7 @@ model.THR.voi <- function(RR.NP1, lambda, gamma, omr, c.revision, tp.rrr, state.
 }
 
 ## testing the function:
-model.THR.voi(RR.vec[i], lambda.vec[i], gamma.vec[i], omr[i,], c.revision.vec[i], tp.rrr.vec[i], state.utilities.df[i,]) 
-
+model.THR.voi(RR.vec[i], omr.df[i,],  tp.rrr.vec[i], 
+              survival.df[i,],c.revision.vec[i], 
+              state.utilities.df[i,]) 
 

@@ -1,14 +1,14 @@
 ---
 title: "Markov Models"
 author: "Nichola Naylor & Jack Williams"
-date: "19 April 2021"
+date: "May/June 2021 Course"
 output:
   pdf_document: default
   html_document: default
 subtitle: Foundation Course Exercise 3
 header-includes:
 - \usepackage{titling}
-- \pretitle{\begin{center}\LARGE\includegraphics[width=12cm]{logo.png}\\[\bigskipamount]}
+- \pretitle{\begin{center}\LARGE\includegraphics[width=7.5cm]{logo.png}\\[\bigskipamount]}
 - \posttitle{\end{center}}
 urlcolor: blue
 linkcolor: red
@@ -30,7 +30,7 @@ The basic structure of the model is given in the figure below, which shows that 
 
 The cycle length of the model is one year and the model is evaluated over 20 years (after which more than 95% of patients are expected to have died).
 
-In this exercise you will use the data given below to populate the model and calculate the incremental cost-effectiveness ratio (ICER) for AZT monotherapy. Ultimately, you should be able to calcualte an ICER of £9,791.
+In this exercise you will use the data given below to populate the model and calculate the incremental cost-effectiveness ratio (ICER) for AZT monotherapy. Ultimately, you should be able to calcualte an ICER of £9,791 per LY gained.
 
 
 **1. Transition probabilities**

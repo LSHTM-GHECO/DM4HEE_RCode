@@ -3,7 +3,11 @@
 #  Authors: Jack Williams and Nichola Naylor 
 
 
-#### Model Parameters #### 
+## For this exercise, see the script section headings 
+## to see which part of the script correspond
+## to sections 1. - 4. in the Intrusctions pdf.
+
+### 1. Setting up the model parameters and estimating NMB ####
 
 lambda <- 30000 # This is our willingness to pay threshold
 prevalence <- 0.3 # This is the prevalence of the condition
@@ -15,7 +19,7 @@ outcome.names <- c("Sick person treated", "Sick person not treated",
 expected.cost <- c(6000, 5000, 3000, 1000)
 expected.qaly <- c(0.8, 0.5, 0.95, 1)
 
-# These parameters are combined into a data frame, with the NMB column left blank, to be calculated seperately.
+# These parameters are combined into a data frame, with the NMB column left blank, to be calculated separately.
 parameter.values <- data.frame(outcome.names, expected.cost, expected.qaly,
                               nmb = NA)
 
@@ -47,7 +51,7 @@ expected.values
 
 # Evaluate NMB across a range of prevalence values
 
-## We can create a function to calcualte NMB for sick and healthy patients (across prevalence values)  
+## We can create a function to calculate NMB for sick and healthy patients (across prevalence values)  
 est.nmb <- function(prev, parameters = parameter.values, lam = lambda){
   ## FUNCTION: a function that calculates net monetary benefit for sick and health patients
   ## INPUTS: prev - a numeric values of prevalence, 
@@ -107,7 +111,9 @@ no.test.nmb <- est.nmb(prev = prevalence.vector)
 no.test.nmb
 
 
-# We can create a plot in base R to observe the results
+# Now we can create a line plot in base R to observe the results:
+# fill in the variable names left blank in the blow
+# you want prevalence on the x-axis and nmb on the x-axis
 # Note - we will be updating this plot in the next section
 plot(no.test.nmb$prevalence, no.test.nmb$nmb.treat, type="l", col = "blue", ylim = c(0, 30000))
   lines(no.test.nmb$prevalence, no.test.nmb$nmb.notreat, col = "red")
@@ -116,7 +122,7 @@ plot(no.test.nmb$prevalence, no.test.nmb$nmb.treat, type="l", col = "blue", ylim
   
 
 
-#### Expected value of a perfect test ####
+#### 2. Expected value of perfect diagnostic information #####
 
 # In this example, we will assume that all sick patients are treated, and all healthy patients are not
 
@@ -153,20 +159,20 @@ est.nmb.perfect.test <- function(prev, parameters = parameter.values, lam = lamb
 }
 
 ## Next, run the function and check the results 
-  # First run the function with the 30% prevalence, then use the prevalence.values previously stored
-  
-est.nmb.perfect.test(prev = 0.3)
-est.nmb.perfect.test(prev = prevalence.vector)
+# First run the function with the 30% prevalence, then use the prevalence.values previously stored
+est.nmb.perfect.test(prev = 0.3) ## 30% prevalence
 
+est.nmb.perfect.test(prev = prevalence.vector) ## using the prevalence vector
+
+# Now save the results using the prevalence values vector 
 perfect.test.nmb <- est.nmb.perfect.test(prev = prevalence.vector)
 
 ## Compare the results of no.test.nmb (calculated using the est.nmb function) 
-# and the perfect.test.nmb (calcualted from the est.nmb.perfect.test function)
+# and the perfect.test.nmb (calculated from the est.nmb.perfect.test function) 
 no.test.nmb
 perfect.test.nmb
 
 ## We can also plot the results of the these tables
-
 plot(no.test.nmb$prevalence, no.test.nmb$nmb.treat, type="l", col = "blue", ylim = c(0, 30000))
 lines(no.test.nmb$prevalence, no.test.nmb$nmb.notreat, col = "red")
 lines(perfect.test.nmb$prevalence, perfect.test.nmb$nmb, col = "dark green")
@@ -202,9 +208,9 @@ evpdi.table
 # We can create a simple plot of the expected value of perfect diagnostic information, by prevalence:
 plot(evpdi.table, type="l", col = "blue", ylim = c(0, 3000))
 
+## take a moment to think about what this plot is showing
 
-
-#### Expected Value of Clinical Information (EVCI) from an (imperfect) diagnostic test ####
+### 3. Test accuracy for imperfect tests #### 
 
 test.char <- c(positive.mean = 1, positive.sd = 1, 
                negative.mean = -1, negative.sd = 1)
@@ -239,14 +245,12 @@ FPR <- 1 - pnorm(diagnostic.threshold, test.char[3], test.char[4])
 # We can view these alongside the diagnostic thresholds 
 positive.rate <- data.frame(diagnostic.threshold, TPR, FPR)
 
-
 # Plot to view TPR and FPR (Receiver Operating Characteristic (ROC) curve)
 plot(FPR, TPR, type="l", col = "red")
 # and we can add a diagonal line too
 lines(c(0,1),(c(0,1)), col = "grey")
 
-
-#### Expected Value of Clinical Information #### 
+#### 4. Expected Value of Clinical Information #### 
 
 # We can now estimate the number of true and false, negatives and positives 
 true.pos <- prevalence * TPR 
@@ -409,13 +413,14 @@ biomarker.dist.long <- reshape2::melt(biomarker.dist, id.vars = c("Diagnostic"))
 diag.plot  <-  ggplot(biomarker.dist.long) + 
   geom_line(aes(x=Diagnostic, y=value, colour=variable), size=1) + 
   labs(x = "Diagnostic Threshold", text = element_text(size=10)) + 
-  labs(y = "", text = element_text(size=10)) + theme_classic() +
+  labs(y = "Density", text = element_text(size=10)) + theme_classic() +
   theme(legend.title = element_blank(), axis.title=element_text(face="bold"), 
         axis.title.x = element_text(margin = margin(t = 7, r = 0, b = 3, l = 0)), 
         axis.title.y = element_text(margin = margin(t = 0, r = 7, b = 0, l = 3)), 
         panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
         legend.key.width=unit(1.8,"line"), text = element_text(size=12)) + 
-  scale_x_continuous(expand = c(0, 0.1)) 
+  scale_x_continuous(expand = c(0, 0.1)) +
+  geom_vline(xintercept=0, linetype="dotted")
   
 diag.plot
 

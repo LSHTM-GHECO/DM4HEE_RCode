@@ -1,14 +1,14 @@
 ---
-title: "R Stream of Decision Modelling for Health Economic Evaluation Reader - Foundation Course"
+title: Decision Modelling for Health Economic Evaluation R Stream Reader - Foundation Course
 author: "Nichola Naylor & Jack Williams"
-date: "19 April 2021"
+date: "May/June 2021 Course"
 output:
   pdf_document: default
   html_document: default
 subtitle: Foundation Course Reader
 header-includes:
 - \usepackage{titling}
-- \pretitle{\begin{center}\LARGE\includegraphics[width=12cm]{logo.png}\\[\bigskipamount]}
+- \pretitle{\begin{center}\LARGE\includegraphics[width=7.5cm]{logo.png}\\[\bigskipamount]}
 - \posttitle{\end{center}}
 urlcolor: blue
 linkcolor: red
@@ -141,6 +141,6 @@ df[1,"cost"] ## 1st row, cost value
 ## Other Information
 Please do let us know (via the blog post tool) whether there are any issues in the R exercise information provided. 
 
-If you are doing the Advanced course following this course, there will be a separate reader with additional information related to related material.
+If you are doing the Advanced course following this course, there will be a separate reader with additional information related to material needed for the Advanced course.
 
 ## Happy coding! 

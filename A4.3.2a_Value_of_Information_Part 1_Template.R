@@ -37,10 +37,10 @@ nmb.SP0 <- simulation.results$qalys.SP0 * WTP - simulation.results$cost.SP0  ## 
 nmb.NP1 <- simulation.results$qalys.NP1 * WTP - simulation.results$cost.NP1  ## estimate the NMB for NP1  
 nmb.table <- data.frame(nmb.SP0, nmb.NP1)
 
-av.current <-      ## use the apply and mean functions, applying to columns within the nmb.table
+av.current <- apply(  )     ## use the apply and mean functions, applying to columns within the nmb.table
   ## This provides the average NMB across all simulations, for each treatment  
   
-max.nmb <-        ## use the apply and max functions, applying to rows within the nmb.table
+max.nmb <- apply(   )        ## use the apply and max functions, applying to rows within the nmb.table
   ## This provides the maximum NMB for each simulations (hence the apply functions moves across rows) 
   ## This selects the NMB for whichever treatment has the highest NMB in each simulation
 
@@ -51,7 +51,6 @@ max.current <- max(av.current) ## this represnets the maximum NMB for SP0 or NP1
   #  the NMB for all simulations - this represents 'current knowledge'
 
 EVPI.indiv <-   ## use 2 of the variables defined above, to find the difference between perfect info and current info
-
 
 #### ESTIMATING POPULATION EVPI #####
 
@@ -96,7 +95,7 @@ est.EVPI.pop <-function(WTP, effective.population,
 }
 
 ## create a data frame to capture the WTP values and subsequent population EVPI results
-EVPI.results <- data.frame(WTP=    , 
+EVPI.results <- data.frame(WTP=    , ## hint: use vector already created
                            EVPI=   )  ## hint: use the rep() function for EVPI for now
 
 ## replace NA EVPI values with estimated population EVPI values
@@ -110,8 +109,8 @@ head(EVPI.results)
 ## ggplot to observe results (the functions created are from from the ggplot functions script)
 
 # Cost-effectiveness plane 
-incremental.results <- simulation.results[,c(6,5)]
-ce.plane(incremental.results)
+incremental.results <- simulation.results[,c("inc.qalys","inc.cost")]
+plot.ce.plane(incremental.results)
 
 # Cost-effectiveness acceptability curve 
 plot.ceac(CEAC)
