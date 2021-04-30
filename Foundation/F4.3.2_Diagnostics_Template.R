@@ -110,7 +110,7 @@ no.test.nmb
 
 # Now we can create a line plot in base R to observe the results:
 # fill in the variable names left blank in the blow
-# you want prevalence on the x-axis and nmb on the x-axis
+# you want prevalence on the x-axis and nmb on the y-axis
 plot(       ,         , type="l", col = "blue", ylim = c(0, 30000))
 lines(      ,         , col = "red")
 legend(0.7, 30000, legend=c("Treat all", "Treat none"), col=c("blue", "red"), 
