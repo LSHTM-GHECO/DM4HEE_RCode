@@ -75,6 +75,7 @@ colnames(life.table) <- c("Age","Index","Males","Female") ## making sure column 
 
 cycle.v <- 1:cycles ## a vector of cycle numbers 1 - 60
 current.age <-    ## a vector of cohort age throughout the model
+current.age
 
 ## creating a table that has every age of the cohort plus death risks associated with that age
 life.table <- as.data.table(life.table) ## turning life.table into a data.table 
@@ -87,8 +88,10 @@ death.risk <- life.table[death.risk, roll=TRUE] ## joining life.table and death.
 
 ## defining the revision risks based on the parameters calculated above and cycle vector
 revision.risk.sp0 <-    ## the time dependent risk of revision for standard treatment
-  
+revision.risk.sp0
+
 revision.risk.np1 <-    ## the time dependent risk of revision for NP1
+revision.risk.np1
 
 
 # combining risks into a time-dependent transition probability data.table
@@ -103,6 +106,7 @@ col.key <- 4-male ## 4 indicates the 4th column of tdps (which is female risk of
 #  We start with a three dimensional array in order to capture the time dependencies
 tm.SP0 <- array(data = , dim = c( , , ),
                 dimnames= list(state.names, state.names, 1:cycles))   # an empty array of dimenions (number of states, number of states, number of cycles)
+                ## naming all dimensions
 
 ### create a loop that creates a time dependent transition matrix for each cycle
 for (i in 1:cycles) {
@@ -144,6 +148,7 @@ for (i in 2:cycles) {  ## a loop filling in the rest of the trace matrix
   trace.SP0[i,] <- 
 }
 
+trace.SP0
 
 ###Life Years####
 
@@ -188,6 +193,7 @@ disc.cost.SP0
 
 tm.NP1 <-   ## an empty array of dimenions (number of states, number of states, number of cycles)
 
+  
 ### create a loop that creates a time dependent transition matrix for each cycle
 for (i in 1:cycles) {
 
@@ -195,8 +201,7 @@ for (i in 1:cycles) {
   ## tranisitions out of P-THR
   tm.NP1["P-THR","Death",i] <- 
   tm.NP1["P-THR","successP-THR",i] <- 
-  
-    ## transitions out of success-P-THR
+  ## transitions out of success-P-THR
   tm.NP1["successP-THR","R-THR",i] <-   ## revision risk with NP1 treatment arm 
   tm.NP1["successP-THR","Death",i] <- 
   tm.NP1["successP-THR","successP-THR",i] <- 
@@ -209,7 +214,6 @@ for (i in 1:cycles) {
   tm.NP1["successR-THR","successR-THR",i] <- 
   
   tm.NP1["Death","Death",i] <-    ## no transitions out of death
-  
 }
 
 tm.NP1
@@ -245,6 +249,7 @@ undisc.QALYs.NP1
 ## DISCOUNTING:
 ## can use the same discount.factor.o as created previously 
 disc.QALYs.NP1 <-  ## total discounted QALYs for NP1 treatment pathway
+
 
 ###COSTS###
 cost.NP1 <-  ## undiscounted costs from NP1 for each cycle

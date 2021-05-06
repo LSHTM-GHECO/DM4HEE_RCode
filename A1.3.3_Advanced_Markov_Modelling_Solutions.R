@@ -43,8 +43,6 @@ c.revision <- 5294 ## Cost of one cycle in the Revision THR state (national refe
 
 state.costs<-c(c.primary, c.success, c.revision,c.success,0) ## a vector with the costs for each state
 
-
-
 # Life years
 state.lys <- c(1,1,1,1,0)  ## a vector of life year effects for each state
 
@@ -90,6 +88,7 @@ death.risk <- life.table[death.risk, roll=TRUE] ## joining life.table and death.
 
 ## defining the revision risks based on the parameters calculated above and cycle vector
 revision.risk.sp0 <- 1- exp(lambda * ((cycle.v-1) ^gamma-cycle.v ^gamma))
+
 revision.risk.np1 <- 1- exp(lambda * RR.NP1 * ((cycle.v-1) ^gamma-cycle.v ^gamma))
 
 revision.risk.sp0 ## the time dependent risk of revision for standard treatment
@@ -112,17 +111,23 @@ tm.SP0 <- array(data=0,dim=c(n.states, n.states, cycles),
 ### create a loop that creates a time dependent transition matrix for each cycle
 for (i in 1:cycles) {
   
+  ## First we get the correct mortality risk for each cycle 
   mortality <- as.numeric(tdtps[i,..col.key]) 
+  
   ## tranisitions out of P-THR
+  
   tm.SP0["P-THR","Death",i] <- tp.PTHR2dead ## Primary THR either enter the death state or.. or..
   tm.SP0["P-THR","successP-THR",i] <- 1 - tp.PTHR2dead ## they go into the success THR state 
+  
   ## transitions out of success-P-THR
   tm.SP0["successP-THR","R-THR",i] <- revision.risk.sp0[i] ## you could also refer to the corersponding tdtps column
   tm.SP0["successP-THR","Death",i] <- mortality
   tm.SP0["successP-THR","successP-THR",i] <- 1-revision.risk.sp0[i] - mortality
+  
   ## transitions out of R-THR 
   tm.SP0["R-THR","Death",i] <- tp.RTHR2dead + mortality
   tm.SP0["R-THR","successR-THR",i] <- 1 - tp.RTHR2dead - mortality 
+  
   ## transitions out of success-THR
   tm.SP0["successR-THR","R-THR",i] <- tp.rrr
   tm.SP0["successR-THR","Death",i] <- mortality
@@ -142,19 +147,19 @@ trace.SP0[1,] <- seed%*%tm.SP0[,,1]
 for (i in 2:cycles) {
   trace.SP0[i,] <- trace.SP0[i-1,]%*%tm.SP0[,,i]
 }
+
 trace.SP0
-
-rowSums(trace.SP0)
-
 
 ###Life Years####
 
 lys.SP0 <- trace.SP0%*%state.lys
 lys.SP0
+
 undisc.lys.SP0 <- colSums(lys.SP0)
 undisc.lys.SP0
 
 ###QALYS######
+
 QALYs.SP0 <- trace.SP0%*%state.utilities
 QALYs.SP0
 
@@ -164,13 +169,14 @@ undisc.QALYs.SP0
 ## DISCOUNTING:
 ## this time we use 
 discount.factor.o <- 1/(1+dr.o)^cycle.v ## many different methods to do this, this one simply multiplies the cycle vector with the discount formulae
-cycle.v
+
 discount.factor.o
 
 disc.QALYs.SP0 <- discount.factor.o%*%QALYs.SP0
 disc.QALYs.SP0
 
 ###COSTS###
+
 cost.SP0 <- trace.SP0%*%state.costs
 cost.SP0
 
@@ -179,15 +185,14 @@ undisc.cost.SP0
 
 ## DISCOUNTING
 discount.factor.c <- 1/(1+dr.c)^cycle.v
-discount.factor.c
 
 disc.cost.SP0 <- (discount.factor.c%*%cost.SP0) + c.SP0
 disc.cost.SP0
 
 ##########**** NP1 *****######
+
 tm.NP1 <- array(data=0,dim=c(n.states, n.states, cycles),
                 dimnames= list(state.names, state.names, 1:cycles)) ## an empty array of dimenions (number of states, number of states, number of cycles)
-## naming all dimensions
 
 ### create a loop that creates a time dependent transition matrix for each cycle
 for (i in 1:cycles) {
@@ -224,12 +229,13 @@ for (i in 2:cycles) {
 }
 trace.NP1
 
-rowSums(trace.SP0)
+rowSums(trace.NP1)
 
 
 ###Life Years####
 lys.NP1 <- trace.NP1%*%state.lys
 lys.NP1
+
 undisc.lys.NP1 <- colSums(lys.NP1)
 undisc.lys.NP1
 
@@ -258,6 +264,7 @@ disc.cost.NP1
 
 
 ####****ANALYSIS****####
+
 output <- c(inc.cost = disc.cost.NP1 - disc.cost.SP0,
             inc.qalys = disc.QALYs.NP1 - disc.QALYs.SP0,
             icer = NA)
