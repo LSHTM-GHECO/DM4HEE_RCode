@@ -78,11 +78,18 @@ current.age <- age + cycle.v ## a vector of cohort age throughout the model
 current.age
 
 ## creating a table that has every age of the cohort plus death risks associated with that age
-life.table <- as.data.table(life.table) ## turning life.table into a data.table 
-death.risk <- as.data.table(current.age) ## turning current age into a data.table 
-setkey(life.table,"Index") ## using the setkey function (read about it by typing in ?setkey in the console)
-setkey(death.risk,"current.age") ## using the setkey function for death.risk to sort and set current.age as the key
-death.risk <- life.table[death.risk, roll=TRUE] ## joining life.table and death.risk by the key columns, rolling forward between index values
+# life.table <- as.data.table(life.table) ## turning life.table into a data.table 
+# death.risk <- as.data.table(current.age) ## turning current age into a data.table 
+# setkey(life.table,"Index") ## using the setkey function (read about it by typing in ?setkey in the console)
+# setkey(death.risk,"current.age") ## using the setkey function for death.risk to sort and set current.age as the key
+# death.risk <- life.table[death.risk, roll=TRUE] ## joining life.table and death.risk by the key columns, rolling forward between index values
+
+lifetable.match <- findInterval(current.age, life.table$Index) # This finds the position of age, within the life table 
+
+# These positions can then be used to subset the appropriate values from life.table
+death.risk <- data.frame(age = current.age, 
+                         males = life.table[lifetable.match,3],
+                         females = life.table[lifetable.match,4])
 
 ####**** STANDARD *****#####
 
@@ -99,8 +106,8 @@ tdtps <- data.table(death.risk, revision.risk.sp0, revision.risk.np1)
 tdtps
 
 ## creating an indicator which selects the death risk column depending on the sex the model is being run on
-col.key <- 4-male ## 4 indicates the 4th column of tdps (which is female risk of death)
-                  ## when male=1 (i.e. male selected as sex) this becomes the 3rd column (which is male risk of death)
+col.key <- 3-male ## 3 indicates the 3rd column of tdps (which is female risk of death)
+                  ## when male=1 (i.e. male selected as sex) this becomes the 2nd column (which is male risk of death)
 
 #  Now create a transition matrix for the standard prosthesis arm
 #  We start with a three dimensional array in order to capture the time dependencies
@@ -268,7 +275,7 @@ disc.cost.NP1
 output <- c(inc.cost = disc.cost.NP1 - disc.cost.SP0,
             inc.qalys = disc.QALYs.NP1 - disc.QALYs.SP0,
             icer = NA)
-output["icer"] <- output["inc.cost"]/output["inc.lys"]
+output["icer"] <- output["inc.cost"]/output["inc.qalys"]
 
 output
 
