@@ -13,7 +13,7 @@ library(reshape2)
 hazards <- read.csv("hazardfunction_NP2.csv", header=TRUE) ## importing the hazard inputs from the regression analysis
 cov.55 <- read.csv("cov55_NP2.csv",row.names=1,header=TRUE) ## importing the covariance matrix
 life.table <- read.csv("life-table.csv", header=TRUE)
-life.table<- as.data.table(life.table)
+#life.table<- as.data.table(life.table)
 
 ####***** THR MODEL FUNCTION ****#####
 
@@ -99,12 +99,19 @@ model.THR.3b <- function(age=60, male=0) {
   colnames(life.table) <- c("Age","Index","Males","Female") ## making sure column names are correct
   cycle.v <- 1:cycles ## a vector of cycle numbers 1 - 60
   current.age <- age + cycle.v ## a vector of cohort age throughout the model
-  life.table <- as.data.table(life.table) ## turning life.table into a data.table 
-  death.risk <- as.data.table(current.age) ## turning current age into a data.table 
-  setkey(life.table,"Index") ## using the setkey function (read about it by typing in ?setkey in the console)
-  setkey(death.risk,"current.age") ## using the setkey function for death.risk to sort and set current.age as the key
-  death.risk <- life.table[death.risk, roll=TRUE] ## joining life.table and death.risk by the key columns, rolling forward between index values
+  # life.table <- as.data.table(life.table) ## turning life.table into a data.table 
+  # death.risk <- as.data.table(current.age) ## turning current age into a data.table 
+  # setkey(life.table,"Index") ## using the setkey function (read about it by typing in ?setkey in the console)
+  # setkey(death.risk,"current.age") ## using the setkey function for death.risk to sort and set current.age as the key
+  # death.risk <- life.table[death.risk, roll=TRUE] ## joining life.table and death.risk by the key columns, rolling forward between index values
   
+  # This finds the position of age, within the life table 
+  interval <- findInterval(current.age, life.table$Index)
+  
+  # These positions can then be used to subset the appropriate values from life.table
+  death.risk <- data.frame(age = current.age, 
+                           males = life.table[interval,3],
+                           females = life.table[interval,4])
   ###  Transition probabilities
   tp.PTHR2dead <- rbeta(1,a.PTHR2dead,b.PTHR2dead) ## Operative mortality rate  (OMR) following primary THR
   # since we assume the same shape parameters for RTHR : 
@@ -155,15 +162,15 @@ model.THR.3b <- function(age=60, male=0) {
   revision.risk.np1 ## the time dependent risk of revision for NP1
   revision.risk.np2 ## the time dependent risk of revision for NP2
   
-  # combining risks into a time-dependent transition probability data.table
-  tdtps <- data.table(death.risk, revision.risk.sp0, revision.risk.np1, revision.risk.np2)
+  # combining risks into a time-dependent transition probability data.frame
+  tdtps <- data.frame(death.risk, revision.risk.sp0, revision.risk.np1, revision.risk.np2)
   
   ## creating an indicator which selects the death risk column depending on the sex the model is being run on
-  col.key <- 4-male ## 4 indicates the 4th column of tdps (which is female risk of death)
-  ## when male=1 (i.e. male selected as sex) this becomes the 3rd column (which is male risk of death)
+  col.key <- 3-male ## 3 indicates the 3rd column of tdps (which is female risk of death)
+  ## when male=1 (i.e. male selected as sex) this becomes the 2nd column (which is male risk of death)
   
   ## Create a vector with the mortality values at each age, to insert into time dependent transition matrix below
-  mortality.vec <- unname(unlist(death.risk[,..col.key]))
+  mortality.vec <- death.risk[,col.key]
   
   #   STANDARD ARM
   #  Now create a transition matrix for the standard prosthesis arm

@@ -102,7 +102,7 @@ revision.risk.np1 <-    ## the time dependent risk of revision for NP1
 revision.risk.np1
 
 
-# combining risks into a time-dependent transition probability data.table
+# combining risks into a time-dependent transition probability data.frame
 tdtps <-    ## combine in the order death.risk, revision.risk.sp0, revision.risk.np1
 tdtps
 
@@ -120,7 +120,7 @@ tm.SP0 <- array(data = , dim = c( , , ),
 for (i in 1:cycles) {
   
   ## First we get the correct mortality risk for each cycle 
-  mortality <- as.numeric(tdtps[i,..col.key]) 
+  mortality <- death.risk[i,col.key]
   
   ## tranisitions out of P-THR
   ## remember you can refer to transitions using state names such as... 

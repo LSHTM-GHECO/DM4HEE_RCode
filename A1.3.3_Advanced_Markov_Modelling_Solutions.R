@@ -3,9 +3,9 @@
 #  Authors: Andrew Briggs, Jack Williams & Nichola Naylor
 
 ### Loading useful packages
-library(data.table)
-library(tidyr)
-library(dplyr)
+# library(data.table)
+# library(tidyr)
+# library(dplyr)
 
 #########**** PARAMETERS *****######
 #  Start by defining parameters
@@ -101,8 +101,8 @@ revision.risk.np1 <- 1- exp(lambda * RR.NP1 * ((cycle.v-1) ^gamma-cycle.v ^gamma
 revision.risk.sp0 ## the time dependent risk of revision for standard treatment
 revision.risk.np1 ## the time dependent risk of revision for NP1
 
-# combining risks into a time-dependent transition probability data.table
-tdtps <- data.table(death.risk, revision.risk.sp0, revision.risk.np1)
+# combining risks into a time-dependent transition probability data.frame
+tdtps <- data.frame(death.risk, revision.risk.sp0, revision.risk.np1)
 tdtps
 
 ## creating an indicator which selects the death risk column depending on the sex the model is being run on
@@ -119,7 +119,8 @@ tm.SP0 <- array(data=0,dim=c(n.states, n.states, cycles),
 for (i in 1:cycles) {
   
   ## First we get the correct mortality risk for each cycle 
-  mortality <- as.numeric(tdtps[i,..col.key]) 
+  #mortality <- as.numeric(tdtps[i,col.key]) 
+  mortality <- death.risk[i, col.key]
   
   ## tranisitions out of P-THR
   
@@ -204,7 +205,7 @@ tm.NP1 <- array(data=0,dim=c(n.states, n.states, cycles),
 ### create a loop that creates a time dependent transition matrix for each cycle
 for (i in 1:cycles) {
   
-  mortality <- as.numeric(tdtps[i,..col.key]) 
+  mortality <- as.numeric(tdtps[i, col.key]) 
   ## tranisitions out of P-THR
   tm.NP1["P-THR","Death",i] <- tp.PTHR2dead ## Primary THR either enter the death state or.. or..
   tm.NP1["P-THR","successP-THR",i] <- 1 - tp.PTHR2dead ## they go into the success THR state 
