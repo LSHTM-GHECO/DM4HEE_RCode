@@ -15,7 +15,7 @@ age <- 60 ## set age group for analyses
 male <- 0 ## set sex identified, 0 = female and 1 = male
         ## the specific number (0,1) becomes important for reasons you'll see further down the script
 dr.c <- 0.06 ## set the discount rate for costs (6%)
-dr.o <- 0.015 ## set the discount rate for outcomes (15%)
+dr.o <- 0.015 ## set the discount rate for outcomes (1.5%)
 
 cycles <- 60 ## number of cycles
 
@@ -31,6 +31,9 @@ tp.RTHR2dead <- 0.02 ##Operative mortality rate (OMR) following revision THR
 tp.rrr <- 0.04 ## Re-revision risk (assumed to be constant)
 
 #  Costs
+c.SP0 <- 394 ## Cost of standard prosthesis
+c.NP1 <- 579 ## Cost of new prosthesis 1
+
 c.primary <- 0  ## Cost of a primary THR procedure 
 ## Note that the cost of the primary procedure is excluded (set to 0): since both arms have this procedure it is assumed to net out of the incremental analysis.  However, if the model was to be used to estimate lifetime costs of THR it would be important to include.
 c.success <- 0 ## Cost of one cycle in a 'success' state (primary or revision)
@@ -40,16 +43,16 @@ c.revision <- 5294 ## Cost of one cycle in the Revision THR state (national refe
 
 state.costs<-c(c.primary, c.success, c.revision,c.success,0) ## a vector with the costs for each state
 
-c.SP0 <- 394 ## Cost of standard prosthesis
-c.NP1 <- 579 ## Cost of new prosthesis 1
+
 
 # Life years
 state.lys <- c(1,1,1,1,0)  ## a vector of life year effects for each state
 
 #  Utilities
 u.success.p <- 0.85 ## Utility score for having had a successful Primary THR
-u.success.r <- 0.75 ## Utility score for having a successful Revision THR
 u.revision <- 0.30 ## Utility score during the revision period
+u.success.r <- 0.75 ## Utility score for having a successful Revision THR
+
 state.utilities <- c(0,u.success.p,u.revision,u.success.r,0) ## a vector with the utilities for each state
 
 #### HAZARD FUNCTION & ASSOCIATED PARAMETERS #####
@@ -122,7 +125,7 @@ for (i in 1:cycles) {
   tm.SP0["R-THR","successR-THR",i] <- 1 - tp.RTHR2dead - mortality 
   ## transitions out of success-THR
   tm.SP0["successR-THR","R-THR",i] <- tp.rrr
-  tm.SP0["successR-THR",5,i] <- mortality
+  tm.SP0["successR-THR","Death",i] <- mortality
   tm.SP0["successR-THR","successR-THR",i] <- 1 - tp.rrr - mortality
   
   tm.SP0["Death","Death",i] <- 1 ## no transitions out of death
@@ -202,7 +205,7 @@ for (i in 1:cycles) {
   tm.NP1["R-THR","successR-THR",i] <- 1 - tp.RTHR2dead - mortality 
   ## transitions out of success-THR
   tm.NP1["successR-THR","R-THR",i] <- tp.rrr
-  tm.NP1["successR-THR",5,i] <- mortality
+  tm.NP1["successR-THR","Death",i] <- mortality
   tm.NP1["successR-THR","successR-THR",i] <- 1 - tp.rrr - mortality
   
   tm.NP1["Death","Death",i] <- 1 ## no transitions out of death
@@ -256,7 +259,7 @@ disc.cost.NP1
 
 ####****ANALYSIS****####
 output <- c(inc.cost = disc.cost.NP1 - disc.cost.SP0,
-            inc.lys = disc.QALYs.NP1 - disc.QALYs.SP0,
+            inc.qalys = disc.QALYs.NP1 - disc.QALYs.SP0,
             icer = NA)
 output["icer"] <- output["inc.cost"]/output["inc.lys"]
 
