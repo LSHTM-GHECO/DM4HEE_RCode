@@ -268,7 +268,7 @@ disc.cost.NP1
 output <- c(inc.cost = disc.cost.NP1 - disc.cost.SP0,
             inc.qalys = disc.QALYs.NP1 - disc.QALYs.SP0,
             icer = NA)
-output["icer"] <- output["inc.cost"]/output["inc.lys"]
+output["icer"] <- output["inc.cost"]/output["inc.qalys"]
 
 output
 
