@@ -3,11 +3,6 @@
 #  Authors: Andrew Briggs, Jack Williams & Nichola Naylor
 
 
-### Loading useful packages
-library(data.table)
-library(tidyr)
-library(dplyr)
-
 #  Reading the data needed from csv files
 hazards <- read.csv("hazardfunction.csv", header=TRUE) ## importing the hazard inputs from the regression analysis
 
@@ -161,19 +156,12 @@ model.THR <- function() {
   current.age
   
   ## creating a table that has every age of the cohort plus death risks associated with that age
-  # life.table <- as.data.table(life.table) ## turning life.table into a data.table 
-  # death.risk <- as.data.table(current.age) ## turning current age into a data.table 
-  # setkey(life.table,"Index") ## using the setkey function (read about it by typing in ?setkey in the console)
-  # setkey(death.risk,"current.age") ## using the setkey function for death.risk to sort and set current.age as the key
-  # death.risk <- life.table[death.risk, roll=TRUE] ## joining life.table and death.risk by the key columns, rolling forward between index values
-  
   # This finds the position of age, within the life table 
   interval <- findInterval(current.age, life.table$Index)
-  
   # These positions can then be used to subset the appropriate values from life.table
-  lt.df <- data.frame(age = current.age, 
-                      males = life.table[interval,3],
-                      females = life.table[interval,4])
+  death.risk <- data.frame(age = current.age, 
+                           males = life.table[interval,3],
+                           females = life.table[interval,4])
   
   #####***** MARKOV MODEL ****#####
   
@@ -341,7 +329,8 @@ model.THR <- function() {
 
 
 # You can run the function to get the results of a simulation (each simulation will provide different results!)
-round(model.THR(),3)
+model.THR()
+round(model.THR(),3) # and to help view the results
 
 # If viewing this code after completing Exercise 2, ignore the below 
 # we will go through simulation storing within the next exercise 
@@ -353,7 +342,7 @@ round(model.THR(),3)
 # sim.runs <- 1000 ## run 1,000 times
 # 
 # # We can create a data frame to store results
-# simulation.results <- simulation.results <- data.frame("inc.cost" = rep(0, sim.runs),
+# simulation.results <- data.frame("inc.cost" = rep(0, sim.runs),
 #                                                        "inc.qalys"=rep(0,sim.runs))
 # 
 # #### Running simulations & recording results #### 

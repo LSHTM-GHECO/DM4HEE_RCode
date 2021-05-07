@@ -3,9 +3,6 @@
 #  Authors: Andrew Briggs, Jack Williams & Nichola Naylor
 
 ### Loading useful packages
-library(data.table)
-library(tidyr)
-library(dplyr)
 library(ggplot2)
 library(reshape2) 
 
@@ -103,14 +100,10 @@ discount.factor.o <- 1/(1+dr.o)^cycle.v  ## discount factor matrix for utility
 # This is included within the function as it varies by age and sex (which are inputs into the function)
 colnames(life.table) <- c("Age","Index","Males","Female") ## making sure column names are correct
 current.age <- age + cycle.v ## a vector of cohort age throughout the model
-life.table <- as.data.table(life.table) ## turning life.table into a data.table 
-death.risk <- as.data.table(current.age) ## turning current age into a data.table 
-setkey(life.table,"Index") ## using the setkey function (read about it by typing in ?setkey in the console)
-setkey(death.risk,"current.age") ## using the setkey function for death.risk to sort and set current.age as the key
-death.risk <- life.table[death.risk, roll=TRUE] ## joining life.table and death.risk by the key columns, rolling forward between index values
-
-col.key <- 4-male 
-mortality.vec <- unname(unlist(death.risk[,..col.key]))
+interval <- findInterval(current.age, life.table$Index)
+death.risk <- data.frame(age = current.age, males = life.table[interval,3], females = life.table[interval,4])
+col.key <- 3-male 
+mortality.vec <- death.risk[,col.key]
 
 #########**** PROBABILISTIC PARAMETERS *****######
 

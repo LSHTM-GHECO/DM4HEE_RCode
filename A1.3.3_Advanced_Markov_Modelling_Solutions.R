@@ -2,10 +2,6 @@
 #  Advanced Course Exercise 1: SOLUTION FILE
 #  Authors: Andrew Briggs, Jack Williams & Nichola Naylor
 
-### Loading useful packages
-# library(data.table)
-# library(tidyr)
-# library(dplyr)
 
 #########**** PARAMETERS *****######
 #  Start by defining parameters
@@ -77,19 +73,13 @@ cycle.v <- 1:cycles ## a vector of cycle numbers 1 - 60
 current.age <- age + cycle.v ## a vector of cohort age throughout the model
 current.age
 
-## creating a table that has every age of the cohort plus death risks associated with that age
-# life.table <- as.data.table(life.table) ## turning life.table into a data.table 
-# death.risk <- as.data.table(current.age) ## turning current age into a data.table 
-# setkey(life.table,"Index") ## using the setkey function (read about it by typing in ?setkey in the console)
-# setkey(death.risk,"current.age") ## using the setkey function for death.risk to sort and set current.age as the key
-# death.risk <- life.table[death.risk, roll=TRUE] ## joining life.table and death.risk by the key columns, rolling forward between index values
-
-lifetable.match <- findInterval(current.age, life.table$Index) # This finds the position of age, within the life table 
-
+## Creating a table that has every age of the cohort plus death risks associated with that age
+# This finds the position of age, within the life table 
+interval <- findInterval(current.age, life.table$Index)
 # These positions can then be used to subset the appropriate values from life.table
 death.risk <- data.frame(age = current.age, 
-                         males = life.table[lifetable.match,3],
-                         females = life.table[lifetable.match,4])
+                         males = life.table[interval,3],
+                         females = life.table[interval,4])
 
 ####**** STANDARD *****#####
 
@@ -119,8 +109,8 @@ tm.SP0 <- array(data=0,dim=c(n.states, n.states, cycles),
 for (i in 1:cycles) {
   
   ## First we get the correct mortality risk for each cycle 
-  #mortality <- as.numeric(tdtps[i,col.key]) 
-  mortality <- death.risk[i, col.key]
+  #mortality <- as.numeric() 
+  mortality <- death.risk[i, col.key] ## This could also be taken from tdtps data frame e.g. tdtps[i,col.key]
   
   ## tranisitions out of P-THR
   

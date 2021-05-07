@@ -3,9 +3,6 @@
 #  Authors: Andrew Briggs, Jack Williams & Nichola Naylor
 
 ### Loading useful packages
-library(data.table)
-library(tidyr)
-library(dplyr)
 library(ggplot2)
 library(reshape2) 
 

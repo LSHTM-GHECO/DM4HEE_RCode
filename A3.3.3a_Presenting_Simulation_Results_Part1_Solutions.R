@@ -3,9 +3,6 @@
 #  Authors: Andrew Briggs, Jack Williams & Nichola Naylor
 
 ### Loading useful packages
-library(data.table)
-library(tidyr)
-library(dplyr)
 library(ggplot2)
 library(reshape2) 
 
@@ -13,7 +10,7 @@ library(reshape2)
 hazards <- read.csv("hazardfunction.csv", header=TRUE) ## importing the hazard inputs from the regression analysis
 cov.55 <- read.csv("cov55.csv",row.names=1,header=TRUE) ## importing the covariance matrix
 life.table <- read.csv("life-table.csv", header=TRUE)
-#life.table<- as.data.table(life.table)
+
 
 ####***** THR MODEL FUNCTION ****#####
 
@@ -96,15 +93,9 @@ model.THR <- function(age=60, male=0) {
   # This is included within the function as it varies by age and sex (which are inputs into the function)
   colnames(life.table) <- c("Age","Index","Males","Female") ## making sure column names are correct
   current.age <- age + cycle.v ## a vector of cohort age throughout the model
-  # life.table <- as.data.table(life.table) ## turning life.table into a data.table 
-  # death.risk <- as.data.table(current.age) ## turning current age into a data.table 
-  # setkey(life.table,"Index") ## using the setkey function (read about it by typing in ?setkey in the console)
-  # setkey(death.risk,"current.age") ## using the setkey function for death.risk to sort and set current.age as the key
-  # death.risk <- life.table[death.risk, roll=TRUE] ## joining life.table and death.risk by the key columns, rolling forward between index values
-  
+
   # This finds the position of age, within the life table 
   interval <- findInterval(current.age, life.table$Index)
-  
   # These positions can then be used to subset the appropriate values from life.table
   death.risk <- data.frame(age = current.age, 
                            males = life.table[interval,3],
