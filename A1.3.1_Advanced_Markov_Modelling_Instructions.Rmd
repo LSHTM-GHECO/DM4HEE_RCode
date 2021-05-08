@@ -108,13 +108,9 @@ print(life.table)
 
 i) Create a vector ('cycle.v') that gives the number of model cycles from 1 to 60. Then create another vector ('current.age') which combines the initial age of the cohort with the number of annual cycles, to provide the age of the cohort in each cycle of the model. 
 
-ii) Next, you can run the `findInterval()` function, which performs a lookup. The first argument is the current age values in each model cycle, and the second argument is the position of this age in the Index column of the life.table data.frame. The output should look like the below, with a position for the age in each model cycle. You should notice that this value represents the position in `life.table$Index`, i.e. the row in the life.table data.frame: 
+ii) Next, you can run the `findInterval()` function, which performs a lookup. The first argument is the current age values in each model cycle, and the second argument is the position of this age in the Index column of the 'life.table' data frame. The output should match the age in each model cycle to the appropriate position in `life.table$Index`, i.e. the row in the life.table data.frame: 
 
-```{r, echo = FALSE}
-interval
-```
-
-Note, for those of you struggling to understand how this function works, you may find it easier to run the function using a simple value set to see how it finds the position of the first vector in the second, for example:
+Note, for those of you struggling to understand how this function works, you may find it easier to run the function using two simple vectors to see how it finds the position of the first vector in the second, for example:
 
 ```{r interval, eval = FALSE}
 findInterval(c(1:10), c(1,2,3,6,10))
