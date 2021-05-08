@@ -42,13 +42,10 @@ This will require the following data files to be located in the same working-dir
 
 And will require the following packages to be installed:
 
-* data.table
-* tidyr
-* dplyr
 * ggplot2
 * reshape2
 
-The final 2 packages mentioned above are needed as we have added some additional code at the bottom of the template and solution files that use the `reshape` and `ggplot2` packages to show you other potential ways to plot the simulation results.
+The two packages mentioned above are needed as we have added some additional code at the bottom of the template and solution files that use the `reshape` and `ggplot2` packages to show you other potential ways to plot the simulation results.
 'ggplot' is a graphics package that allows you to make very good graphs and plots, but requires the data to be structured in a specific way (long format), and tends to require more detailed code (which is how it allows for highly detailed plots). For more information on ggplot2, see this cheat sheet: https://www.rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf.
 
 * Please ensure you have the "ggplot_CEA_functions.R" script stored in the same folder as your template/solution files, with the working directory set to that same folder. Or alternatively make sure you set an appropriate file path to load the script.  

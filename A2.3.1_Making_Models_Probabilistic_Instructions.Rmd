@@ -36,13 +36,15 @@ The step-by-step guide below will take you through a number of stages of making 
 5. Correlating parameters by Cholesky decomposition
 6. Application to the regression model for prosthesis survival
 
-A template for the exercise, ‘A2.3.2_Making_Models_Probablistic_Template.R’, is available, and builds upon the deterministic model developed in Module 1. Again, we use the 3 packages used in Module 1 - `data.table`, `tidyr` and `dplyr`. So please do run the `library()` functions at the beginning of the script before continuing. 
+A template for the exercise, ‘A2.3.2_Making_Models_Probablistic_Template.R’, is available, and builds upon the deterministic model developed in Module 1. 
 
 To work through this exercise, you will need to have the following csv files available within the same working-directory folder as the template and solution files:
 
 * "hazardfunction.csv"
 * "life-tables.csv"
 * "cov55.csv" 
+
+\newpage
 
 ## Step by step guide 
 
@@ -165,17 +167,14 @@ vi) Remember that we have been working on the log hazard scale for the Weibull r
 
 (@) **Life-table transitions for background mortality**
 
-We can still employ time dependent transitions in other model state providing the time dependency relates to time in the model rather than time in the state itself.  This is the case for a background mortality rate, for example, which depends on the age of a subject rather than which state of the model they are in.  In this section we will illustrate the use of a time dependent transition to model background mortality in the model from a life-table.
+As we described in Module 1, we can still employ time dependent transitions in other model state providing the time dependency relates to time in the model rather than time in the state itself, as is the case for the background mortality rate, which depends on the age of a subject rather than which state of the model they are in.  
 
-
-Open the 'Life tables' section of the code and familiarise yourself with the contents. This is similar to what was done in the Advanced Module 1. View the imported lifetable data.frame, containing the age-sex specific mortality rates taken from a standard life-table, published as deaths per thousand per year.  
-
-Refer to the solutions from the Module 1 and try to complete the definitions currently blank, trying to understand the process of each step.
+Open the 'Life tables' section of the code and again familiarise yourself with the `findInterval()` function, and how this is used to create the 'death.risk' data.frame, by selecting the appropriate mortality values for each cycle (based on the cohort age at that cycle).  
 
 
 (@) **Building the Markov model**
 
-Using the same approach taken in Module 1 build the time-dependent transition probability data.table for standard and new prosthesis pathways.
+Using the same approach taken in Module 1 build the time-dependent transitions for standard and new prosthesis pathways.
 
 This time we will order the building of the transition matrices for each arm, then build the cost and effect matrices to multiply through (but the order doesn’t really matter in terms of construction and is down to preference).
 
