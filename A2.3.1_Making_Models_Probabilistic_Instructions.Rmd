@@ -25,7 +25,7 @@ source("A2.3.3_Making_Models_Probabilistic_Solutions.R", local = knitr::knit_glo
 
 ## Overview
 
-The aim of this exercise is to demonstrate how a deterministic Markov model can be made probabilistic by fitting distributions to parameters.  Emphasis is on choosing the correct distribution for different types of parameters and on correlating parameters using the Cholesky decomposition of a variance-covariance matrix.  
+The aim of this exercise is to demonstrate how a deterministic Markov model can be made probabilistic by fitting distributions to parameters.  Emphasis is on choosing the correct distribution for different types of parameters and on correlating parameters using the Cholesky decomposition of a variance-covariance matrix. This Module will focus on coding the model to perform one probabilistic run (or simulation). In Module 3 we will look at storing and analysing the results of many model simulatons. 
 
 The step-by-step guide below will take you through a number of stages of making the model probabilistic:
 
@@ -36,7 +36,7 @@ The step-by-step guide below will take you through a number of stages of making 
 5. Correlating parameters by Cholesky decomposition
 6. Application to the regression model for prosthesis survival
 
-A template for the exercise, ‘A2.3.2_Making_Models_Probablistic_Template.R’, is available, and builds upon the deterministic model developed in Module 1. 
+A template for the exercise, ‘A2.3.2_Making_Models_Probablistic_Template.R’, is available, and builds upon the deterministic model developed in Module 1.   
 
 To work through this exercise, you will need to have the following csv files available within the same working-directory folder as the template and solution files:
 
@@ -174,9 +174,7 @@ Open the 'Life tables' section of the code and again familiarise yourself with t
 
 (@) **Building the Markov model**
 
-Using the same approach taken in Module 1 build the time-dependent transitions for standard and new prosthesis pathways.
-
-This time we will order the building of the transition matrices for each arm, then build the cost and effect matrices to multiply through (but the order doesn’t really matter in terms of construction and is down to preference).
+Using the same approach taken in Module 1 build the time-dependent transitions for standard and new prosthesis pathways. We will order the building of the transition matrices for each arm, then build the cost and effect matrices to multiply through (but the order doesn’t really matter in terms of construction and is down to preference).
 
 (@) **Estimating cost-effectiveness**
 
