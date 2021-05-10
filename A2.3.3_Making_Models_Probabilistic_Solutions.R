@@ -228,21 +228,20 @@ tm.NP1 <- array(data=0,dim=c(n.states, n.states, cycles),
 ### create a loop that creates a time dependent transition matrix for each cycle
 for (i in 1:cycles) {
   
-  mortality <- death.risk[i, col.key] 
   ## tranisitions out of P-THR
   tm.NP1["P-THR","Death",i] <- tp.PTHR2dead ## Primary THR either enter the death state or.. or..
   tm.NP1["P-THR","successP-THR",i] <- 1 - tp.PTHR2dead ## they go into the success THR state 
   ## transitions out of success-P-THR
   tm.NP1["successP-THR","R-THR",i] <- revision.risk.np1[i] ## revision risk with NP1 treatment arm 
-  tm.NP1["successP-THR","Death",i] <- mortality
-  tm.NP1["successP-THR","successP-THR",i] <- 1 - revision.risk.np1[i] - mortality
+  tm.NP1["successP-THR","Death",i] <- death.risk[i, col.key] 
+  tm.NP1["successP-THR","successP-THR",i] <- 1 - revision.risk.np1[i] - death.risk[i, col.key] 
   ## transitions out of R-THR 
-  tm.NP1["R-THR","Death",i] <- tp.RTHR2dead + mortality
-  tm.NP1["R-THR","successR-THR",i] <- 1 - tp.RTHR2dead - mortality 
+  tm.NP1["R-THR","Death",i] <- tp.RTHR2dead + death.risk[i, col.key] 
+  tm.NP1["R-THR","successR-THR",i] <- 1 - tp.RTHR2dead - death.risk[i, col.key]  
   ## transitions out of success-THR
   tm.NP1["successR-THR","R-THR",i] <- tp.rrr
-  tm.NP1["successR-THR","Death",i] <- mortality
-  tm.NP1["successR-THR","successR-THR",i] <- 1 - tp.rrr - mortality
+  tm.NP1["successR-THR","Death",i] <- death.risk[i, col.key] 
+  tm.NP1["successR-THR","successR-THR",i] <- 1 - tp.rrr - death.risk[i, col.key] 
   
   tm.NP1["Death","Death",i] <- 1 ## no transitions out of death
 }

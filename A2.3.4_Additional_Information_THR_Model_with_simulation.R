@@ -233,7 +233,6 @@ model.THR <- function() {
   ### create a loop that creates a time dependent transition matrix for each cycle
   for (i in 1:cycles) {
     
-    mortality <- death.risk[i, col.key] 
     ## tranisitions out of P-THR
     tm.NP1["P-THR","Death",i] <- tp.PTHR2dead ## Primary THR either enter the death state or.. or..
     tm.NP1["P-THR","successP-THR",i] <- 1 - tp.PTHR2dead ## they go into the success THR state 
