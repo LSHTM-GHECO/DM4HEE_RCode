@@ -12,6 +12,7 @@ life.table <- read.csv("life-table.csv", header=TRUE) ## importing the life tabl
 
 #########**** PARAMETERS *****######
 #  Start by defining parameters
+
 ##### DETERMINISTIC PARAMETERS ######
 age <- 60 ## set age group for analyses
 male <- 0 ## set sex identified, 0 = female and 1 = male
@@ -313,9 +314,12 @@ disc.QALYs.NP1 <- discount.factor.o%*%QALYs.NP1
 disc.QALYs.NP1
 
 ####****ANALYSIS****####
+
 output <- c(inc.cost = disc.cost.NP1 - disc.cost.SP0,
             inc.qalys = disc.QALYs.NP1 - disc.QALYs.SP0,
             icer = NA)
 output["icer"] <- output["inc.cost"]/output["inc.qalys"]
+
+output
 
 round(output,3)

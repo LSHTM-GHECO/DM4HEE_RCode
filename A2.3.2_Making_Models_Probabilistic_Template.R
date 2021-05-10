@@ -61,6 +61,8 @@ se.PTHR2dead
 mn.rrr <-         ## mean value for Re-revision risk 
 se.rrr <-         ## standard error value for Re-revision risk 
 
+  
+  
 ##  Costs
 c.primary <- 0  ## Cost of a primary THR procedure - 
 ## Note that the cost of the primary procedure is excluded (set to 0): since both arms have this procedure it is assumed to net out of the incremental analysis.  However, if the model was to be used to estimate lifetime costs of THR it would be important to include.
@@ -112,7 +114,6 @@ uRevision    <-       ## drawing from the Beta distribution based on a and b
 state.utilities <-    ## a vector of health state utilities
 
 ##  Hazard function ####
-
 ## Coefficients - on the log hazard scale
 mn.lngamma <- hazards$coefficient[1] ## lngamma coefficient
 mn.cons <- hazards$coefficient[2] ##Constant 
@@ -124,9 +125,9 @@ mn <- c(mn.lngamma, mn.cons,mn.ageC,mn.maleC,mn.NP1) ## vector of mean values fr
 
 cholm <- t(chol(t(cov.55))) ## lower triangle of the Cholesky decomposition
 
-z <-   ## 5 random draws from the normal distribution
+z <- rnorm() ## 5 random draws from the normal distribution
 
-Tz <-    ## Tz which is the Cholesky matrix multiplied by the 5 random draws
+Tz <- %*%  ## Tz which is the Cholesky matrix multiplied by the 5 random draws (z)
 
 x <-   ## mn plus Tz
 
@@ -136,9 +137,9 @@ r.ageC<-x[3,1]
 r.maleC<-x[4,1]
 r.NP1<-x[5,1]
 
-gamma <-      ##Ancilliary parameter in Weibull distribution
-lambda <-     ##Lambda parameter survival analysis
-RR.NP1 <-     ##Relative risk of revision for new prosthesis 1 compared to standard
+gamma <- exp(  )    ##Ancilliary parameter in Weibull distribution
+lambda <- exp(  )    ##Lambda parameter survival analysis
+RR.NP1 <- exp(  )    ##Relative risk of revision for new prosthesis 1 compared to standard
 
 ##### LIFE TABLES #####
 
@@ -156,6 +157,7 @@ death.risk <- data.frame(age = current.age,
                          males = life.table[interval,3],
                          females = life.table[interval,4])
 
+
 #####***** MARKOV MODEL ****#####
 
 #### TRANS AND TRACE ######
@@ -164,9 +166,13 @@ death.risk <- data.frame(age = current.age,
 revision.risk.sp0 <- 
 revision.risk.np1 <- 
 
+revision.risk.sp0 ## the time dependent risk of revision for standard treatment
+revision.risk.np1 ## the time dependent risk of revision for NP1
+
 # combining risks into a time-dependent transition probability data.frame
 tdtps <- 
-  
+
+    
 ## creating an indicator which selects the death risk column depending on the sex the model is being run on
 col.key <-      ## 3 indicates the 3rd column of tdps (which is female risk of death)
 ## when male=1 (i.e. male selected as sex) this becomes the 2nd column (which is male risk of death)
@@ -176,6 +182,8 @@ col.key <-      ## 3 indicates the 3rd column of tdps (which is female risk of d
 #  We start with a three dimensional array in order to capture the time dependencies
 tm.SP0 <-     ## an empty array of dimenions (number of states, number of states, number of cycles)
 
+  
+  
 ### create a loop that creates a time dependent transition matrix for each cycle
 for (i in 1:cycles) {
   
@@ -216,21 +224,10 @@ rowSums(trace.SP0)
 #  NP1 ARM
 tm.NP1 <-    ## an empty array of dimenions (number of states, number of states, number of cycles)
 
+  
+  
 ### create a loop that creates a time dependent transition matrix for each cycle
 for (i in 1:cycles) {
-  
-  
-}
-
-tm.NP1
-
-#  Create a trace for the standard prosthesis arm
-trace.NP1 <- 
-colnames(trace.NP1) <- state.names
-
-trace.NP1[1,] <- 
-
-for (i in 2:cycles) {
   
   mortality <- 
   ## tranisitions out of P-THR
@@ -245,10 +242,21 @@ for (i in 2:cycles) {
   tm.NP1["R-THR","successR-THR",i] <- 1 -   
   ## transitions out of success-THR
   tm.NP1["successR-THR","R-THR",i] <-   
-  tm.NP1["successR-THR",5,i] <- 
+  tm.NP1["successR-THR","Death",i] <- 
   tm.NP1["successR-THR","successR-THR",i] <-
-  
+      
   tm.NP1["Death","Death",i] <- 1 ## no transitions out of death
+}
+
+tm.NP1
+
+#  Create a trace for the standard prosthesis arm
+trace.NP1 <- 
+colnames(trace.NP1) <- state.names
+
+trace.NP1[1,] <- 
+
+for (i in 2:cycles) {
   
 }
 trace.NP1

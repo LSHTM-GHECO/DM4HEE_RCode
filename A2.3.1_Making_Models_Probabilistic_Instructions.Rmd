@@ -25,7 +25,7 @@ source("A2.3.3_Making_Models_Probabilistic_Solutions.R", local = knitr::knit_glo
 
 ## Overview
 
-The aim of this exercise is to demonstrate how a deterministic Markov model can be made probabilistic by fitting distributions to parameters.  Emphasis is on choosing the correct distribution for different types of parameters and on correlating parameters using the Cholesky decomposition of a variance-covariance matrix. This Module will focus on coding the model to perform one probabilistic run (or simulation). In Module 3 we will look at storing and analysing the results of many model simulatons. 
+The aim of this exercise is to demonstrate how a deterministic Markov model can be made probabilistic by fitting distributions to parameters.  Emphasis is on choosing the correct distribution for different types of parameters and on correlating parameters using the Cholesky decomposition of a variance-covariance matrix. This Module will focus on coding the model to perform one probabilistic run (or simulation). In Module 3 we will look at storing and analysing the results of many model simulatons.
 
 The step-by-step guide below will take you through a number of stages of making the model probabilistic:
 
@@ -50,9 +50,11 @@ To work through this exercise, you will need to have the following csv files ava
 
 (@) **Setting up the 'Parameters' section for probabilistic analysis**
 
-Before working on the code within this section, reacquaint yourself with the 'hazardfunction' data - these are the results from the regression analysis used in Module 1. You can also open the 'cov55'  CSV files, which is the corresponding covariance matrix. Take a moment familiarise yourself with these data. You’ll first need to read in these data files using the read.csv functions. We've converted the life-table from a data.frame into a data.table (as we will need to use data.table functionality for these data later on).
+Before working on the code within this section, reacquaint yourself with the 'hazardfunction' data - these are the results from the regression analysis used in Module 1. You can also open the 'cov55'  CSV files, which is the corresponding covariance matrix. Take a moment familiarise yourself with these data. You’ll first need to read in these data files using the read.csv functions.
 
-Firstly, start by defining all parameters that are not drawn from distributions for the probabilistic analysis: patient characteristics (age & sex), discount rates and prosthesis costs - these are to be left deterministic.  Before starting on the exercise, ensure that you are totally happy with why these parameters will not form part of the probabilistic analysis.
+Firstly, within the 'Deterministic parameters section', start by defining all parameters that are not drawn from distributions for the probabilistic analysis: patient characteristics (age & sex), discount rates and prosthesis costs - these are to be left deterministic, and the parameter values have been provided for you.  Before starting on the exercise, ensure that you are totally happy with why these parameters will not form part of the probabilistic analysis.
+
+Next, we will move to the 'Probabilistic parameters' section (Line 34), to sampling values from distributions. 
 
 (@) **Fitting Beta distributions to (constant) probability parameters** 
 
@@ -62,19 +64,21 @@ The following information has been provided to you concerning operative mortalit
 
 1) Use this information to specify the parameters (alpha and beta) of a beta distribution for the probability of operative mortality during primary surgery. These are noted by "`a.`" and "`b.`" respectively. Your beta values for operative mortality should be equivalent to __`r b.PTHR2dead`__  (but make sure you understand how the number was derived!).
 
-ii) Use the `rbeta()` function to generate a random draw from this distribution to define `tp.PTHR2dead`. Note that the rbeta function takes 3 arguments, first the number of draws or samples, the alpha parameter (named shape1) and the beta parameter (named shape2). Check the following code to see a demonstration. 
+ii) Use the `rbeta()` function to generate one random draw from this distribution to define `tp.PTHR2dead`. Note that the rbeta function takes 3 arguments, first the number of draws or samples, the alpha parameter (named shape1) and the beta parameter (named shape2). If you are unsure of how the rbeta function works, check the following code to see a demonstration of five samples, before you begin assigning values in this exercise. 
 
 ```{r, echo=TRUE}
 rbeta(n = 5, shape1 = 50, shape2 = 100)
 ```
 
+Notice that when you re-run `rbeta()` function, a different sample will be drawn each time (hence why it is probabilistic). We have shown you the code to draw 5 samples above, but for the `tp.PTHR2dead` parameter, ensure that you only assign one sampled value.
+
 iii) Since no information is available on operative mortality following a revision procedure, use the same distribution again for this parameter (`tp.RTHR2dead`).
 
-The following information has been provided to you concerning revision procedures among patients already having had a revision operation.
+The following information has been provided to you concerning revision procedures among patients already having had a revision operation (i.e. the re-revision risk).
 
 *'The hospital records of a sample of 100 patients having experienced a revision procedure to replace a failed primary THR were reviewed at one year.  During this time, four patients had undergone a further revision procedure.'*
 
-iv) Use this information to fit a constant transition probability for the annual re-revision rate parameter, using the same approach as for operative mortality above. Your beta value for re-revision risk should be equivalent to __`r b.rrr`__ .
+iv) Use this information to fit a constant transition probability for the annual re-revision rate parameter (`tp.rrr`), using the same approach as for operative mortality above. Your beta value for re-revision risk should be equivalent to __`r b.rrr`__ .
 
 You should now have three probabilistic parameters (`tp.PTHR2dead`, `tp.PTHR2dead` and `tp.rrr`), that should automatically generate a new value from the specified distribution when you rerun the random draw assignments for these values. You can test this by re-running this section of the code and seeing the different results.
 
@@ -98,7 +102,10 @@ You are given the following information regarding the cost of revising a failed 
 
 i) Define the mean and standard error values for costs of a revision procedure. 
 
-ii) Use the method of moments approach described in the presentation to calculate the parameters (alpha and beta) of a Gamma distribution that has the corresponding mean and standard error.
+ii) Use the method of moments approach described in the presentation to calculate the parameters (alpha and beta) of a Gamma distribution that has the corresponding mean and standard error. The formulae for alpha and beta are also provided below, where $\overline{m}$ equals the sample mean, and $s$ equals the standard error.
+
+$$ \alpha  = \frac {\overline{m}^2} {s^2}$$
+$$ \beta  = \frac {s^2}{\overline{m}}   $$
 
 iii) Use the `rgamma()` function to generate a random draw from this distribution. *(Hint: the base R functions for distributions tend to use the same arguments: number of draws or samples, followed by the shape and/or scale parameters)*
 
@@ -124,7 +131,13 @@ You are given the following information on utilities for patients experiencing d
 
 i) Enter the means and standard errors for these parameters 
 
-ii) Obtain the Beta parameters corresponding to these means and standard errors by method of moments. Use the `rbeta()` function in cells to generate random draws from these distributions. Do this first for utility of successful primary prosthesis, and repeat for the 2 other utility values that need specifying. 
+Next, you need to obtain the Beta parameters corresponding to these means and standard errors by method of moments. The formulae are provided below (and are also provided in the videos). 
+
+$$ (\alpha + \beta) = \frac {\overline{m}(1-\overline{m})} {s^2} -1 $$
+
+$$ \alpha =  \overline{m} (\alpha + \beta) $$ 
+
+ii)  Use the `rbeta()` function in cells to generate random draws from these distributions. Do this first for utility of successful primary prosthesis, and repeat for the 2 other utility values that need specifying. 
 
 iii) Create a vector of utility values for the states of the model (matching the `state.names` order of health states).
 
@@ -143,9 +156,9 @@ print(state.utilities)
 We now implement the Cholesky decomposition matrix method in the model.  Look at the 'Hazard function' section, which gives the results of a regression analysis for the hazard ratio.  You have used these results before when constructing the deterministic model, but now we have added the covariance matrix for the parameters.  It should be clear that, while some parameters do not have a strong relationship, there are strong relationships within this set of parameters – particularly between the regression constant and the other parameters.
 
 
-i) Note that the covariance matrix you have been given is a  matrix in `cov55.csv`.  To turn this into a lower triangular Cholesky decomposition of the covariance matrix we have presented 2 options; in the main script the `chol()` function [as a note you have to transpose the cov55 matrix before reading in and then transpose back to get the format of the lower triangular Cholesky decomposition due to the way the function reads in and outputs data], but to understand what is actually happening take a look at the `cholesky_decomposition.R` script provided within this course. Take a few moments to understand how this was obtained.
+i) Note that the covariance matrix you have been given is a  matrix in `cov55.csv`.  To turn this into a lower triangular Cholesky decomposition of the covariance matrix we have presented 2 options; in the main script the `chol()` function (note you have to transpose the cov55 matrix using `t()` before reading in and then transpose back to get the format of the lower triangular Cholesky decomposition due to the way the function reads in and outputs data), but to understand what is actually happening take a look at the `cholesky_decomposition.R` script provided within this course. Take a few moments to understand how this was obtained.
 
-ii) Create a vector (z) or 5 random values drawn from the standard normal distribution using the `rnorm()` function.
+ii) Create a vector (`z`) of 5 random values drawn from the standard normal distribution using the `rnorm()` function. This should have a mean of 0 and a standard deviation of 1. 
 
 iii) Enter the solution of the `Tz` matrix calculation: that is the Cholesky decomposition matrix multiplied by the vector of standard normal variates _(Hint: use `%*% `)_.
 
