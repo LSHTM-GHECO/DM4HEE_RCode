@@ -187,7 +187,6 @@ tm.SP0 <-     ## an empty array of dimenions (number of states, number of states
 ### create a loop that creates a time dependent transition matrix for each cycle
 for (i in 1:cycles) {
   
-  mortality <- death.risk[i, col.key]
   ## tranisitions out of P-THR
   tm.SP0["P-THR","Death",i] <- 
   tm.SP0["P-THR","successP-THR",i] <-
@@ -229,7 +228,6 @@ tm.NP1 <-    ## an empty array of dimenions (number of states, number of states,
 ### create a loop that creates a time dependent transition matrix for each cycle
 for (i in 1:cycles) {
   
-  mortality <- 
   ## tranisitions out of P-THR
   tm.NP1["P-THR","Death",i] <-    ## Primary THR either enter the death state or.. or..
   tm.NP1["P-THR","successP-THR",i] <-    ## they go into the success THR state 

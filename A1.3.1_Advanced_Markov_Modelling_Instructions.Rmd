@@ -156,7 +156,7 @@ i) Start by creating an empty array of an empty array of dimensions (number of s
 tm.SP0[,,1:2]
 ```
 
-The structure of a for loop has been created for you. You want this loop to create the correct transition matrix for each corresponding cycle, from cycle 1 to cycle 60 (hence why there are 60 loops). The start of the loop has been completed for you, with transitions from the 'P-THR' and 'successP-THR' health states completed for you. Take note of how the appropriate time dependent transitions are selected (for both mortality and for the revsision risk). 
+The structure of a for loop has been created for you. You want this loop to create the correct transition matrix for each corresponding cycle, from cycle 1 to cycle 60 (hence why there are 60 loops). The start of the loop has been completed for you, with the correct transitions from the 'P-THR' and 'successP-THR' health states completed. Take note of how the appropriate time dependent transitions are selected. For background mortality, this is taken from the `death.risk` data frame, selecting the appropriate value using the cycle number - indicated by 'i', and the column key defined above (to select male of female risk value). Similarly for the revision risk, the 'i' element is selected from the `revision.risk.sp0` vector, to assign the correct risk to the appropriate transition matrix for that cycle). 
 
 ii) Refamiliarise yourself with the diagram of the model, and then complete the remaining transitions for each cycle, from the 'R-THR' and 'successR-THR' health states.
 

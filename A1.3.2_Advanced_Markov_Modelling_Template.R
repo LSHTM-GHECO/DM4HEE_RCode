@@ -108,9 +108,7 @@ tm.SP0 <- array(data = , dim = c( , , ),
 ### create a loop that creates a time dependent transition matrix for each cycle
 for (i in 1:cycles) {
   
-  ## First we get the correct mortality risk for each cycle 
-  mortality <- death.risk[i,col.key] ## This could also be taken from tdtps data frame e.g. tdtps[i,col.key]
-  
+
   ## tranisitions out of P-THR
   ## remember you can refer to transitions using state names such as... 
   tm.SP0["P-THR","Death",i] <- tp.PTHR2dead ## Primary THR either enter the death state or.. or..
@@ -118,8 +116,8 @@ for (i in 1:cycles) {
   
   ## transitions out of success-P-THR
   tm.SP0["successP-THR","R-THR",i] <- revision.risk.sp0[i] # you could also refer to the corersponding tdtps column
-  tm.SP0["successP-THR","Death",i] <- mortality
-  tm.SP0["successP-THR","successP-THR",i] <- 1-revision.risk.sp0[i] - mortality
+  tm.SP0["successP-THR","Death",i] <- death.risk[i,col.key]
+  tm.SP0["successP-THR","successP-THR",i] <- 1-revision.risk.sp0[i] - death.risk[i,col.key]
   
   ## Now complete the remaining transitions out of R-THR 
   tm.SP0["R-THR","Death",i] <- 
@@ -194,7 +192,6 @@ tm.NP1 <-   ## an empty array of dimenions (number of states, number of states, 
 ### create a loop that creates a time dependent transition matrix for each cycle
 for (i in 1:cycles) {
 
-  mortality <- 
   ## tranisitions out of P-THR
   tm.NP1["P-THR","Death",i] <- 
   tm.NP1["P-THR","successP-THR",i] <- 
