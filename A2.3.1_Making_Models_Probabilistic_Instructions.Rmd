@@ -104,8 +104,7 @@ i) Define the mean and standard error values for costs of a revision procedure.
 
 ii) Use the method of moments approach described in the presentation to calculate the parameters (alpha and beta) of a Gamma distribution that has the corresponding mean and standard error. The formulae for alpha and beta are also provided below, where $\overline{m}$ equals the sample mean, and $s$ equals the standard error.
 
-$$ \alpha  = \frac {\overline{m}^2} {s^2}$$
-$$ \beta  = \frac {s^2}{\overline{m}}   $$
+$$ \alpha  = \frac {\overline{m}^2} {s^2},  \qquad  \beta  = \frac {s^2}{\overline{m}}   $$
 
 iii) Use the `rgamma()` function to generate a random draw from this distribution. *(Hint: the base R functions for distributions tend to use the same arguments: number of draws or samples, followed by the shape and/or scale parameters)*
 
