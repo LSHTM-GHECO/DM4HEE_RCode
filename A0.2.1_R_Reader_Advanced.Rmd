@@ -21,7 +21,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Welcome to the R Stream of the Decision Modelling for Health Economic Evaluation - the Advanced Course! 
 
-Over the course of the next few modules we will cover how to code Advanced Markov Models (Module 1), Making Models Probablistic (Module 2), Presenting Simulation Results (Module 2) and Value of Information Analyses (Module 4).
+Over the course of the next few modules we will cover how to code Advanced Markov Models (Module 1), Making Models Probablistic (Module 2), Presenting Simulation Results (Module 3) and Value of Information Analyses (Module 4).
 
 This course stream is not intended to teach you how to use R, but rather to teach potential ways of constructing health economic evaluation models within R. For more information on how to use R seek readily available resources such as:
 
@@ -44,9 +44,9 @@ Each Module has the following:
 
 * A solutions R script (e.g. "A1.3.1_Advanced_Markov_Modelling_Solutions.pdf" which refers to Advanced Module 2, R stream, File 3) which provides a filled in model code script. If you run this R script (having in mind the section below about directory set up), this will provide the fully functional models and results. 
 
-For Modules 3 and 4, there Template and Solution files are split into 'Part 1' and 'Part 2', you will be walked through when to use which within the Instructions pdf.
+For Modules 3 and 4, the Template and Solution files are split into 'Part 1' and 'Part 2', and the Instructions pdf will walk you through when to use which.
 
-We mention "sections" within the R scripts (such as 'see <Parameters> section') for this course, similar to how you might refer to sheets in Excel. If you are using RStudio, sections can be selected using the bottom left of the Source panel or alternativly using the document outline functionality (top right of the Source panel).
+We mention "sections" within the R scripts (such as "see 'Parameters' section"") for this course, similar to how you might refer to sheets in Excel. If you are using RStudio, sections can be selected using the bottom left of the Source panel or alternatively using the document outline functionality (top right of the Source panel).
 
 ## Additional Files and Scripts for the Advanced Course
 

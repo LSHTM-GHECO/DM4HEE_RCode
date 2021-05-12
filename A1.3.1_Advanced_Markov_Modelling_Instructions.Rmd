@@ -38,8 +38,6 @@ In this exercise we will be focusing on:
 Before beginning the exercise take a moment to familiarise yourself with the R template for the exercise, ‘A1.3.1_Advanced_Markov_Modelling_Template.R' and the figure below. Figure A1.3.1a contains the overall structure of the model you are about to build and it will be worth you spending a little time familiarising yourself with this figure.  It contains state transition diagram of the four-state Markov model you will be building and contains a key to the different parameters of the model, which are seperated into three categories: transition probabilities, state costs and state utilities.  
 The model itself is constructed across a number of sections with separate sections for the parameters of the model and the final analysis, for the survival analysis used to estimate prosthesis failure rates, for each of the Markov model arms and for the life tables used for mortality rates.  Of course, there are many ways to structure models – much being down to personal preference.  However, we hope that you will find that our chosen way of presenting the model does not deviate too much from your own preferences!
 
-\newpage 
-
 **Figure A1.3.1a** 
 
 ![](markov_diagram.png)
@@ -77,13 +75,13 @@ Open the 'corresponding'A1.3.2_Advanced_Markov_Modelling_Template.R' file and st
 
 The aim of this section of the exercise is to prepare the 'Parameters' section to facilitate the use of parameter names throughout the rest of the modelling exercise.  
 
-On opening the section you will see that some of the work has been done for you, including entry of patient characteristics, the inclusion of standard discounting rates, and the cost of the two prostheses that we are seeking to evaluate.  This section will guide you through the completion of the parameter information for the (constant) transition probabilities (taken from the model figure), the state costs and the state utilities.
+On opening the section you will see that some of the work has been done for you, including entry of patient characteristics (age and sex), the inclusion of standard discounting rates, and (further down the script)the cost of the two prostheses that we are seeking to evaluate.  This section will guide you through the completion of the parameter information for the (constant) transition probabilities (taken from the model figure), the state costs and the state utilities.
 
 i) We will start with the three transition probabilities that will be assumed to be constant in the model: the operative mortality rates and the re-revision rate parameters, which are named as “`tp.`” variables. We will assume that the operative mortality is 2% for both primary and revision procedures and that the re-revision rate is 4% per annum.  Enter these values now.
 
-ii) Now we deal with the costs in the model.  Note that the costs of the prostheses (standard and new) have already been entered for you.  That leaves the costs for the states of the model.  However, the state cost for the primary procedure is assumed to be the same irrespective of the implant – we therefore leave this out (since it is received by both arms and nets out of the analysis, but would be important if you were interested in total costs for each arm).  We also assume for the purposes of this model that there is no ongoing cost to the health service if people have a successful implant in place.  Therefore the only cost to consider at this point is the cost of the revision procedure itself.  This has been estimated as £5,294 and this should be entered into `c.revision`. Afterwards, create a vector (`state.costs`) that combines all of these costs, remember that the order is important and should match the order of states that you will use in the state transition matrix (and should match the order of states listed in the `state.names` vector above). 
+ii) Now we deal with the costs in the model.  Note that the costs of the standard and new prostheses (named `c.SP0` and `c.NP1` ) have already been entered for you.  That leaves the costs for the states of the model.  However, the state cost for the primary hospital procedure is assumed to be the same irrespective of the implant – we therefore leave this out (since it is received by both arms and nets out of the analysis, but would be important if you were interested in total costs for each arm).  We also assume for the purposes of this model that there is no ongoing cost to the health service if people have a successful implant in place. Therefore the health state cost can be assigned  zero in the model.  Therefore the only cost to consider at this point is the cost of the revision procedure itself.  This has been estimated as £5,294 and this should be entered into `c.revision`. Afterwards, create a vector (named `state.costs`) that combines all of these costs, and remember that the order is important and should match the order of states that you will use in the state transition matrix (and should match the order of states listed in the `state.names` vector above). 
 
-iii) Create two effect vectors; one for the life year effects of each health state and one for quality-adjusted life years (hint: these vectors also need to be the same length as the numer of health staets - 5). The quality of life utilities of a year spent in each of the model health states has been estimated to be 0.85, 0.3 and 0.75 for the Successful primary, Revision, and Successful revision health states respectively.   The utility value for those in the 'Primary' state are not counted since these individuals do not remain in this state after the first cycle. You can therefore assign a value of 0 quality of life to this state (although any value would not impact the results). Enter these values into the respective `u.` variables. Pull this information together by creating a utility vector, and remember this should match the same state order for costs as previously defined.
+iii) Create two effect vectors; one for the life year effects of each health state and one for quality-adjusted life years (hint: these vectors also need to be the same length as the numer of health states - 5). For the life years vector, the values will consist of 0 or 1, since the cycle length is one year and therefore one cycle alive equals one life year). The quality of life utilities of a year spent in each of the model health states has been estimated to be 0.85, 0.3 and 0.75 for the Successful primary, Revision, and Successful revision health states respectively. The utility value for those in the 'Primary' state are not counted since these individuals do not remain in this state after the first cycle. You can therefore assign a value of 0 quality of life to this state (although any value would not impact the results). Enter these values into the respective `u.` variables. Then pull this information together by creating a vector of these utility values, and remember this should match the same state order for costs as previously defined.
 
 You should now have the following vectors defined as follows:
 
@@ -161,21 +159,29 @@ i) Start by creating an empty array of an empty array of dimensions (number of s
 tm.SP0[,,1:2]
 ```
 
-ii) Create a for loop that for cycle 1 to cycle 60 that creates the correct transition matrix for each corresponding cycle. Refamiliarise yourself with the diagram of the model to highlight which transitions need to be filled. 
+The structure of a for loop has been created for you. You want this loop to create the correct transition matrix for each corresponding cycle, from cycle 1 to cycle 60 (hence why there are 60 loops). The start of the loop has been completed for you, with transitions from the 'P-THR' and 'successP-THR' health states completed for you. Take note of how the appropriate time dependent transitions are selected (for both mortality and for the revsision risk). 
 
-We then are concerned with generating the Markov trace: that is showing the numbers of patients that are in any one state at any one time. 
+ii) Refamiliarise yourself with the diagram of the model, and then complete the remaining transitions for each cycle, from the 'R-THR' and 'successR-THR' health states.
 
-i) First create the first cycle trace by multiplying the seed population (cycle0) by the transition matrix for cycle1
+Once you have completed the array with all transition matrices, we then are concerned with generating the Markov trace: that is showing the numbers of patients that are in any one state at any one time. 
+
+i) First create the first cycle trace by multiplying the seed population (cycle0) by the transition matrix for cycle1 _(Hint: use %*% to perform a matrix multiplication)_
 
 ii) Create a for loop for cycle 2 to cycle 60 that multiplies populations within cycles with the correct transition matrix *[Hint: you will have to “look back” if starting from cycle2]*
 
 iii) Take a look at the trace that you’ve constructed, provide a check (for example, check the sum across rows must always equal the size of the original cohort).
 
+(@) **Calculating costs and effects** 
+
 Now that we have the Markov trace we can calculate the cost and effects for each cycle of the model.
 
-i) Calculate the life years for the standard treatment arm using the trace outputs and the life year vector.  By doing this without quality adjustment or discounting, this column can be used to calculate life-expectancy (which is often useful – but not particularly in this example). _[Hint: `%*%` is a useful matrix multiplier]_
+i) Calculate the life years for the standard treatment arm using the trace outputs and the life year vector.  By doing this without quality adjustment or discounting, this column can be used to calculate life-expectancy (which is often useful – but not particularly in this example). We have provided the code for you here, so that you can see how the life year vector is multiplied by the trace - using `%*%` for matrix multiplification. *(Hint: use this code as a guide to perform the remaining calculations for QALYs and costs)* 
 
-ii) Now calculate quality adjusted life years (QALYs).  However, this is undiscounted.  Therefore, we need to apply the standard discount formula, you can do this by creating a matrix (`discount.factor.o`) which specifies the discount factor that needs to be applied for each cycle. This should look like this:
+ii) Now calculate quality adjusted life years (QALYs). However, this is undiscounted.  Therefore, we need to apply the standard discount formula, you can do this by creating a vector (`discount.factor.o`) which specifies the discount factor that needs to be applied for each cycle. The discount formula is given below, where *r* is the discount rate, and *t* is time (in years):
+
+$$ 1 / (1 + r)^t $$
+
+Note that for the above, if you provide *t* as a vector, then the formula will return a vector *(Hint: use the 'cycle.v' vector as the years, since each cycle is one year)*. Once you have completed this, the vector should look like this:
 
 ```{r, echo = FALSE}
 print(discount.factor.o)
@@ -187,9 +193,11 @@ iii) Calculate the costs in a similar manner (but this time with the state cost 
 
 iv) We also now want to include the cost of the original prosthesis, there are many ways to do this, but since it is a one off cost occurring in `cycle0`, here we can add on at the end.
 
-v) Finally, sum the columns to get the per patient predictions of cost, life expectancy and QALYs for this arm of the model.  
+v) Sum the columns to get the per patient predictions of cost, life expectancy and QALYs for this arm of the model.  
 
-Now perform the same processes for the NP1 treatment arm within the <NP1> section, then create an output matrix storing the differences in treatment costs and effects, and incremental cost-effectiveness ratio in the <Analysis> section. You should have an incremental cost-effectiveness ratio of __£`r round(output[3])`__ per QALY gained.
+Now that you have the results for the standard prosthesis, perform the same processes for the NP1 treatment arm within the 'NP1' section. Some sections have been made more difficult for you (e.g. generating the transition matrices), but you can use the code above to help you). 
+
+vi) Finally, create an output matrix storing the differences in treatment costs and effects, and incremental cost-effectiveness ratio in the 'Analysis' section. You should have an incremental cost-effectiveness ratio of __£`r round(output[3])`__ per QALY gained.
 
 Congratulations! Your Markov model is now complete.  
 

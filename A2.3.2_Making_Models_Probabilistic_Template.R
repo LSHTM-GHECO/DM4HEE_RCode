@@ -43,13 +43,13 @@ seed <- c(1,0,0,0,0)
 a.PTHR2dead <-     ## alpha value for operative mortality from primary surgery
 b.PTHR2dead <-     ## beta value for operative mortality from primary surgery
 
-tp.PTHR2dead <-      ## Operative mortality rate  (OMR) following primary THR
+tp.PTHR2dead <-   rbeta(n = , shape1 = , shape2 = )   ## Operative mortality rate  (OMR) following primary THR
 # since we assume the same shape parameters for RTHR : 
-tp.RTHR2dead <-      ## Operative mortality rate (OMR) following revision THR
+tp.RTHR2dead <-   rbeta( )   ## Operative mortality rate (OMR) following revision THR
 
 a.rrr <-     ## alpha value for re-revision risk
 b.rrr <-     ## beta value for re-revision risk
-tp.rrr <-    ## Re-revision risk transition probability
+tp.rrr <-    ## Re-revision risk transition probability (beta distribution)
 
 tp.PTHR2dead
 tp.RTHR2dead
@@ -125,7 +125,7 @@ mn.ageC <- hazards$coefficient[3] ## Age coefficient
 mn.maleC <- hazards$coefficient[4] ## Male coefficient 
 mn.NP1 <- hazards$coefficient[5] ## NP1 coefficient
 
-mn<-c(mn.lngamma, mn.cons,mn.ageC,mn.maleC,mn.NP1) ## vector of mean values from the regression analysis
+mn <- c(mn.lngamma, mn.cons,mn.ageC,mn.maleC,mn.NP1) ## vector of mean values from the regression analysis
 
 cholm <- t(chol(t(cov.55))) ## lower triangle of the Cholesky decomposition
 

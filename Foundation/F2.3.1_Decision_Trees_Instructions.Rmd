@@ -48,9 +48,9 @@ Discussions with professional staff indicate that the following assumptions can 
 
 ### Decision Tree Figure 
 
-To help visualise the decision tree model structure, we have provided the decision tree and conditional probabilities for each branch below: 
+To help visualise the decision tree model structure, we have provided the decision tree and conditional probabilities for each branch below. We have also provided a naming convention for each pathway, which matches the names used in the R code: 
 
-![](DecisionTreeHIV.png)
+![](DecisionTreeHIV2.png)
 
 It should be noted that our outcome of interest in this example is cost per HIV-infection avoided in a child, as such the decision tree ends with HIV-infection status of the child. 
 
@@ -58,7 +58,7 @@ It should be noted that our outcome of interest in this example is cost per HIV-
 
 ## Tasks
 
-i) First, assign the appropriate values to each parameter, using the data derived from the literature review, given above within the <Parameters> section of the Template R script (we have listed the variable names for you). 
+i) First, assign the appropriate values to each parameter, using the data derived from the literature review, given above within the 'Parameters' section of the Template R script (we have listed the variable names for you). 
 
 ii) Within the <Decision Tree> section, create each of the five pathways - shown in the figure above - for the testing arm of the decision tree, estimating the pathway probabilities, costs, and cases (HIV births due to vertical transmission) for each pathway. _(Hint: We have provided a naming convention, working through pathways 1 to 5 for the testing arm and have completed the first one for you)._
 

@@ -85,6 +85,7 @@ A.AsympHIV.AZT <- c(tp.A2A, tp.A2B, tp.A2C, tp.A2D) ## all of the transitions ou
 B.SympHIV.AZT <- c(0, tp.B2B, tp.B2C, tp.B2D) 
 C.AIDS.AZT <- c(0, 0, tp.C2C, tp.C2D)
 D.Death <- c(0,0,0,1) ## as nobody transitions out of dead the transition probability of staying in dead, once in dead, is equal to 1
+## as nobody transitions out of dead the transition probability of staying in dead, once in dead, is equal to 1
 
 tm.AZT <- matrix(c(A.AsympHIV.AZT,B.SympHIV.AZT,C.AIDS.AZT,D.Death), 
                  nrow = n.states, ncol=n.states, byrow = TRUE)
@@ -127,6 +128,7 @@ ly.AZT
 undisc.ly.AZT <- colSums(ly.AZT) ## calculating the total LYs from AZT arm
 undisc.ly.AZT 
 
+
 discount.factor.o <- matrix(data=NA, nrow=1, ncol=cycles)
 for (i in 1:cycles) {
   discount.factor.o[1,i]<-1/(1+dr.o)^i
@@ -135,6 +137,7 @@ discount.factor.o
 
 disc.ly.AZT <- discount.factor.o %*% ly.AZT ##multiply the discount factor matrix and the outcome matrix of the AZT arm
 disc.ly.AZT
+
 
 #### COST CALCULATIONS #####
 ## undiscounted:
@@ -163,6 +166,7 @@ C.AIDS.comb <- c(0,0,1-tp.C2D*RR,tp.C2D*RR)
 
 tm.comb <- matrix(c(A.AsympHIV.comb, B.SympHIV.comb, C.AIDS.comb, D.Death), 
        nrow = n.states, ncol=n.states, byrow = TRUE)
+
 rownames(tm.comb) <- state.names
 colnames(tm.comb) <- state.names
 tm.comb
@@ -179,6 +183,7 @@ trace.comb[2,] <- trace.comb[1,]%*%tm.comb
 for (i in 3:cycles) {
   trace.comb[i,] <- trace.comb[i-1,]%*%tm.AZT
 }
+
 trace.comb
 
 ly.comb <- trace.comb%*%LY
@@ -191,6 +196,7 @@ disc.ly.comb <- discount.factor.o%*%ly.comb
 disc.ly.comb
 
 cost.comb<-trace.comb%*%c.dmc+trace.comb%*%c.ccc+trace.comb%*%c.azt
+
 ## we need to replace rows 1 and 2 to add in the cost of lamivudine for years 1 and 2
 cost.comb[1,1] <- cost.comb[1,1] + (trace.comb[1,1] + trace.comb[1,2] + trace.comb[1,3]) *c.LAM
 cost.comb[2,1] <- cost.comb[2,1] + (trace.comb[2,1] + trace.comb[2,2] + trace.comb[2,3]) *c.LAM
@@ -221,5 +227,4 @@ round(output, 2)
 ## More efficient code for discounting is defined below, there are many other ways to do this, you can check results against your chosen method
 discount.factor.o <- matrix(1/(1+dr.o) ^ c(1:cycles), nrow = 1, ncol = cycles)
 discount.factor.c <- matrix(1/(1+dr.c) ^ c(1:cycles), nrow = 1, ncol = cycles)
-
 
