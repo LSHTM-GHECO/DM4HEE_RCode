@@ -2,10 +2,6 @@
 #  Advanced Course Exercise 1: SOLUTION FILE
 #  Authors: Andrew Briggs, Jack Williams & Nichola Naylor
 
-### Loading useful packages
-library(data.table)
-library(tidyr)
-library(dplyr)
 
 #########**** PARAMETERS *****######
 #  Start by defining parameters
@@ -77,12 +73,13 @@ cycle.v <- 1:cycles ## a vector of cycle numbers 1 - 60
 current.age <- age + cycle.v ## a vector of cohort age throughout the model
 current.age
 
-## creating a table that has every age of the cohort plus death risks associated with that age
-life.table <- as.data.table(life.table) ## turning life.table into a data.table 
-death.risk <- as.data.table(current.age) ## turning current age into a data.table 
-setkey(life.table,"Index") ## using the setkey function (read about it by typing in ?setkey in the console)
-setkey(death.risk,"current.age") ## using the setkey function for death.risk to sort and set current.age as the key
-death.risk <- life.table[death.risk, roll=TRUE] ## joining life.table and death.risk by the key columns, rolling forward between index values
+## Creating a table that has every age of the cohort plus death risks associated with that age
+# This finds the position of age, within the life table 
+interval <- findInterval(current.age, life.table$Index)
+# These positions can then be used to subset the appropriate values from life.table
+death.risk <- data.frame(age = current.age, 
+                         males = life.table[interval,3],
+                         females = life.table[interval,4])
 
 ####**** STANDARD *****#####
 
@@ -94,13 +91,13 @@ revision.risk.np1 <- 1- exp(lambda * RR.NP1 * ((cycle.v-1) ^gamma-cycle.v ^gamma
 revision.risk.sp0 ## the time dependent risk of revision for standard treatment
 revision.risk.np1 ## the time dependent risk of revision for NP1
 
-# combining risks into a time-dependent transition probability data.table
-tdtps <- data.table(death.risk, revision.risk.sp0, revision.risk.np1)
+# combining risks into a time-dependent transition probability data.frame
+tdtps <- data.frame(death.risk, revision.risk.sp0, revision.risk.np1)
 tdtps
 
 ## creating an indicator which selects the death risk column depending on the sex the model is being run on
-col.key <- 4-male ## 4 indicates the 4th column of tdps (which is female risk of death)
-                  ## when male=1 (i.e. male selected as sex) this becomes the 3rd column (which is male risk of death)
+col.key <- 3-male ## 3 indicates the 3rd column of tdps (which is female risk of death)
+                  ## when male=1 (i.e. male selected as sex) this becomes the 2nd column (which is male risk of death)
 
 #  Now create a transition matrix for the standard prosthesis arm
 #  We start with a three dimensional array in order to capture the time dependencies
@@ -111,9 +108,6 @@ tm.SP0 <- array(data=0,dim=c(n.states, n.states, cycles),
 ### create a loop that creates a time dependent transition matrix for each cycle
 for (i in 1:cycles) {
   
-  ## First we get the correct mortality risk for each cycle 
-  mortality <- as.numeric(tdtps[i,..col.key]) 
-  
   ## tranisitions out of P-THR
   
   tm.SP0["P-THR","Death",i] <- tp.PTHR2dead ## Primary THR either enter the death state or.. or..
@@ -121,17 +115,17 @@ for (i in 1:cycles) {
   
   ## transitions out of success-P-THR
   tm.SP0["successP-THR","R-THR",i] <- revision.risk.sp0[i] ## you could also refer to the corersponding tdtps column
-  tm.SP0["successP-THR","Death",i] <- mortality
-  tm.SP0["successP-THR","successP-THR",i] <- 1-revision.risk.sp0[i] - mortality
+  tm.SP0["successP-THR","Death",i] <- death.risk[i,col.key]
+  tm.SP0["successP-THR","successP-THR",i] <- 1-revision.risk.sp0[i] - death.risk[i,col.key]
   
   ## transitions out of R-THR 
-  tm.SP0["R-THR","Death",i] <- tp.RTHR2dead + mortality
-  tm.SP0["R-THR","successR-THR",i] <- 1 - tp.RTHR2dead - mortality 
+  tm.SP0["R-THR","Death",i] <- tp.RTHR2dead + death.risk[i,col.key]
+  tm.SP0["R-THR","successR-THR",i] <- 1 - tp.RTHR2dead - death.risk[i,col.key] 
   
   ## transitions out of success-THR
   tm.SP0["successR-THR","R-THR",i] <- tp.rrr
-  tm.SP0["successR-THR","Death",i] <- mortality
-  tm.SP0["successR-THR","successR-THR",i] <- 1 - tp.rrr - mortality
+  tm.SP0["successR-THR","Death",i] <- death.risk[i,col.key]
+  tm.SP0["successR-THR","successR-THR",i] <- 1 - tp.rrr - death.risk[i,col.key]
   
   tm.SP0["Death","Death",i] <- 1 ## no transitions out of death
 }
@@ -197,21 +191,21 @@ tm.NP1 <- array(data=0,dim=c(n.states, n.states, cycles),
 ### create a loop that creates a time dependent transition matrix for each cycle
 for (i in 1:cycles) {
   
-  mortality <- as.numeric(tdtps[i,..col.key]) 
+ 
   ## tranisitions out of P-THR
   tm.NP1["P-THR","Death",i] <- tp.PTHR2dead ## Primary THR either enter the death state or.. or..
   tm.NP1["P-THR","successP-THR",i] <- 1 - tp.PTHR2dead ## they go into the success THR state 
   ## transitions out of success-P-THR
   tm.NP1["successP-THR","R-THR",i] <- revision.risk.np1[i] ## revision risk with NP1 treatment arm 
-  tm.NP1["successP-THR","Death",i] <- mortality
-  tm.NP1["successP-THR","successP-THR",i] <- 1 - revision.risk.np1[i] - mortality
+  tm.NP1["successP-THR","Death",i] <- death.risk[i, col.key]
+  tm.NP1["successP-THR","successP-THR",i] <- 1 - revision.risk.np1[i] - death.risk[i, col.key]
   ## transitions out of R-THR 
-  tm.NP1["R-THR","Death",i] <- tp.RTHR2dead + mortality
-  tm.NP1["R-THR","successR-THR",i] <- 1 - tp.RTHR2dead - mortality 
+  tm.NP1["R-THR","Death",i] <- tp.RTHR2dead + death.risk[i, col.key]
+  tm.NP1["R-THR","successR-THR",i] <- 1 - tp.RTHR2dead - death.risk[i, col.key] 
   ## transitions out of success-THR
   tm.NP1["successR-THR","R-THR",i] <- tp.rrr
-  tm.NP1["successR-THR","Death",i] <- mortality
-  tm.NP1["successR-THR","successR-THR",i] <- 1 - tp.rrr - mortality
+  tm.NP1["successR-THR","Death",i] <- death.risk[i, col.key]
+  tm.NP1["successR-THR","successR-THR",i] <- 1 - tp.rrr - death.risk[i, col.key]
   
   tm.NP1["Death","Death",i] <- 1 ## no transitions out of death
 }

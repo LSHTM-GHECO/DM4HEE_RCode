@@ -49,27 +49,11 @@ To work through this exercise, you will need to have the following csv files ava
 * "hazardfunction.csv"
 * "life-tables.csv"
 
-Here we use 3 useful packages for data manipulation - datatable, tidyr, and dplyr.  You can have a look on the internet (e.g. via Google) for more information on these. The following cheat sheets are available:
-
-* Data table : https://s3.amazonaws.com/assets.datacamp.com/img/blog/data+table+cheat+sheet.pdf 
-
-* dyplr and tidyr: https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf 
-
-Therefore please ensure these packages are installed before running the template and/or solution files for this exercise:
-```{r , echo=TRUE, warning=FALSE}
-
-install.packages("data.table")
-install.packages("tidyr")
-install.packages("dplyr")
-```
+\newpage 
 
 ## Step by step guide  
 
 Open the 'corresponding'A1.3.2_Advanced_Markov_Modelling_Template.R' file and start at the 'Parameters' section of the script. 
-
-
-
-\  
 
 (@) **Preparing parameters** 
 
@@ -118,10 +102,23 @@ We can still employ time dependent transitions in other model states providing t
 
 Go to the 'Life tables' section and familiarise yourself with the contents.  View the imported lifetable data.frame, containing figures on age-sex specific mortality rates taken from a standard life-table, published as deaths per thousand per year.  These are converted to the corresponding annual probabilities.  Notice the addition of an `Index` column – the reason for this will become apparent.
 
-i) Create a vector ('current.age') which combines the initial age of the cohort and their ages throughout the model
+```{r lifetable, echo = FALSE}
+print(life.table)
+```
 
-ii) Using the data.table package function `roll()` we can create, we have done this for you, but take a look at the functions used and the `death.risk` data.table created to understand the process. You can find more information on the data.table package in the package manual: https://cran.r-project.org/web/packages/data.table/data.table.pdf
+i) Create a vector ('cycle.v') that gives the number of model cycles from 1 to 60. Then create another vector ('current.age') which combines the initial age of the cohort with the number of annual cycles, to provide the age of the cohort in each cycle of the model. 
 
+ii) Next, you can run the `findInterval()` function, which performs a lookup. The first argument is the current age values in each model cycle, and the second argument is the position of this age in the Index column of the 'life.table' data frame. The output should match the age in each model cycle to the appropriate position in `life.table$Index`, i.e. the row in the life.table data.frame: 
+
+Note, for those of you struggling to understand how this function works, you may find it easier to run the function using two simple vectors to see how it finds the position of the first vector in the second, for example:
+
+```{r interval, eval = FALSE}
+findInterval(c(1:10), c(1,2,3,6,10))
+```
+
+iii) Once you have the interval values, you can use the positions within the Index column of the life.table, to select the corrent risk of death from the same table. For males (column 3), we can do this with th following code `life.table[interval,3]`, and can do the same for females by selecting column 4. We have provided the code for you for steps i) and ii), but we would recommend that you check the code to ensure that you understand how this works. 
+
+Note: There are many ways in which this type of matching or lookup can be performed in R. For those who are interested in learning alternatives, another method to perform this is using the 'data.table' package, and using `setkey()` and `roll()` functions, which gives the same output. However we have focused on using the base R functions wherever possible. 
 
 (@) **Building a Markov model for the standard prosthesis** 
 
@@ -159,7 +156,7 @@ i) Start by creating an empty array of an empty array of dimensions (number of s
 tm.SP0[,,1:2]
 ```
 
-The structure of a for loop has been created for you. You want this loop to create the correct transition matrix for each corresponding cycle, from cycle 1 to cycle 60 (hence why there are 60 loops). The start of the loop has been completed for you, with transitions from the 'P-THR' and 'successP-THR' health states completed for you. Take note of how the appropriate time dependent transitions are selected (for both mortality and for the revsision risk). 
+The structure of a for loop has been created for you. You want this loop to create the correct transition matrix for each corresponding cycle, from cycle 1 to cycle 60 (hence why there are 60 loops). The start of the loop has been completed for you, with the correct transitions from the 'P-THR' and 'successP-THR' health states completed. Take note of how the appropriate time dependent transitions are selected. For background mortality, this is taken from the `death.risk` data frame, selecting the appropriate value using the cycle number - indicated by 'i', and the column key defined above (to select male of female risk value). Similarly for the revision risk, the 'i' element is selected from the `revision.risk.sp0` vector, to assign the correct risk to the appropriate transition matrix for that cycle). 
 
 ii) Refamiliarise yourself with the diagram of the model, and then complete the remaining transitions for each cycle, from the 'R-THR' and 'successR-THR' health states.
 

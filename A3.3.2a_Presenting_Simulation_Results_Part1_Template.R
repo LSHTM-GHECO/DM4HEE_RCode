@@ -3,9 +3,6 @@
 #  Authors: Andrew Briggs, Jack Williams & Nichola Naylor
 
 ### Loading useful packages
-library(data.table)
-library(tidyr)
-library(dplyr)
 library(ggplot2)
 library(reshape2) 
 
@@ -13,7 +10,7 @@ library(reshape2)
 hazards <- read.csv("hazardfunction.csv", header=TRUE) ## importing the hazard inputs from the regression analysis
 cov.55 <- read.csv("cov55.csv",row.names=1,header=TRUE) ## importing the covariance matrix
 life.table <- read.csv("life-table.csv", header=TRUE)
-life.table<- as.data.table(life.table)
+
 
 
 #########**** PARAMETERS *****######
@@ -65,19 +62,19 @@ c.success <- 0 ## Cost of one cycle in a 'success' state (primary or revision)
 ## during the revision period 
 mn.uSuccessP <- 0.85 ## mean utility value for successful primary prosthesis
 se.uSuccessP <- 0.03 ## standard errror utility value for successful primary prosthesis
-ab.uSuccessP <- mn.uSuccessP*(1-mn.uSuccessP)/(se.uSuccessP^2) ## estimating alpha plus beta (ab)
+ab.uSuccessP <- mn.uSuccessP*(1-mn.uSuccessP)/(se.uSuccessP^2)-1 ## estimating alpha plus beta (ab)
 a.uSuccessP<-mn.uSuccessP*ab.uSuccessP ## estimating alpha (a)
 b.uSuccessP<-a.uSuccessP*(1-mn.uSuccessP)/mn.uSuccessP ## estimating beta (b)
 
 mn.uSuccessR<-0.75 ## mean utility value for having a successful Revision THR
 se.uSuccessR<-0.04 ## standard error utility value for having a successful Revision THR
-ab.uSuccessR<-mn.uSuccessR*(1-mn.uSuccessR)/(se.uSuccessR^2) ## alpha + beta (ab)
+ab.uSuccessR<-mn.uSuccessR*(1-mn.uSuccessR)/(se.uSuccessR^2)-1 ## alpha + beta (ab)
 a.uSuccessR<-mn.uSuccessR*ab.uSuccessR ## alpha (a)
 b.uSuccessR<-a.uSuccessR*(1-mn.uSuccessR)/mn.uSuccessR ## beta(b)
 
 mn.uRevision<-0.30 ## mean utility score during the revision period
 se.uRevision<-0.03 ## standard error utility score during the revision period
-ab.uRevision<-mn.uRevision*(1-mn.uRevision)/(se.uRevision^2) ## alpha + beta (ab)
+ab.uRevision<-mn.uRevision*(1-mn.uRevision)/(se.uRevision^2)-1 ## alpha + beta (ab)
 a.uRevision<-mn.uRevision*ab.uRevision ## alpha (a)
 b.uRevision<-a.uRevision*(1-mn.uRevision)/mn.uRevision ## beta(b)
 
@@ -98,12 +95,13 @@ model.THR <- function(age=60, male=0) {
   colnames(life.table) <- c("Age","Index","Males","Female") ## making sure column names are correct
   current.age <-      ## a vector of cohort age throughout the model
   
-  life.table <- as.data.table(life.table) ## turning life.table into a data.table 
-  death.risk <- as.data.table(current.age) ## turning current age into a data.table 
-  setkey(life.table,"Index") ## using the setkey function (read about it by typing in ?setkey in the console)
-  setkey(death.risk,"current.age") ## using the setkey function for death.risk to sort and set current.age as the key
-  death.risk <- life.table[death.risk, roll=TRUE] ## joining life.table and death.risk by the key columns, rolling forward between index values
-  
+  # This finds the position of age, within the life table 
+  interval <- findInterval(current.age, life.table$Index)
+  # These positions can then be used to subset the appropriate values from life.table
+  death.risk <- data.frame(age = current.age, 
+                           males = life.table[interval,3],
+                           females = life.table[interval,4])
+    
   ###  Transition probabilities
   tp.PTHR2dead <-       ## Operative mortality rate  (OMR) following primary THR
   # Note we assume the same shape parameters for RTHR : 
@@ -151,11 +149,11 @@ model.THR <- function(age=60, male=0) {
   tdtps <-   ## use data.table()
   
   ## creating an indicator which selects the death risk column depending on the sex the model is being run on
-  col.key <- 4-male ## 4 indicates the 4th column of tdps (which is female risk of death)
-  ## when male=1 (i.e. male selected as sex) this becomes the 3rd column (which is male risk of death)
+  col.key <- 3-male ## 3 indicates the 3rd column of tdps (which is female risk of death)
+  ## when male=1 (i.e. male selected as sex) this becomes the 2nd column (which is male risk of death)
   
   ## Create a vector with the mortality values at each age, to insert into time dependent transition matrix below
-  mortality.vec <- unname(unlist(death.risk[,..col.key]))
+  mortality.vec <- death.risk[,col.key]
   
   #   STANDARD ARM
   #  Now create a transition matrix for the standard prosthesis arm
