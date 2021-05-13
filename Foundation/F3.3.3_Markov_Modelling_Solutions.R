@@ -38,7 +38,7 @@ tp.C2D <- alpha.C2D / C.sum ## transition probability of C to D
 # ### Note you could input the numbers directly 
 # ## e.g
 # tp.A2A <- 1251/1734 
-# ## but for understanding of where the numbers come frome
+# ## but for understanding of where the numbers come from
 # ## we asked you to work through the calculations of these numbers
 # ## also note if we wanted to calculate complements we can do this using:
 # beta.A2A <- A.sum-alpha.A2A
@@ -69,8 +69,6 @@ RR <- 0.509 ## Treatment effect (RR)
 dr.c <- 0.035 ## Annual discount rate - costs (%)
 dr.o <- 0.035  ## Annual discount rate - benefits (%) 
 
-
-
 ####**** MARKOV MODEL ****######
 #  Set the total number of cycles for the model to run
 cycles <- 20 ## i.e. we want to run the model for each year for 20 years
@@ -100,7 +98,7 @@ colnames(trace.AZT) <- state.names
 
 ## set the first row as the seed population (cycle0) multiplied by the transition matrix
 # i.e. running the first cycle of the model
-# Note this does not include any cost/effect of anything occuring before cycle 1
+# Note this does not include any cost/effect of anything occurring before cycle 1
 trace.AZT[1,] <- seed %*% tm.AZT 
 
 ## Let's see what the first few rows of the Markov trace looks like:
@@ -141,7 +139,7 @@ disc.ly.AZT
 
 #### COST CALCULATIONS #####
 ## undiscounted:
-cost.AZT <- trace.AZT %*% c.dmc + trace.AZT %*% c.ccc + trace.AZT %*% c.azt ## multply the matrix by each cost type and sum
+cost.AZT <- trace.AZT %*% c.dmc + trace.AZT %*% c.ccc + trace.AZT %*% c.azt ## multiply the matrix by each cost type and sum
 cost.AZT
 
 undisc.cost.AZT<-colSums(cost.AZT) ## calculating the total cost of the AZT arm
@@ -158,6 +156,7 @@ disc.cost.AZT
 
 
 #### COMBINATION THERAPY ARM ##### 
+
 # Create a transition matrix for the combination therapy arm
 A.AsympHIV.comb <- c(1-(tp.A2B+tp.A2C+tp.A2D)*RR,tp.A2B*RR,tp.A2C*RR,tp.A2D*RR)
 B.SympHIV.comb <- c(0,1-(tp.B2C+tp.B2D)*RR,tp.B2C*RR,tp.B2D*RR)
@@ -202,8 +201,8 @@ cost.comb[1,1] <- cost.comb[1,1] + (trace.comb[1,1] + trace.comb[1,2] + trace.co
 cost.comb[2,1] <- cost.comb[2,1] + (trace.comb[2,1] + trace.comb[2,2] + trace.comb[2,3]) *c.LAM
 cost.comb
 
-undisc.cost.comb <- colSums(ly.AZT) 
-undisc.ly.AZT 
+undisc.cost.comb <- colSums(cost.comb) 
+undisc.cost.comb
 
 disc.cost.comb <- discount.factor.c %*% cost.comb 
 disc.cost.comb
@@ -215,7 +214,7 @@ disc.cost.comb
 output <- c(inc.cost = disc.cost.comb - disc.cost.AZT,
             inc.lys = disc.ly.comb - disc.ly.AZT,
             icer = NA)
-output[3] <- output[1]/output[2]
+output["icer"] <- output[1]/output[2]
 output
 
 ### Note if you want to round these outputs using the round() functon:
