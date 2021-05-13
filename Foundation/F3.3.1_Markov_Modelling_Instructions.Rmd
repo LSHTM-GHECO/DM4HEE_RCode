@@ -20,7 +20,7 @@ source("F3.3.3_Markov_Modelling_Solutions.R", local = knitr::knit_global())
 
 ## Overview 
 
-The aim of this exercise is to get you to replicate a previously published Markov model by Chancellor and colleagues (1997). The model itself is somewhat out of date in that it compares combination therapy (lamivudine and AZT) to monotherapy (AZT alone).  Nevertheless, the model is straightforward enough to serve as a simple example that it is possible to replicate in a short period of time.
+The aim of this exercise is to get you to replicate a previously published Markov model by Chancellor and colleagues (1997). The model itself is somewhat out of date in that it compares combination therapy (lamivudine and AZT) to monotherapy (AZT alone).  Nevertheless, the model is straightforward enough to serve as a simple example that is possible to replicate in a short period of time.
 
 The basic structure of the model is given in the figure below, which shows that the chronic disease process is structured as  such that patients can move to successively more serious disease states, but cannot recover.
 
@@ -35,7 +35,7 @@ In this exercise you will use the data given below to populate the model and cal
 
 **1. Transition probabilities**
 
-The transitions in the table below were calculated from the counts of individuals that were observed to move between the four health states each year in a longitudinal data set from the Chelsea and Westminster hospital in London.  The counts are given in the table below. 
+The transitions in the table below were calculated from the counts of individuals that were observed to move between the four health states each year in a longitudinal data set from the Chelsea and Westminster hospital in London.  The counts are given in the table below. "From" states are listed in the first column and "to" states are listed in the first row. For example, there were 512 transitions from State B to State C.
 
 ```{r, include =FALSE}
 table <- matrix(data = c(1251, 350, 116, 17,
@@ -88,7 +88,7 @@ We will use the current discount rates in use in the UK – 3.5% for both costs 
 
 Open the file ‘F3.3.2_Markov_Modelling_Template.R’. You will see that there are parameters that need to be defined, based on the data above.
 
-i) Using the counts of transitions shown in the transitions probability section above, complete parameters definitions in the <Parameters> section for the transition probabilities.  Parameters starting with “`alpha.`” should contain the number of events of interest and “`sum.`” should contain the total transitions (the sum of events and complement), such that they should equal the appropriate row total from the transitions table above. Now calculate the respective transition probabilities in variables beginning with “`tp.`” using the “`alpha.`” and “`sum.`” variables. *(Note: For those on the advanced course, the reason for defining events and complements becomes apparent in later exercises using probabilistic methods)*  
+i) Using the counts of transitions shown in the transitions probability section above, complete parameters definitions in the "Parameters" section for the transition probabilities.  Parameters starting with “`alpha.`” should contain the number of events of interest and “`sum.`” should contain the total transitions (the sum of events and complements), such that they should equal the appropriate row total from the transitions table above. Now calculate the respective transition probabilities in variables beginning with “`tp.`” using the “`alpha.`” and “`sum.`” variables. *(Note: For those on the advanced course, the reason for defining events and complements becomes apparent in later exercises using probabilistic methods)*  
 
 ii) Enter the other information for the state costs (direct and community care costs), drug costs, treatment effect and discounting in the appropriate place in the script.
 
