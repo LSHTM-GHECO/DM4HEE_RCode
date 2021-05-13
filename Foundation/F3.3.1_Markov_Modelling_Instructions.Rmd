@@ -190,7 +190,7 @@ iii) Calculate life years and costs as before. For the costs, first utilise the 
 The final task is simply to create an output matrix by running the code in the "Analysis" section and the to to calculate the appropriate the ICER by completing the blank `output["icer"]`.
 
 
-**Congratulations!** You have now replicated the Markov model.  Compare your result for the ICER to that given in the solution (£9,971). The results are also printed below:  
+**Congratulations!** You have now replicated the Markov model.  Compare your result for the ICER to that given in the solution (£9,791). The results are also printed below:  
 
 ```{r, echo = FALSE}
 print(output)
