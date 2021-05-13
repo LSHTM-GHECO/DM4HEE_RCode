@@ -2,7 +2,6 @@
 .Rhistory
 .RData
 .Ruserdata
-*.pdf
 Markdown Exercises/*.html
 Markdown Exercises/*.pdf
 Foundation/*.html
