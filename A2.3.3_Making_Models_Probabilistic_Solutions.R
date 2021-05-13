@@ -2,10 +2,6 @@
 #  Advanced Course Exercise 2: SOLUTION FILE
 #  Authors: Andrew Briggs, Jack Williams & Nichola Naylor
 
-### Loading useful packages
-library(data.table)
-library(tidyr)
-library(dplyr)
 
 #  Reading the data needed from csv files
 hazards <- read.csv("hazardfunction.csv", header=TRUE) ## importing the hazard inputs from the regression analysis
@@ -13,10 +9,10 @@ hazards <- read.csv("hazardfunction.csv", header=TRUE) ## importing the hazard i
 cov.55 <- read.csv("cov55.csv",row.names=1,header=TRUE) ## importing the covariance data
 
 life.table <- read.csv("life-table.csv", header=TRUE) ## importing the life table 
-life.table<- as.data.table(life.table)
 
 #########**** PARAMETERS *****######
 #  Start by defining parameters
+
 ##### DETERMINISTIC PARAMETERS ######
 age <- 60 ## set age group for analyses
 male <- 0 ## set sex identified, 0 = female and 1 = male
@@ -92,7 +88,7 @@ state.costs<-c(c.primary, c.success, c.revision,c.success,0) ## a vector with th
 mn.uSuccessP <- 0.85 ## mean utility value for successful primary prosthesis
 se.uSuccessP <- 0.03 ## standard errror utility value for successful primary prosthesis
 
-ab.uSuccessP <- mn.uSuccessP*(1-mn.uSuccessP)/(se.uSuccessP^2) ## estimating alpha plus beta (ab)
+ab.uSuccessP <- mn.uSuccessP*(1-mn.uSuccessP)/(se.uSuccessP^2)-1 ## estimating alpha plus beta (ab)
 a.uSuccessP <- mn.uSuccessP*ab.uSuccessP ## estimating alpha (a)
 b.uSuccessP <- a.uSuccessP*(1-mn.uSuccessP)/mn.uSuccessP ## estimating beta (b)
 uSuccessP <- rbeta(1,a.uSuccessP,b.uSuccessP) ## drawing from the Beta distribution based on a and b
@@ -101,7 +97,7 @@ uSuccessP <- rbeta(1,a.uSuccessP,b.uSuccessP) ## drawing from the Beta distribut
 mn.uSuccessR <- 0.75 ## mean utility value for having a successful Revision THR
 se.uSuccessR <- 0.04 ## standard error utility value for having a successful Revision THR
 
-ab.uSuccessR <- mn.uSuccessR*(1-mn.uSuccessR)/(se.uSuccessR^2) ## alpha + beta (ab)
+ab.uSuccessR <- mn.uSuccessR*(1-mn.uSuccessR)/(se.uSuccessR^2)-1 ## alpha + beta (ab)
 a.uSuccessR <- mn.uSuccessR*ab.uSuccessR ## alpha (a)
 b.uSuccessR <- a.uSuccessR*(1-mn.uSuccessR)/mn.uSuccessR ## beta(b)
 uSuccessR <- rbeta(1,a.uSuccessR,b.uSuccessR) ## drawing from the Beta distribution based on a and b
@@ -110,7 +106,7 @@ uSuccessR <- rbeta(1,a.uSuccessR,b.uSuccessR) ## drawing from the Beta distribut
 mn.uRevision <- 0.30 ## mean utility score during the revision period
 se.uRevision <- 0.03 ## standard error utility score during the revision period
 
-ab.uRevision <- mn.uRevision*(1-mn.uRevision)/(se.uRevision^2) ## alpha + beta (ab)
+ab.uRevision <- mn.uRevision*(1-mn.uRevision)/(se.uRevision^2)-1 ## alpha + beta (ab)
 a.uRevision  <- mn.uRevision*ab.uRevision ## alpha (a)
 b.uRevision  <- a.uRevision*(1-mn.uRevision)/mn.uRevision ## beta(b)
 uRevision  <- rbeta(1,a.uRevision,b.uRevision) ## drawing from the Beta distribution based on a and b
@@ -154,13 +150,13 @@ cycle.v <- 1:cycles ## a vector of cycle numbers 1 - 60
 current.age <- age + cycle.v ## a vector of cohort age throughout the model
 current.age
 
-## creating a table that has every age of the cohort plus death risks associated with that age
-life.table <- as.data.table(life.table) ## turning life.table into a data.table 
-death.risk <- as.data.table(current.age) ## turning current age into a data.table 
-setkey(life.table,"Index") ## using the setkey function (read about it by typing in ?setkey in the console)
-setkey(death.risk,"current.age") ## using the setkey function for death.risk to sort and set current.age as the key
-death.risk <- life.table[death.risk, roll=TRUE] ## joining life.table and death.risk by the key columns, rolling forward between index values
-
+## Creating a table that has every age of the cohort plus death risks associated with that age
+# This finds the position of age, within the life table 
+interval <- findInterval(current.age, life.table$Index)
+# These positions can then be used to subset the appropriate values from life.table
+death.risk <- data.frame(age = current.age, 
+                         males = life.table[interval,3],
+                         females = life.table[interval,4])
 
 #####***** MARKOV MODEL ****#####
 
@@ -173,13 +169,13 @@ revision.risk.np1 <- 1- exp(lambda * RR.NP1 * ((cycle.v-1) ^gamma-cycle.v ^gamma
 revision.risk.sp0 ## the time dependent risk of revision for standard treatment
 revision.risk.np1 ## the time dependent risk of revision for NP1
 
-# combining risks into a time-dependent transition probability data.table
-tdtps <- data.table(death.risk, revision.risk.sp0, revision.risk.np1)
+# combining risks into a time-dependent transition probability data.frame
+tdtps <- data.frame(death.risk, revision.risk.sp0, revision.risk.np1)
 tdtps
 
 ## creating an indicator which selects the death risk column depending on the sex the model is being run on
-col.key <- 4-male ## 4 indicates the 4th column of tdps (which is female risk of death)
-## when male=1 (i.e. male selected as sex) this becomes the 3rd column (which is male risk of death)
+col.key <- 3-male ## 3 indicates the 3rd column of tdps (which is female risk of death)
+## when male=1 (i.e. male selected as sex) this becomes the 2nd column (which is male risk of death)
 
 #   STANDARD ARM
 #  Now create a transition matrix for the standard prosthesis arm
@@ -191,21 +187,20 @@ tm.SP0 <- array(data=0,dim=c(n.states, n.states, cycles),
 ### create a loop that creates a time dependent transition matrix for each cycle
 for (i in 1:cycles) {
   
-  mortality <- as.numeric(tdtps[i,..col.key]) 
   ## tranisitions out of P-THR
   tm.SP0["P-THR","Death",i] <- tp.PTHR2dead ## Primary THR either enter the death state or.. or..
   tm.SP0["P-THR","successP-THR",i] <- 1 - tp.PTHR2dead ## they go into the success THR state 
   ## transitions out of success-P-THR
   tm.SP0["successP-THR","R-THR",i] <- revision.risk.sp0[i]
-  tm.SP0["successP-THR","Death",i] <- mortality
-  tm.SP0["successP-THR","successP-THR",i] <- 1-revision.risk.sp0[i] - mortality
+  tm.SP0["successP-THR","Death",i] <- death.risk[i,col.key]
+  tm.SP0["successP-THR","successP-THR",i] <- 1-revision.risk.sp0[i] - death.risk[i,col.key]
   ## transitions out of R-THR 
-  tm.SP0["R-THR","Death",i] <- tp.RTHR2dead + mortality
-  tm.SP0["R-THR","successR-THR",i] <- 1 - tp.RTHR2dead - mortality 
+  tm.SP0["R-THR","Death",i] <- tp.RTHR2dead + death.risk[i,col.key]
+  tm.SP0["R-THR","successR-THR",i] <- 1 - tp.RTHR2dead - death.risk[i,col.key] 
   ## transitions out of success-THR
   tm.SP0["successR-THR","R-THR",i] <- tp.rrr
-  tm.SP0["successR-THR","Death",i] <- mortality
-  tm.SP0["successR-THR","successR-THR",i] <- 1 - tp.rrr - mortality
+  tm.SP0["successR-THR","Death",i] <- death.risk[i,col.key]
+  tm.SP0["successR-THR","successR-THR",i] <- 1 - tp.rrr - death.risk[i,col.key]
   
   tm.SP0["Death","Death",i] <- 1 ## no transitions out of death
 }
@@ -233,21 +228,20 @@ tm.NP1 <- array(data=0,dim=c(n.states, n.states, cycles),
 ### create a loop that creates a time dependent transition matrix for each cycle
 for (i in 1:cycles) {
   
-  mortality <- as.numeric(tdtps[i,..col.key]) 
   ## tranisitions out of P-THR
   tm.NP1["P-THR","Death",i] <- tp.PTHR2dead ## Primary THR either enter the death state or.. or..
   tm.NP1["P-THR","successP-THR",i] <- 1 - tp.PTHR2dead ## they go into the success THR state 
   ## transitions out of success-P-THR
   tm.NP1["successP-THR","R-THR",i] <- revision.risk.np1[i] ## revision risk with NP1 treatment arm 
-  tm.NP1["successP-THR","Death",i] <- mortality
-  tm.NP1["successP-THR","successP-THR",i] <- 1 - revision.risk.np1[i] - mortality
+  tm.NP1["successP-THR","Death",i] <- death.risk[i, col.key] 
+  tm.NP1["successP-THR","successP-THR",i] <- 1 - revision.risk.np1[i] - death.risk[i, col.key] 
   ## transitions out of R-THR 
-  tm.NP1["R-THR","Death",i] <- tp.RTHR2dead + mortality
-  tm.NP1["R-THR","successR-THR",i] <- 1 - tp.RTHR2dead - mortality 
+  tm.NP1["R-THR","Death",i] <- tp.RTHR2dead + death.risk[i, col.key] 
+  tm.NP1["R-THR","successR-THR",i] <- 1 - tp.RTHR2dead - death.risk[i, col.key]  
   ## transitions out of success-THR
   tm.NP1["successR-THR","R-THR",i] <- tp.rrr
-  tm.NP1["successR-THR","Death",i] <- mortality
-  tm.NP1["successR-THR","successR-THR",i] <- 1 - tp.rrr - mortality
+  tm.NP1["successR-THR","Death",i] <- death.risk[i, col.key] 
+  tm.NP1["successR-THR","successR-THR",i] <- 1 - tp.rrr - death.risk[i, col.key] 
   
   tm.NP1["Death","Death",i] <- 1 ## no transitions out of death
 }
@@ -318,9 +312,12 @@ disc.QALYs.NP1 <- discount.factor.o%*%QALYs.NP1
 disc.QALYs.NP1
 
 ####****ANALYSIS****####
+
 output <- c(inc.cost = disc.cost.NP1 - disc.cost.SP0,
             inc.qalys = disc.QALYs.NP1 - disc.QALYs.SP0,
             icer = NA)
 output["icer"] <- output["inc.cost"]/output["inc.qalys"]
 
-round(output,2)
+output
+
+round(output,3)

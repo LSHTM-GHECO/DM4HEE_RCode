@@ -78,7 +78,6 @@ testing.costs
 testing.cases <-             ## expected value of cases for each pathways (hint: use vector multiplication)
 testing.cases
 
-
 ## For the total costs and cases of the whole intervention arm (i.e. all 5 pathways)
 # take the sum of the vectors 
 testing.costs.total <-        ## total costs (hint: use sum())
@@ -142,6 +141,3 @@ incr.costs <-
 incremental.results <-
 
 print(incremental.results)
-
-
-

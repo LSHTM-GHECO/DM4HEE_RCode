@@ -84,7 +84,7 @@ est.nmb <- function(prev, parameters = parameter.values, lam = lambda){
 
   nmb.notreat <- (qaly.notreat * lam) - cost.notreat
 
-  ## Alternative if NMB already estimated
+  ## Alternative method, as NMB already estimated
   # nmb.treat <- prev * parameters$nmb[1] + (1-prev)*parameters$nmb[3]
   # nmb.notreat <- prev * parameters$nmb[2] + (1-prev)*parameters$nmb[4]
   
@@ -110,7 +110,8 @@ no.test.nmb
 
 # Now we can create a line plot in base R to observe the results:
 # fill in the variable names left blank in the blow
-# you want prevalence on the x-axis and nmb on the x-axis
+# you want prevalence on the x-axis and nmb on the y-axis
+# Note - we will be updating this plot in the next section
 plot(       ,         , type="l", col = "blue", ylim = c(0, 30000))
 lines(      ,         , col = "red")
 legend(0.7, 30000, legend=c("Treat all", "Treat none"), col=c("blue", "red"), 
@@ -287,6 +288,8 @@ diag.accuracy$nmb <-
 
 # Calculate the Expected Value of Clinical Information (EVCI)
 
+# First, remind yourself of the est.nmb() function from earlier  
+  
 est.nmb(prev = prevalence.vector)
 
 est.evci <- function(prev, diag = diagnostic.threshold, test = test.char, 

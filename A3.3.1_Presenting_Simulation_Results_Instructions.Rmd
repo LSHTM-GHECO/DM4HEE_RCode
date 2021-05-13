@@ -42,13 +42,10 @@ This will require the following data files to be located in the same working-dir
 
 And will require the following packages to be installed:
 
-* data.table
-* tidyr
-* dplyr
 * ggplot2
 * reshape2
 
-The final 2 packages mentioned above are needed as we have added some additional code at the bottom of the template and solution files that use the `reshape` and `ggplot2` packages to show you other potential ways to plot the simulation results.
+The two packages mentioned above are needed as we have added some additional code at the bottom of the template and solution files that use the `reshape` and `ggplot2` packages to show you other potential ways to plot the simulation results.
 'ggplot' is a graphics package that allows you to make very good graphs and plots, but requires the data to be structured in a specific way (long format), and tends to require more detailed code (which is how it allows for highly detailed plots). For more information on ggplot2, see this cheat sheet: https://www.rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf.
 
 * Please ensure you have the "ggplot_CEA_functions.R" script stored in the same folder as your template/solution files, with the working directory set to that same folder. Or alternatively make sure you set an appropriate file path to load the script.  
@@ -165,7 +162,7 @@ Up to this point we have been working with a model where the patient characteris
 
 * Next, create a data.frame called 'CEAC.subgroups', with the number of rows equal to the WTP values and the number of columns euqal to the number of subgroups + 1, to record the probability of cost-effectiveness results. *(Note that you can also use a matrix instead of a data.frame, however it is generally easier to generate plots using a data frames, particularly if using ggplot).*
 
-* You can now generate a simple plot in base R, using the `plot()` and `lines()` functions. We have provided the code for the plot for you. Note that in base R plots, the 'ylim' argument indicates the high and low values of the yaxis (in this case from 0 to 1), the 'col' argument is for colour, and the 'lty' argument indicates the linetype.  
+* You can now generate a simple plot in base R, using the `plot()` and `lines()` functions. We have provided the code for the plot for you. Note that in base R plots, the 'ylim' argument indicates the high and low values of the y-axis (in this case from 0 to 1), the 'col' argument is for colour, and the 'lty' argument indicates the linetype.  
 
 We can also use ggplot here, however, this will require that the 'CEAC.subgroups' data.frame in reshaped from wide format to long format. We have given some examples of how this can be done below *(note the data here are an example)*: 
 
