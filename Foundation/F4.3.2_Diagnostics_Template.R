@@ -4,7 +4,7 @@
 
 ## For this exercise, see the script section headings 
 ## to see which part of the script correspond
-## to sections 1. - 4. in the Intrusctions pdf.
+## to sections 1. - 4. in the Intsructions pdf.
 
 ### 1. Setting up the model parameters and estimating NMB ####
 
@@ -21,14 +21,14 @@ expected.qaly <- c(0.8, 0.5, 0.95, 1)
 parameter.values <- data.frame(outcome.names, expected.cost, expected.qaly,
                               nmb = NA)
 
-# Estimate the NMB associted with each outcome status: 
+# Estimate the NMB associated with each outcome status: 
 parameter.values$nmb <- 
 
 # here you can see the expected costs, QALYs and NMB for each possible outcome
 parameter.values
 
 # first estimate the expected values of treating all versus treating none
-# in the complete abscence of testing:
+# in the complete absence of testing:
 
 # Estimating costs and QALYs associated with treating all vs. treat none 
 treat.cost <- prevalence * expected.cost[1] + (1 - prevalence) * expected.cost[3]
@@ -59,7 +59,7 @@ est.nmb <- function(prev, parameters = parameter.values, lam = lambda){
   ##          net monetary benefit for treated and not treated
   
   # Treatment - look up correct costs and outcomes for treated
-
+  ### Note this is the scenario where all are treated (both sick and healthy)
   cost.sick <-  parameters$expected.cost[1]
   cost.healthy <-  parameters$expected.cost[3]
 
@@ -72,7 +72,7 @@ est.nmb <- function(prev, parameters = parameter.values, lam = lambda){
   nmb.treat <- (qaly.treat * lam) - cost.treat
 
   # No treatment- look up correct costs and outcomes for not treated
-
+  ### Note this is the scenario where none are treated (both sick and healthy)
   cost.sick <-  parameters$expected.cost[2]
   cost.healthy <-  parameters$expected.cost[4]
 
@@ -112,8 +112,8 @@ no.test.nmb
 # fill in the variable names left blank in the blow
 # you want prevalence on the x-axis and nmb on the y-axis
 # Note - we will be updating this plot in the next section
-plot(       ,         , type="l", col = "blue", ylim = c(0, 30000))
-lines(      ,         , col = "red")
+plot(       ,         , type="l", col = "blue", ylim = c(0, 30000)) ## TREAT ALL
+lines(      ,         , col = "red") ## TREAT NONE
 legend(0.7, 30000, legend=c("Treat all", "Treat none"), col=c("blue", "red"), 
        lty = 1, cex = 0.8)
 
@@ -176,9 +176,9 @@ perfect.test.nmb
 plot() 
 lines()  
 lines() ## an additional line is needed in this case for the prefect test scenario
-legend(0.7, 30000, legend=c("Treat all", "Treat none", "Perfect test"), col=c("blue", "red", "dark green"), 
+## NOTE:  match the colours specified in the above code to match the below code to match the instruction odf colour key
+legend(0.7, 30000, legend=c("Treat all", "Treat none", "Perfect test"), col=c("red", "dark green", "blue"), 
        lty = 1, cex = 0.8)
-
 
 # Estimate the Expected Value of Perfect Diagnostic Information (EVPDI) 
 
@@ -232,12 +232,12 @@ round(biomarker.dist, 4)
 
 # And here we can plot the numbers to re-create the video 
 # (note we can use the data frame columns (biomarker.dist), or the vectors that formed the data frame)
-plot(diagnostic.threshold, dis.pos, type="l", col = "blue", ylim = c(0, 0.3))
-lines(diagnostic.threshold, dis.neg, col = "red")
+plot(diagnostic.threshold, dis.pos, type="l", col = "red", ylim = c(0, 0.3))
+lines(diagnostic.threshold, dis.neg, col = "blue")
 
 
 ## True Positive Rate and False Positive Rate - You must add the appropriate parameters to the normal distribution
-TPR <- 1 - pnorm()
+TPR <- 1 - pnorm() ## use the diagnostic.threshold and test.char data
 FPR <- 1 - pnorm()
 
 # We can view these alongside the diagnostic thresholds 
@@ -284,7 +284,8 @@ for(i in 1:length(diagnostic.threshold)){
 data.frame(diagnostic.threshold, nmb.test.vec)    
 
 # You can add these results onto the diagnostic accuracy data.frame 
-diag.accuracy$nmb <- 
+diag.accuracy$nmb <- nmb.test.vec
+head(diag.accuracy)
 
 # Calculate the Expected Value of Clinical Information (EVCI)
 

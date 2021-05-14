@@ -4,7 +4,7 @@
 
 ## For this exercise, see the script section headings 
 ## to see which part of the script correspond
-## to sections 1. - 4. in the Intrusctions pdf.
+## to sections 1. - 4. in the Intsructions pdf.
 
 ### 1. Setting up the model parameters and estimating NMB ####
 
@@ -21,14 +21,14 @@ expected.qaly <- c(0.8, 0.5, 0.95, 1)
 parameter.values <- data.frame(outcome.names, expected.cost, expected.qaly,
                               nmb = NA)
 
-# Estimate the NMB associted with each outcome status: 
+# Estimate the NMB associated with each outcome status: 
 parameter.values$nmb <- (expected.qaly * lambda) - expected.cost
 
 # here you can see the expected costs, QALYs and NMB for each possible outcome
 parameter.values
 
 # first estimate the expected values of treating all versus treating none
-# in the complete abscence of testing:
+# in the complete absence of testing:
 
 # Estimating costs and QALYs associated with treating all vs. treat none 
 treat.cost <- prevalence * expected.cost[1] + (1 - prevalence) * expected.cost[3]
@@ -173,10 +173,10 @@ perfect.test.nmb
 
 ## We can also plot the results of the these tables
 # (take a look at previous plot functions for more help getting started)
-plot(no.test.nmb$prevalence, no.test.nmb$nmb.treat, type="l", col = "blue", ylim = c(0, 30000))
-lines(no.test.nmb$prevalence, no.test.nmb$nmb.notreat, col = "red")
-lines(perfect.test.nmb$prevalence, perfect.test.nmb$nmb, col = "dark green")
-legend(0.7, 30000, legend=c("Treat all", "Treat none", "Perfect test"), col=c("blue", "red", "dark green"), 
+plot(no.test.nmb$prevalence, no.test.nmb$nmb.treat, type="l", col = "red", ylim = c(0, 30000))
+lines(no.test.nmb$prevalence, no.test.nmb$nmb.notreat, col = "dark green")
+lines(perfect.test.nmb$prevalence, perfect.test.nmb$nmb, col = "blue")
+legend(0.7, 30000, legend=c("Treat all", "Treat none", "Perfect test"), col=c("red", "dark green", "blue"), 
        lty = 1, cex = 0.8)
 
 
@@ -232,8 +232,8 @@ round(biomarker.dist, 4)
 
 # And here we can plot the numbers to re-create the video 
 # (note we can use the data frame columns (biomarker.dist), or the vectors that formed the data frame)
-plot(diagnostic.threshold, dis.pos, type="l", col = "blue", ylim = c(0, 0.3))
-lines(diagnostic.threshold, dis.neg, col = "red")
+plot(diagnostic.threshold, dis.pos, type="l", col = "red", ylim = c(0, 0.3))
+lines(diagnostic.threshold, dis.neg, col = "blue")
 
 
 ## True Positive Rate and False Positive Rate 
