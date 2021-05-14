@@ -132,7 +132,7 @@ Your first cycle should now look like this:
 head(trace.AZT, 1)
 ```
 
-iii) Now that you have calculated the first cycle, use the transition matrix to populate the rest of the Markov model by using a loop (we’ve started the outline of this for you).  This will involve looping through each row of the trace matrix and multiplying it with the transition matrix. _(Hint: to calculate the each new row of results in the trace, use the row above and multiply this with the transition matrix)._ Once this is done you can run the code to label each row, and check the trace to see check the numbers make sense. 
+iii) Now that you have calculated the first cycle, use the transition matrix to populate the rest of the Markov model by using a loop (we’ve started the outline of this for you).  This will involve looping through each row of the trace matrix and multiplying it with the transition matrix. _(Hint: to calculate each new row of results in the trace, use the row above and multiply this with the transition matrix)._ Once this is done you can run the code to label each row, and check the trace to see check the numbers make sense. 
 
 iv) Use the `rowSums()` function to provide a sense check, since the sum across columns for each row must always equal the size of the original cohort – which is set to 1 in this exercise, such that the Markov trace represents proportions of patients. _(Hint: if the numbers of patients in the model in each cycle is changing then there may be a mistake in the calculations done in the previous step)._ 
 
@@ -187,7 +187,7 @@ iii) Calculate life years and costs as before. For the costs, first utilise the 
 
 (@) **Cost-effectiveness estimates**
 
-The final task is simply to create an output matrix by running the code in the "Analysis" section and the to to calculate the appropriate the ICER by completing the blank `output["icer"]`.
+The final task is simply to create an output matrix by running the code in the "Analysis" section and to calculate the appropriate ICER by completing the blank `output["icer"]`.
 
 
 **Congratulations!** You have now replicated the Markov model.  Compare your result for the ICER to that given in the solution (£9,791). The results are also printed below:  
