@@ -1,7 +1,7 @@
 ---
 title: Decision Modelling for Health Economic Evaluation R Stream Reader - Foundation Course
 author: "Nichola Naylor & Jack Williams"
-date: "May/June 2021 Course"
+date: "May/June 2021 Course Version 2"
 output:
   pdf_document: default
   html_document: default
@@ -58,8 +58,8 @@ setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 
 ## Some R Reminders
 
-We will use many base R functions throughout the course. You can see a simple cheat sheet here:
-https://www.rstudio.com/wp-content/uploads/2016/10/r-cheat-sheet-3.pdf 
+We will use many base R functions throughout the course. You can see a simple cheat sheet available under the "Base R" category within the RStudio cheat sheet repository:
+https://www.rstudio.com/resources/cheatsheets/
 
 Key terms to be familiar with before starting: vectors, matrices, functions, loops. 
 
@@ -99,7 +99,7 @@ print(x)
 
 ## Subsetting and selecting data 
 
-Another important aspect of the course is selecting the appropraite data. For the various vectors, data frames and arrays, here are some selections of data
+Another important aspect of the course is selecting the appropraite data. For the various vectors, data frames and matrices, here are some selections of data
 
 
 **Vector**
