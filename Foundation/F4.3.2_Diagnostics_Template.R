@@ -4,7 +4,7 @@
 
 ## For this exercise, see the script section headings 
 ## to see which part of the script correspond
-## to sections 1. - 4. in the Intsructions pdf.
+## to sections 1. - 4. in the Instructions pdf.
 
 ### 1. Setting up the model parameters and estimating NMB ####
 

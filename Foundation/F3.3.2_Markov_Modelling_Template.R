@@ -142,7 +142,7 @@ disc.ly.AZT
 
 #### COST CALCULATIONS #####
 ## undiscounted:
-cost.AZT <- trace.AZT %*% c.dmc + trace.AZT %*% c.ccc + trace.AZT %*% c.azt ## multpily the matrix by each cost type and sum
+cost.AZT <- trace.AZT %*% c.dmc + trace.AZT %*% c.ccc + trace.AZT %*% c.azt ## multiply the matrix by each cost type and sum
 cost.AZT
 
 undisc.cost.AZT<-colSums(cost.AZT) ## calculating the total cost of the AZT arm
