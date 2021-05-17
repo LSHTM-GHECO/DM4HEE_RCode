@@ -97,7 +97,7 @@ est.nmb.perfect.test(prev = prevalence)
 
 iii) Now run the function using the vector of prevalence values that you created eaerlier (`prevalence.vector`), to get the NMB of a perfect test, across different prevalences. Make sure to save this as a data.frame - you can save this as `perfect.test.nmb`.
 
-v) Next, compare the results generated in the `perfect.test.nmb` to the results saved earlier in the `no.test.nmb` data frame visually by filling in the plot function we've left blan. You should be able to see that the NMB for the perfect test is higher than the treat all or treat none strategies (except when the prevalence is 0 or 1). Add another line to the line plot created previously (again using `plot()` and `lines()` for now), '`prevalence.vector`'. YOur plot should look like this (don't worry if the formatting is slighlty different): 
+v) Next, compare the results generated in the `perfect.test.nmb` to the results saved earlier in the `no.test.nmb` data frame visually by filling in the plot function we've left blank. You should be able to see that the NMB for the perfect test is higher than the treat all or treat none strategies (except when the prevalence is 0 or 1). Add another line to the line plot created previously (again using `plot()` and `lines()` for now), '`prevalence.vector`'. Your plot should look like this (don't worry if the formatting is slighlty different): 
 
 
 ```{r, echo=FALSE}
@@ -228,4 +228,4 @@ install.packages("ggplot2")
 install.packages("reshape2")
 ```
 
-'ggplot' is a graphics package that allows you to make very good graphs and plots, but requires the data to be structured in a specific way (long format), and tends to require more detailed code (which is why it allows for highly detailed plots). For more information on ggplot2, see this cheat sheet: https://www.rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf 
+'ggplot' is a graphics package that allows you to make very good graphs and plots, but requires the data to be structured in a specific way (long format), and tends to require more detailed code (which is why it allows for highly detailed plots). For more information on ggplot2, see the cheat sheet available online: https://www.rstudio.com/resources/cheatsheets/ - see "Data Visualization Cheatsheet"

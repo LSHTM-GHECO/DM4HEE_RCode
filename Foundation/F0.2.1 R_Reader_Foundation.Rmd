@@ -99,7 +99,7 @@ print(x)
 
 ## Subsetting and selecting data 
 
-Another important aspect of the course is selecting the appropraite data. For the various vectors, data frames and matrices, here are some selections of data
+Another important aspect of the course is selecting the appropriate data. For the various vectors, data frames and matrices, here are some selections of data
 
 
 **Vector**
