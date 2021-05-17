@@ -20,6 +20,7 @@ n.states <- length(state.names)
 
 #  Seed the starting states of the model
 seed <- c(1,0,0,0,0) ## all people start in the first state
+## order defined inline with state.names order
 
 #  Transition probabilities
 tp.PTHR2dead <- 0.02 ## Operative mortality rate (OMR) following primary THR
@@ -33,7 +34,7 @@ c.NP1 <- 579 ## Cost of new prosthesis 1
 c.primary <- 0  ## Cost of a primary THR procedure 
 ## Note that the cost of the primary procedure is excluded (set to 0): since both arms have this procedure it is assumed to net out of the incremental analysis.  However, if the model was to be used to estimate lifetime costs of THR it would be important to include.
 c.success <- 0 ## Cost of one cycle in a 'success' state (primary or revision)
-## Note for c.sucess There are assumed to be no ongoing monitoring costs for successful THR.  However, this parameter is included in case users want to change this assumption.
+## Note for c.success There are assumed to be no ongoing monitoring costs for successful THR.  However, this parameter is included in case users want to change this assumption.
 
 c.revision <- 5294 ## Cost of one cycle in the Revision THR state (national reference costs for revision hip or knee)
 
@@ -46,6 +47,7 @@ state.lys <- c(1,1,1,1,0)  ## a vector of life year effects for each state
 u.success.p <- 0.85 ## Utility score for having had a successful Primary THR
 u.revision <- 0.30 ## Utility score during the revision period
 u.success.r <- 0.75 ## Utility score for having a successful Revision THR
+u.primary <- 0     ## utility for primary procedure
 
 state.utilities <- c(0,u.success.p,u.revision,u.success.r,0) ## a vector with the utilities for each state
 
