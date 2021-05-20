@@ -329,6 +329,8 @@ model.THR <- function() {
 # You can run the function to get the results of a simulation (each simulation will provide different results!)
 model.THR()
 round(model.THR(),3) # and to help view the results
+round(model.THR(),3) # running a few times to see the different outcomes estimated
+round(model.THR(),3)
 
 # If viewing this code after completing Exercise 2, ignore the below 
 # we will go through simulation storing within the next exercise 
