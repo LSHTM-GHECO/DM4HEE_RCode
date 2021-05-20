@@ -316,7 +316,7 @@ Now run the final lines of code that uses our pre-defined `plot.ceac.all()` from
 plot.ceac.all(CEAC.long)
 ```
 
-As was noted in the presentation, the interpretation of multiple acceptability curves can be tricky – especially when the model is non-linear.  Fenwick et al (2001) have argued for the use of a cost-effectiveness acceptability frontier (CEAF) in these situations and an example of this applied to the Excel version of the model you have just constructed, whic is available on the course website.
+As was noted in the presentation, the interpretation of multiple acceptability curves can be tricky – especially when the model is non-linear.  Fenwick et al (2001) have argued for the use of a cost-effectiveness acceptability frontier (CEAF) in these situations and an example of this applied to the Excel version of the model you have just constructed, which is available on the course website.
 
 Congratulations! You have now created a time-dependent, probablistic Markov model with an additional treatment arm comparator, additionally you've presented results from such analyses graphically. In the next module we'll be building on `model.THR` to explore Value of Information Analyses.
 
