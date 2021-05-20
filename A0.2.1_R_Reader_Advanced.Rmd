@@ -203,6 +203,80 @@ ar[1,,2] # first row, of second matrix
 ar[,,1] # All rows, all columns, first matrix
 
 ```
+
+## Matrix Multiplication
+
+Throughout this course matrix multiplication will play an important role in our models. Below is a reminder of some useful information on matrix multiplication in R. (Some code based on https://www.programmingr.com/matrix-multiplication/ , last accessed 19/05/2021) 
+
+```{r, echo=TRUE}
+a = matrix(c(1,3,5,7), ncol=2, nrow=2)
+a
+
+b = matrix(c(2,4,6,8), ncol=2, nrow=2)
+b
+
+c <- a*b ## this just multiplied values by the same positioned-value 
+## c[2,1] = a[2,1] * b[2,1]
+c  
+
+
+### However, if we want to perform matrix multiplication to get the matrix product
+### we can use the %*% operator in R
+c <- a %*% b
+## c[2,1] = (a[2,1]*b[1,1])+(a[2,2]*b[1,2])
+## c[2,1] = 6 + 28 = 24
+c
+
+
+## Notice that the order of the matrices affects the results:
+c <- b %*% a
+## c[2,1] = (b[2,1]*a[1,1])+(b[2,2]*a[1,2])
+## c[2,1] = 4 + 24 = 28
+c
+
+
+## If we have a vector and want to multiply a matrix by the values in the vector
+## Again, ordering matters. For example..
+## if we want to multiply state costs (vector) by number of people in each state (matrix)
+
+people <- matrix(c(100,0,0,
+                   90,10,0,
+                   80,10,10,
+                   50,30,20), ncol=3, nrow=4, byrow=TRUE, 
+                 dimnames = list(c("year1","year2","year3","year4"),
+                                 c("healthy","sick","verysick") ))
+cost <- c(0, 200, 500)
+
+people
+cost
+
+result <- people %*% cost
+result
+
+## results[1,1] = people[1,1]*cost[1]+people[2,1]*cost[2]+people[3,1]*cost[3]
+
+# Note that if we tried "cost %*% people" this would result in: 
+# "Error in cost %*% people : non-conformable arguments"
+# This is because the number of columns/values in cost (n=3) does not equal the number of
+# rows/values in people (n=4). 
+# We also wouldn't want the product of this calculation, even if these dimension lengths 
+# match, as that would multiply the wrong values together - For example ...
+
+people_3yr <- matrix(c(100,0,0,
+                  90,10,0,
+                  80,10,10), ncol=3, nrow=3, byrow=TRUE, 
+                dimnames = list(c("year1","year2","year3"),
+                                c("healthy","sick","verysick") ))
+
+wrong_result <- cost %*% people_3yr
+wrong_result
+
+## wrong_result[1,] = (100*0)+(200*90)+(500*80), which is wrongly multiplying healthy
+## people in years 2 and 3 with the cost of sick and very sick respectively.
+
+```
+Therefore, be sure to be careful when using matrix multiplication throughout these exercises!
+
 \ 
 
 ## Probabilistic modelling and sampling from random draws
