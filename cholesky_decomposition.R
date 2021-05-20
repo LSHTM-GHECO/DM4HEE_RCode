@@ -3,7 +3,7 @@
 #  Authors: Nichola Naylor & Jack Williams
 
 ## importing data.table library
-library(data.table)
+library(data.table) ## install this package if not already installed before continuing
 
 #  Read in the lcovariance table
 hazards <- read.csv("hazardfunction.csv", header=TRUE) ## importing the hazard inputs from the regression analysis
@@ -52,5 +52,5 @@ mn<-c(mn.lngamma, mn.cons,mn.ageC,mn.maleC,mn.NP1)
   # cholm[2:5,1] <- cov.55[2:5,1]/cholm[1,1]
   # cholm[2,2] <- sqrt(cov.55[2,2]-(cholm[2,1]^2))
   # cholm[3:5,2] <- (cov.55[3:5,2]-cholm[2,1]*cholm[3:5,1])/cholm[2,2]
-  # ### can be expanded
+  # ### can be expanded accordingly
   
