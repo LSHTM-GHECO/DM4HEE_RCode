@@ -81,17 +81,17 @@ print(state.utilities)
 
 If you go to the 'Hazard function & Associated Parameters' section you will see the  importing of an output of a regression analysis on prosthesis failure. After importing the csv file `hazardfunction.csv` type in `View(hazards)` into the console to see the hazard ratios.  A parametric Weibull model was fitted to patient level survival time data to estimate this function.  The regression model shows that prosthesis survival time is significantly related to age, sex, and type of prosthesis (new versus standard).  In addition, the significance of the gamma parameter indicates that there is an important time dependency to the risk of failure – which increases over time.
 
-Note that the estimation of this regression model was undertaken on the log hazard scale.  We therefore have to exponentiate the results to get the actual hazard rate.  The exponents of the individual coefficients are interpreted as hazard ratios (column “coefficient” in hazards data.frame).  For example, the new prosthesis has a hazard ratio of 0.26 indicating that it has a much lower hazard compared to the standard prosthesis.
+Note that the estimation of this regression model was undertaken on the log hazard scale. We therefore have to exponentiate the results to get the actual hazard rate.  The exponents of the individual coefficients are interpreted as hazard ratios (column “coefficient” in hazards data.frame). For example, the new prosthesis (`NP1`) has a hazard ratio of 0.26 indicating that it has a much lower hazard compared to the standard prosthesis.
 
-Take a moment to understand this survival model.  If you are having trouble with the appropriate interpretation then do ask a tutor - we are about to implement this model and you may struggle if you are not clear on the interpretation from the start.
+Take a moment to understand this survival model. Remember that these values are on the log hazard scale. If you are having trouble with the appropriate interpretation then do post any questions in the discussion board - we are about to implement this model and you may struggle if you are not clear on the interpretation from the start.R
 
-i) To start with, generate a link from the <Parameters> section  to the corresponding results of the survival analysis on the “hazards” data.frame for the constant, age and male coefficients. Fill in the remaining “`r.`” variable definitions. Remember that these values are on the log hazard scale.
+i) To start with, we need to generate a link from the "Parameters" section  to the corresponding results of the survival analysis from the “`hazards`” data.frame for the constant, age and male coefficients. Fill in the remaining “`r.`” variable definitions within the template file. 
 
-ii) We now want to calculate the lambda value of Weibull distribution (this, together with the gamma parameter, enables us to specify the baseline hazard). In estimating a standard survival analysis, it is the log of the lambda parameter that is a linear sum of the coefficients multiplied by the explanatory variables.  Therefore to get the value of log lambda, multiply the coefficients of age and sex by the age and sex characteristics and add together, not forgetting to also add the constant term.  Remember that the parameters in “hazards” are on the log scale.  Exponentiate each of these to give the value of the lambda and gamma parameters of the Weibull distribution and the hazard ratio for the new prosthesis compared to the standard.
+ii) We now want to calculate the lambda value of Weibull distribution (this, together with the gamma parameter - which we've defined for you - enables us to specify the baseline hazard). In estimating a standard survival analysis, the linear sum of the coefficients multiplied by the explanatory variables (e.g. coefficient(age)x65yearsold + coefficient(male_dummy)x1) is the log of the lambda.  Therefore to get the value of log lambda, multiply the coefficients of age and sex by the age and sex characteristics and add together, not forgetting to also add the constant term.  Using this information, define `lambda`.
 
-iii) Exponentiate the NP1 coefficient to get the Relative risk of revision for new prosthesis 1 compared to standard 
+iii) Exponentiate the NP1 coefficient to get the relative risk (RR) of revision for new prosthesis 1 compared to standard. 
 
-Your gamma value should be equal to __`r gamma`__ , your lambda value should be equal to __`r format(lambda, scientific=FALSE)`__ and your relative risk of revision for new prosthesis 1 compared to standard  __`r RR.NP1`__.
+Your gamma value should be equal to __`r gamma`__ , your lambda value should be equal to __`r format(lambda, scientific=FALSE)`__ and your relative risk of revision for new prosthesis 1 compared to standard  __`r RR.NP1`__. *Note: values here are rounded.*
 
 \  
 
@@ -99,13 +99,13 @@ Your gamma value should be equal to __`r gamma`__ , your lambda value should be 
 
 We can still employ time dependent transitions in other model states providing the time dependency relates to time in the model rather than time in the state itself.  This is the case for a background mortality rate, for example, which depends on the age of a subject rather than which state of the model they are in.  In this section we will illustrate the use of a time dependent transition to model background mortality in the model from a life-table.
 
-Go to the 'Life tables' section and familiarise yourself with the contents.  View the imported lifetable data.frame, containing figures on age-sex specific mortality rates taken from a standard life-table, published as deaths per thousand per year.  These are converted to the corresponding annual probabilities.  Notice the addition of an `Index` column – the reason for this will become apparent.
+Go to the 'Life tables' section and familiarise yourself with the contents.  View the imported lifetable data.frame, containing figures on age-sex specific mortality rates taken from a standard life-table, published as deaths per thousand per year.  These are converted to the corresponding annual probabilities.  Notice the`Index` column – the need for this will become apparent.
 
 ```{r lifetable, echo = FALSE}
 print(life.table)
 ```
 
-i) Create a vector ('cycle.v') that gives the number of model cycles from 1 to 60. Then create another vector ('current.age') which combines the initial age of the cohort with the number of annual cycles, to provide the age of the cohort in each cycle of the model. 
+i) Create a vector ('`cycle.v`') that gives the number of model cycles from 1 to 60. Then create another vector ('`current.age`') which combines the initial age (`age`) of the cohort with the number of annual cycles, to provide the age of the cohort in each cycle of the model. 
 
 ii) Next, you can run the `findInterval()` function, which performs a lookup. The first argument is the current age values in each model cycle, and the second argument is the position of this age in the Index column of the 'life.table' data frame. The output should match the age in each model cycle to the appropriate position in `life.table$Index`, i.e. the row in the life.table data.frame: 
 
@@ -115,13 +115,13 @@ Note, for those of you struggling to understand how this function works, you may
 findInterval(c(1:10), c(1,2,3,6,10))
 ```
 
-iii) Once you have the interval values, you can use the positions within the Index column of the life.table, to select the corrent risk of death from the same table. For males (column 3), we can do this with th following code `life.table[interval,3]`, and can do the same for females by selecting column 4. We have provided the code for you for steps i) and ii), but we would recommend that you check the code to ensure that you understand how this works. 
+iii) Once you have the interval values, you can use the positions within the Index column of the life.table, to select the corrent risk of death from the same table. For males (column 3), we can do this with th following code `life.table[interval,3]`, and can do the same for females by selecting column 4. We have provided the code for you, but we would recommend that you check the code to ensure that you understand how this works. 
 
-Note: There are many ways in which this type of matching or lookup can be performed in R. For those who are interested in learning alternatives, another method to perform this is using the 'data.table' package, and using `setkey()` and `roll()` functions, which gives the same output. However we have focused on using the base R functions wherever possible. 
+*Note: There are many ways in which this type of matching or lookup can be performed in R. For those who are interested in learning alternatives, another method to perform this is using the 'data.table' package, and using `setkey()` and `roll()` functions, which gives the same output. However we have focused on using the base R functions wherever possible for this course.* 
 
 (@) **Building a Markov model for the standard prosthesis** 
 
-In preparation for building the Markov model we are going to specify the time dependent transition probability for prosthesis failure.  Recall from Section 3.1.2 that the cumulative hazard rate for the Weibull is given by:
+In preparation for building the Markov model we are going to specify the time dependent transition probability for prosthesis failure after initial surgery.  Recall that the cumulative hazard rate for the Weibull is given by:
 
 $$ H(t) = \lambda t^{y}$$
 
@@ -133,9 +133,11 @@ $$ tp(t) = 1 - exp \{\lambda (t-1)^{\gamma} - \lambda t^{\gamma}\} $$
 
 $$ tp(t) = 1 - exp \{\lambda [(t-1)^{\gamma} - t^{\gamma}]\} $$
 
-i) Go to the 'Standard' section. Use the above formula to calculate the time-dependent transition probability for the standard prosthesis (referred to in the script as `revision.risk`) using the cycle number for the time variable (`cycle`) and the lambda and gamma parameters already defined in this exercise. Do the same for the NP1 treatment arm.
+Where tp(t) = the transition probability at time t, $\lambda$ = lambda and $\gamma$ = gamma.
 
-ii) Now combine age and sex dependent risk of death (from `death.risk`), and age dependent risk of revision (which we have just defined for SP0 and NP1), into one data.table (`tdtps`). Based on the column numbers we set a column key which switches between pulling risk of death from the “Men” or “Women” values. 
+i) Go to the 'Standard' section of the template file. Use the above formula to calculate the time-dependent transition probability for the standard prosthesis (referred to in the script as `revision.risk`) using the cycle number for the time vector (`cycle.v`) and the lambda and gamma parameters already defined in this exercise. Do the same for the NP1 treatment arm. *Hint: cycle.v can be used as t directly within the formula. Additionaly, for NP1, remember that the relative risk reduction is affecting the lambda value.*
+
+ii) Now combine age and sex dependent risk of death (from `death.risk`), and age dependent risk of revision (which we have just defined for SP0 and NP1), into one data.frame (`tdtps`). Based on the column numbers we set a column key which switches between pulling risk of death from the “Men” or “Women” values. 
 
 For example, setting the column key to 3 means we are selecting column from the data.table (first 6 rows displayed below), i.e. selecting the Male values for risk of death.
 
@@ -147,56 +149,59 @@ What you have just implemented is a relatively sophisticated use of survival ana
 
 You have now implemented all three key types of transition probability: constant, time dependent (function) and  time dependent (tabular).
 
-Having specified the time dependent transition parameters we can now proceed to construct the Markov model. To begin with we need to create an array of time dependent state transition matrices. 
+Having specified the time dependent transition parameters we can now proceed to construct the Markov model. To begin with we need to create an array of time dependent state transition matrices. Remember the course reader has an overview of data structures, including arrays, in R.
 
-i) Start by creating an empty array of an empty array of dimensions (number of states, number of states, number of cycles). *[Hint: putting 0s instead of NAs allows for 0 values to be pre-filled for where transitions can’t occur].* It is recommended to provide dimension names (where the transition matrix column and row names match the state names). See below to give an idea of the structure of what this should look like (with only cycle 1 and 2 results displayed below).
+i) Start by creating an empty array of an empty array of dimensions (number of states, number of states, number of cycles). *[Hint: putting 0s instead of NAs allows for 0 values to be pre-filled for where transitions can’t occur].* It is recommended to provide dimension names (where the transition matrix column and row names match the state names). See below to give an idea of the structure of what this should look like (with only cycle 1 and 2 results displayed below, which we will now attempt to fill!).
 
 ```{r, echo = TRUE}
 tm.SP0[,,1:2]
 ```
 
-The structure of a for loop has been created for you. You want this loop to create the correct transition matrix for each corresponding cycle, from cycle 1 to cycle 60 (hence why there are 60 loops). The start of the loop has been completed for you, with the correct transitions from the 'P-THR' and 'successP-THR' health states completed. Take note of how the appropriate time dependent transitions are selected. For background mortality, this is taken from the `death.risk` data frame, selecting the appropriate value using the cycle number - indicated by 'i', and the column key defined above (to select male of female risk value). Similarly for the revision risk, the 'i' element is selected from the `revision.risk.sp0` vector, to assign the correct risk to the appropriate transition matrix for that cycle). 
+The structure of a for loop has been created for you. You want this loop to create the correct transition matrix for each corresponding cycle, from cycle 1 to cycle 60 (hence why there are 60 loops). The start of the loop has been completed for you, with the correct transitions from the 'P-THR' and 'successP-THR' health states completed. Take note of how the appropriate time dependent transitions are selected. For background mortality, this is taken from the `death.risk` data frame, selecting the appropriate value using the cycle number - indicated by 'i', and the column key defined above (to select male or female risk value). Similarly for the revision risk, the 'i' element is selected from the `revision.risk.sp0` vector, to assign the correct risk to the appropriate transition matrix for that cycle, accounting for patient age for that cycle). *Remember we are still only interested in the SP0 arm at the moment.*
 
-ii) Refamiliarise yourself with the diagram of the model, and then complete the remaining transitions for each cycle, from the 'R-THR' and 'successR-THR' health states.
+ii) Refamiliarise yourself with the diagram of the model, and then complete the remaining transitions for each cycle, from the 'R-THR' and 'successR-THR' health states. *Note: a revision after R-THR is a re-revision, therefore we need to use the associated transition probability of re-revision, which you defined earlier in this exercise.*
 
-Once you have completed the array with all transition matrices, we then are concerned with generating the Markov trace: that is showing the numbers of patients that are in any one state at any one time. 
+Once you have completed the array with all transition matrices, we then are concerned with generating the Markov trace: that is showing the numbers of patients that are in any one state at any one time. We've set up the initial trace matrix (`trace.SP0`) for you.
 
-i) First create the first cycle trace by multiplying the seed population (cycle0) by the transition matrix for cycle1 _(Hint: use %*% to perform a matrix multiplication)_
+i) First create the first cycle trace by multiplying the seed population (cycle0, i.e. `trace.SP0[1,]`) by the transition matrix for cycle1 using `%*%`. 
+*Hint: If you get a non-comformable error, make sure you're only selecting the relevant matrix from `tm.SP0`. Refer back to the reader for some more information on matrix multiplication in R* 
 
-ii) Create a for loop for cycle 2 to cycle 60 that multiplies populations within cycles with the correct transition matrix *[Hint: you will have to “look back” if starting from cycle2]*
+ii) Create a for loop for cycle 2 to cycle 60 that multiplies populations within cycles with the correct transition matrix, we've outlined the structure for you. *[Hint: you will have to “look back” if starting from cycle2].*
 
-iii) Take a look at the trace that you’ve constructed, provide a check (for example, check the sum across rows must always equal the size of the original cohort).
+iii) Take a look at the trace that you’ve constructed, check the sum across rows must always equal the size of the original cohort, which in our case is 1.
 
 (@) **Calculating costs and effects** 
 
 Now that we have the Markov trace we can calculate the cost and effects for each cycle of the model.
 
-i) Calculate the life years for the standard treatment arm using the trace outputs and the life year vector.  By doing this without quality adjustment or discounting, this column can be used to calculate life-expectancy (which is often useful – but not particularly in this example). We have provided the code for you here, so that you can see how the life year vector is multiplied by the trace - using `%*%` for matrix multiplification. *(Hint: use this code as a guide to perform the remaining calculations for QALYs and costs)* 
+i) Calculate the total life years (LYs) for the standard treatment arm using the trace outputs and the life year vector.  By doing this without quality adjustment or discounting, this column can be used to calculate life-expectancy (which is often useful – but not particularly in this example). We have provided the code for you here for calculating the LYs for each cycle, so that you can see how the life year vector is multiplied by the trace - using `%*%` for matrix multiplication. Now calculate the total number of LYs over the whole modelled period. *(Hint: we essentially want the sum of the 1st (and only) column of lys.SP0)* 
 
-ii) Now calculate quality adjusted life years (QALYs). However, this is undiscounted.  Therefore, we need to apply the standard discount formula, you can do this by creating a vector (`discount.factor.o`) which specifies the discount factor that needs to be applied for each cycle. The discount formula is given below, where *r* is the discount rate, and *t* is time (in years):
+ii) Now calculate quality adjusted life years (QALYs), defining `QALYs.SP0` and `undiscounted.QALYs.SP0` using the same methods as above, but this time with the `state.utilities` vector. 
+
+However, this is undiscounted.  Therefore, we need to apply the standard discount formula, you can do this by creating a vector (`discount.factor.o`) which specifies the discount factor that needs to be applied for each cycle. The discount formula is given below, where *r* is the discount rate, and *t* is time (in years):
 
 $$ 1 / (1 + r)^t $$
 
-Note that for the above, if you provide *t* as a vector, then the formula will return a vector *(Hint: use the 'cycle.v' vector as the years, since each cycle is one year)*. Once you have completed this, the vector should look like this:
+Note that for the above, if you provide *t* as a vector, then the formula will return a vector *(Hint: use the 'cycle.v' vector, since each cycle is one year)*. Once you have completed this, the vector should look like this:
 
 ```{r, echo = FALSE}
 print(discount.factor.o)
 ```
 
-Then multiply `discount.factor.o` with `undisc.QALYs.SP0` to get the discounted QALYs for the standard treatment arm. 
+Then multiply `discount.factor.o` with `QALYs.SP0` to get the discounted QALYs for the standard treatment arm. 
 
 iii) Calculate the costs in a similar manner (but this time with the state cost vector).  Don’t forget to incorporate the cost discount rate (which is different to the outcome discount rate).
 
-iv) We also now want to include the cost of the original prosthesis, there are many ways to do this, but since it is a one off cost occurring in `cycle0`, here we can add on at the end.
+iv) We also now want to include the cost of the original prosthesis, there are many ways to do this, but since it is a one off cost occurring in `cycle0`, here we can add on at the end when defining `disc.cost.SP0` (and `undisc.cost.SP0` for completeness).
 
-v) Sum the columns to get the per patient predictions of cost, life expectancy and QALYs for this arm of the model.  
+Now that you have the results for the standard prosthesis, perform the same processes for the NP1 treatment arm within the 'NP1' section. More sections have been made left blank for you to fill out (e.g. generating the transition matrices), but you can use the code above to help you. *Hint: run the chuncks of code as you go to spot major errors early on.*
 
-Now that you have the results for the standard prosthesis, perform the same processes for the NP1 treatment arm within the 'NP1' section. Some sections have been made more difficult for you (e.g. generating the transition matrices), but you can use the code above to help you). 
+vi) Finally, in the 'Analysis' section create an output matrix storing the differences in treatment costs and effects, and incremental cost-effectiveness ratio, filling in the formulae needed to calculate these results in `output`. *Hint: use the discounted values for these results.*
 
-vi) Finally, create an output matrix storing the differences in treatment costs and effects, and incremental cost-effectiveness ratio in the 'Analysis' section. You should have an incremental cost-effectiveness ratio of __£`r round(output[3])`__ per QALY gained.
+You should have an incremental cost-effectiveness ratio of __£`r round(output[3])`__ per QALY gained.
 
 Congratulations! Your Markov model is now complete.  
 
-Try re-running the model for different sex and age groups (between 40 and 90 years), and/or different discount rates, and see differences in the results produced. *Hint: to do this you can go back to the top of your model R script and adapt the`age` and `male` assignments and rerun.*
+Try re-running the model for different sex and age groups (between 40 and 90 years), and/or different discount rates, and see differences in the results produced. *Hint: to do this you can go back to the top of your model R script and adapt the `age` and `male` assignments and rerun.*
 
 

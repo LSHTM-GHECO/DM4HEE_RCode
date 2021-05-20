@@ -71,7 +71,7 @@ RR.NP1 <- exp(  )
 life.table <- read.csv("life-table.csv") ## importing the life table csv inputs
 colnames(life.table) <- c("Age","Index","Males","Female") ## making sure column names are correct
 
-cycle.v <- 1:cycles ## a vector of cycle numbers 1 - 60
+cycle.v <-        ## a vector of cycle numbers 1 - 60
 current.age <-    ## a vector of cohort age throughout the model
 current.age
 
@@ -117,7 +117,7 @@ for (i in 1:cycles) {
   tm.SP0["P-THR","successP-THR",i] <- 1 - tp.PTHR2dead ## they go into the success THR state 
   
   ## transitions out of success-P-THR
-  tm.SP0["successP-THR","R-THR",i] <- revision.risk.sp0[i] # you could also refer to the corersponding tdtps column
+  tm.SP0["successP-THR","R-THR",i] <- revision.risk.sp0[i] # you could also refer to the corresponding tdtps column
   tm.SP0["successP-THR","Death",i] <- death.risk[i,col.key]
   tm.SP0["successP-THR","successP-THR",i] <- 1-revision.risk.sp0[i] - death.risk[i,col.key]
   
@@ -166,7 +166,7 @@ undisc.QALYs.SP0
 ## DISCOUNTING:
 ## this time we use 
 discount.factor.o <-    ## a vector of a discount factor multiplier for each cycle
-  ## one way to do this is to simply multiplies the cycle vector (cycle.v) with the discount formulae
+  ## one way to do this is to simply multiply the cycle vector (cycle.v) with the discount formulae
 discount.factor.o
 
 disc.QALYs.SP0 <-    ## discounted QALYs from standard treatment
@@ -255,7 +255,7 @@ undisc.cost.NP1 <-  ## total undiscounted costs (including one-off costs)
 undisc.cost.NP1
 
 ## DISCOUNTING
-disc.cost.NP1 <-   ## discounted costs from NP1 pathway
+disc.cost.NP1 <-   ## discounted costs from NP1 pathway (including one-off costs)
 disc.cost.NP1
 
 

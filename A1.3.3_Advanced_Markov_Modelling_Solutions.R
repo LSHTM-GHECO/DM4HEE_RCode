@@ -49,7 +49,7 @@ u.revision <- 0.30 ## Utility score during the revision period
 u.success.r <- 0.75 ## Utility score for having a successful Revision THR
 u.primary <- 0     ## utility for primary procedure
 
-state.utilities <- c(0,u.success.p,u.revision,u.success.r,0) ## a vector with the utilities for each state
+state.utilities <- c(u.primary,u.success.p,u.revision,u.success.r,0) ## a vector with the utilities for each state
 
 #### HAZARD FUNCTION & ASSOCIATED PARAMETERS #####
 
@@ -63,7 +63,7 @@ r.maleC <- hazards$coefficient[4] ## Male coefficient in survival analysis for b
 r.NP1 <- hazards$coefficient[5]
 
 gamma <- exp(r.lnlambda)
-lambda <- exp(r.cons+age*r.ageC+male*r.maleC)
+lambda <- exp(r.cons+(age*r.ageC)+(male*r.maleC))
 RR.NP1 <- exp(r.NP1)
 
 ##### LIFE TABLES #####
@@ -116,7 +116,7 @@ for (i in 1:cycles) {
   tm.SP0["P-THR","successP-THR",i] <- 1 - tp.PTHR2dead ## they go into the success THR state 
   
   ## transitions out of success-P-THR
-  tm.SP0["successP-THR","R-THR",i] <- revision.risk.sp0[i] ## you could also refer to the corersponding tdtps column
+  tm.SP0["successP-THR","R-THR",i] <- revision.risk.sp0[i] ## you could also refer to the corresponding tdtps column
   tm.SP0["successP-THR","Death",i] <- death.risk[i,col.key]
   tm.SP0["successP-THR","successP-THR",i] <- 1-revision.risk.sp0[i] - death.risk[i,col.key]
   
@@ -164,7 +164,7 @@ undisc.QALYs.SP0
 
 ## DISCOUNTING:
 ## this time we use 
-discount.factor.o <- 1/(1+dr.o)^cycle.v ## many different methods to do this, this one simply multiplies the cycle vector with the discount formulae
+discount.factor.o <- 1/(1+dr.o)^cycle.v ## many different methods to do this, this one simply multiplies the cycle vector with the discount formula
 
 discount.factor.o
 
