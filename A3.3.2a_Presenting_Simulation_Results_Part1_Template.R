@@ -306,7 +306,7 @@ head(simulation.results)
 #### PLOTTING THE COST-EFFECTIVENESS PLANE #####
 
 # simple base plot of incremental QALYs and costs
-plot(simulation.results$inc.qalys,simulation.results$inc.cost)
+plot(   ,    ) ## try ?plot() if not used before
 
 ## using pre-created ggplot2 functions for nicer cost-effectiveness plane graphs
 source("ggplot_CEA_functions.R")
@@ -314,7 +314,8 @@ plot.ce.plane(simulation.results)
 
 ## Estimating average ICER from the simulation:
 # note you don't have to do this all in one calculation/variable definition
-
+PSA.inc.cost <- 
+PSA.inc.qalys <- 
 PSA.icer <- 
 
 #### PLOTTING THE COST-EFFECTIVENESS ACCEPTABILITY CURVE #####
@@ -334,6 +335,10 @@ p.CE<-function(WTP, simulation.results) {
   # OUTPUTS: A numeric value specifying the probability of cost-effectiveness given the inputs
   
   ## write the function here that returns the probability of cost-effectiveness vector
+  
+  nmb <-       ## vector of NMB estimates for each simulation length 1:sim.runs
+  CE <-         ## vector of TRUE/FALSE for each simulation length 1:sim.runs
+  probCE<-       ## the mean value of TRUE (=1) and FALSE (=0) [which equates to probability of cost-effectiveness]
   
   return(probCE)
   
@@ -365,7 +370,7 @@ plot.ceac(CEAC)
 subgroups.names <- c("Male 40", "Male 60", "Male 80", "Female 40", "Female 60", "Female 80")
 subgroups.n <- length(subgroups.names)
 
-simulation.subgroups <-  ## use array() and specifiy dimensions and dimension names using dimnames=
+simulation.subgroups <-  ## use array() and specify dimensions and dimension names using dimnames=
 
 # Run model for each subgroup, inputting the age and sex into the function, and record results within the array
 for(i in 1:sim.runs){
@@ -386,9 +391,10 @@ colnames(CEAC.subgroups) <- c("WTP", subgroups.names)
 for (i in 1:length(WTP.values)) {
   
   CEAC.subgroups[i,1] <- WTP.values[i]
-  ### using the p.CE function define the reat of CEAC.subgroups values for i here
+  ### by using CEAC.subgroups[i,2]<-p.CE( )  define the reat of CEAC.subgroups values for i here
+  ### for the remainging 7 columns (i.e. the 6 subgroups):
   
-  
+ 
 }
 
 # Show the structure of the subgroup results 

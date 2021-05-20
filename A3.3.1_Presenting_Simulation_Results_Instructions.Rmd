@@ -46,9 +46,9 @@ And will require the following packages to be installed:
 * reshape2
 
 The two packages mentioned above are needed as we have added some additional code at the bottom of the template and solution files that use the `reshape` and `ggplot2` packages to show you other potential ways to plot the simulation results.
-'ggplot' is a graphics package that allows you to make very good graphs and plots, but requires the data to be structured in a specific way (long format), and tends to require more detailed code (which is how it allows for highly detailed plots). For more information on ggplot2, see this cheat sheet: https://www.rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf.
+'ggplot' is a graphics package that allows you to make very good graphs and plots, but requires the data to be structured in a specific way (long format), and tends to require more detailed code (which is how it allows for highly detailed plots). For more information on ggplot2, see the data visualisation cheat sheet available through RStudio: https://www.rstudio.com/resources/cheatsheets/
 
-* Please ensure you have the "ggplot_CEA_functions.R" script stored in the same folder as your template/solution files, with the working directory set to that same folder. Or alternatively make sure you set an appropriate file path to load the script.  
+* Please also ensure you have the "ggplot_CEA_functions.R" script stored in the same folder as your template/solution files, with the working directory set to that same folder. Or alternatively make sure you set an appropriate file path to load the script.  
 
 **PART 2**: We will be using the "A3.3.2b" template and "A3.3.3b" solution files. The purpose of this exercise is to introduce a further prosthesis into the THR model in order to illustrate the approach to calculating multiple CEACs for multiple, mutually exclusive treatment options.The step-by-step guide covers two main tasks: 
 
@@ -65,33 +65,24 @@ All of R packages listed above for Part 1 are also needed for Part 2. Additional
 
 ## PART 1: Step-by-step guide
 
-(1) **Creating the model function**
+(1) **Running the model function**
 
-In the template file for this exercise you will find a new section labelled 'THR Model Function'. The aim of this function is to wrap the main parts of the Markov model into a function, so that we can repeat and record the results of the probabilistic analysis constructed in Module 2. 
+In the template file for this exercise you will find first the same section as in Module 2 ("Deterministic Parameters"), but then a new section labelled 'THR Model Function'. The aim of this function is to wrap the main parts of the Markov model into a function, so that we can repeat and record the results of the probabilistic analysis constructed in Module 2. 
 
-As part of the previous module, we added an additional resource 'THR Model with simulation' (file name  "A2.3.4_Additional_Information_THR_Model_with_simulation.R") which just created a function that re-ran the whole of the R script to run the model 1,000 times. Whilst this is a very easy way to write code to re-run the model many times, many parts of the script will be uneccesaryily repeated. For example, the discount rates, and the mean and stadard error inputs for parameters will be assigned the same value in every moodel iteration, which takes time. This becomes particularly important when running high numbers of simulations (this becomes a particular issue when performing the model is very complex, or you need to run a large number of simulations, running through many subgroups, or performing value of information analyses, which you learn about in the next module).
+As part of the previous module, we added an additional resource 'THR Model with simulation' (file name  "A2.3.4_Additional_Information_THR_Model_with_simulation.R") which just created a function that re-ran the whole of the R script to run the model 1,000 times. Whilst this is a very easy way to write code to re-run the model many times, many parts of the script will be unnecessarily repeated. For example, the discount rates, and the mean and stadard error inputs for parameters will be assigned the same value in every moodel iteration, which takes time. This becomes a particular issue when the model is very complex, or you need to run a large number of simulations, running through many subgroups, or performing value of information analyses (which you learn about in the next module).
 
-In this exercise we will aim to structure the model function to be more efficient (i.e. run through the code at a faster speed) by trying to avoid repeating some of the unnecesary parts of the code multiple times. We've started off by loading the packages and data files needed, and allow for characteristics within the model to be easily changed whilst using the model function.
+In this exercise we aimed to structure the model function to be slightly more efficient (i.e. run through the code at a faster speed) by trying to avoid repeating some of the unnecesary (deterministic) parts of the code multiple times. 
 
-* First, assign all the model parameters that are fixed throughout the model runs (i.e. those that aren’t sampled in the probabilistic analyses) outside of the model function (these are in lines 21 to 86). We’ve provided the fixed parameters for you, including the discount rates, starting distribution, and for the mean, alpha and beta values for the transition probabilities (and hazard function), costs and utilities. Make sure you understand why these are outside of the model function.  
-
-* Now you can develop a function `model.THR()` that can be run across a probabilistic THR model. Assume, for now, that we are always running across the same sex (female) and age (60) groups. You can set this as the default in the model function by defining these, when writing the function. Later in the exercise we will alter this to allow for varying age/sex groups, and we can pass these arguments into the function. *(Note: if you aren't familiar with writing functions, passing values to arguments in functions, and having default values for arguments, then you should familiarise yourself with this to ensure that you can understand the code).* 
-
-This function should return a named vector (this should include discounted costs and outcomes of the standard treatment, the discounted costs and outcomes of new treatment, and the incremental costs and outcomes). We have layed out the structure of this function, with gaps that need filling before running (based on the work you did for Module 2, you may copy and paste parts of the code from the Module 2 Exercise R script into this one, but be sure to define all variables needed/used within the model outlined in the template, and try to understand what each part is doing).
-
-** (Jack note - I wonder whether we could give them the model that they have essentially already built, and try to focus more time on the novel aspects of this exercise, but not sure if providing everything means that some people will gloss over / not fully understand why the model is a fucntion and how it differs - would be good to get some feedback on this!)**
-
-* Try running `model.THR()` function to check it provides the correct results before moving to the next stage (remember the model currently assumes a female population, with mean age of 60, unless arguments are provided otherwise). You can run the model a few times to see the differences in the results generated across probabilistic runs. This may still take a fair few seconds to run so be patient on first running. You should have similar results to the below (remember actual numbers will differ):
+Since this is the same model structure as you created in Modules 1 and 2, we haven't asked you to re-write the model code, but do read through the `model.THR()` function to check you understand what parts of the model are now within the function, and how "age" and "male" are set/used. You can run the model a few times to see the differences in the results generated across probabilistic runs. This may still take a fair few seconds to run so be patient on first running. You should have similar results to the below (remember actual numbers will differ due to random draws):
 
 ```{r, echo=FALSE}
 model.THR()
 ```
 
-*Top tip: If you want to debug your function, after defining the deterministic parameter, set male <- 0 and female  <- 0 and work through chunks of the function code to see where the error occurs* 
-
+*Top tip for your future models: If you want to debug your function, after defining the deterministic parameters, manually set male and age (or equivalents), and work through chunks of the function code (treating it not as a function) to see where the error occurs* 
 It should be noted that you can have functions stored in a separate R script within your working directory and run this into your simulation analysis script through using the `source()` function [check `?source` for more information]. However, for the simplicity of teaching this course this was not done here.  
 
-(2) **Running the simulation**
+(2) **Running the simulations**
 
 Create the following first:
 
@@ -117,7 +108,7 @@ Then run the simulations in a loop, and replace the NA values with the results f
 
 Now that we have stored the results of 1000 probabilistic trials of the model, the results can be analysed:  
 
-(i) Using a simple `plot()` function plot incremental QALYs against incremental costs, with incremental qalys on the x-axis and incremental cost on the y-axis.
+(i) Using a simple `plot()` function plot incremental QALYs against incremental costs, with incremental qalys on the x-axis and incremental cost on the y-axis. 
 
 Next, we have used the `ggplot2` package to create more readable plots.
 
@@ -130,7 +121,7 @@ Notice the slightly strange shape of the ‘cloud’ of points.  This is due to 
 
 (4) **Creating the Cost-Effectiveness Acceptability Curve**
 
-Once probabilistic results are obtained as in the form of step (i) above, the analysis of the results can proceed much like the analysis of bootstrap replications of real data in a statistical analysis (Briggs & Fenn 1998).  This includes the potential for calculating confidence intervals for the ICER (using, for example, simple percentile methods) or cost-effectiveness acceptability curves (CEACs).  We focus on the calculation of CEACs as the appropriate way of presenting uncertainty in CEA as a method that avoids the problems that can arise when uncertainty covers all four quadrants of the CE plane.
+Once probabilistic results are obtained as above, the analysis of the results can proceed much like the analysis of bootstrap replications of real data in a statistical analysis (Briggs & Fenn 1998).  This includes the potential for calculating confidence intervals for the ICER (using, for example, simple percentile methods) or cost-effectiveness acceptability curves (CEACs).  We focus on the calculation of CEACs as the appropriate way of presenting uncertainty in CEA as a method that avoids the problems that can arise when uncertainty covers all four quadrants of the CE plane.
 
 The calculation of CEACs will involves creating another function (`p.CE`).  However, some preparation of the section is required first.  In particular, the presentation mentioned that two alternative approaches to the use of the net benefit statistic could be used to generate acceptability curves.  This exercise will involve calculating both in order to convince you that the methods are equivalent.
 
@@ -149,7 +140,7 @@ There are many ways this can be coded but the aim is to output 1 numeric value o
 
 * Then, generate the cost-effectiveness acceptability curve table by using a for loop and the above function to estimate the probability of cost-effectiveness for different WTP values ranging from 0 to £50,000 (by increments of £10). This can be done by first creating a data.frame with 2 columns; with the WTP values, and the probability of cost-effectiveness. *(Hint: you can fill the first column with WTP values already, and leave the second column with numeric, missing values in the first instance, and then replace them with outputs of `p.CE()` using a for loop).*
 
-* Finally, use the `plot()` function to simply plot WTP values against probability of cost-effectiveness *(Hint: use “type=”l”)*.  We have also provided a pre-defined function to plot the CEAC using ggplot, and we have named this function `plot.ceac()` (from“`ggplot_CEA_functions.R`” script which should already be loaded into your work environment, see source("A0.2_R_Starting Material_for_Advanced_Course/ggplot_CEA_functions.R")).
+* Finally, use the `plot()` function to simply plot WTP values against probability of cost-effectiveness *(Hint: use “type=”l”)*.  We have also provided a pre-defined function to plot the CEAC using ggplot, and we have named this function `plot.ceac()` (from“`ggplot_CEA_functions.R`” script which should already be loaded into your work environment, by running `source("ggplot_CEA_functions.R")`).
 
 
 (5) **Multiple curves: different patient sub-groups**
@@ -158,13 +149,17 @@ Up to this point we have been working with a model where the patient characteris
 
 * Create an array that can store the PSA simulation results for each subgroup defined above. Think about the output of `model.THR()` in terms of size and shape of this array. *(Hint: think about the structure and dimensions of the 'simulations.results' data frame, and repeat for each subgroup)* 
 
-* Run the function on each of the subgroups, storing the results within the array. You may want to have larger increments in the WTP values this time to help with speed. 
+* Run the function on each of the subgroups, storing the results within the array, by completing the for loop we've started for you. *Note: match the subgroup to the order listed in `subgroups.names`.*
 
-* Next, create a data.frame called 'CEAC.subgroups', with the number of rows equal to the WTP values and the number of columns euqal to the number of subgroups + 1, to record the probability of cost-effectiveness results. *(Note that you can also use a matrix instead of a data.frame, however it is generally easier to generate plots using a data frames, particularly if using ggplot).*
+* You may want to have larger increments in the WTP values this time to help with spee (e.g. redefine `WTP.values` with larger increments than 10) 
+
+* Next, create a data.frame called 'CEAC.subgroups', with the number of rows equal to the WTP values and the number of columns euqal to the number of subgroups + 1, to record the probability of cost-effectiveness results by running the code. *(Note that you can also use a matrix instead of a data.frame, however it is generally easier to generate plots using a data frames, particularly if using ggplot).*
+
+* Now replace the NA values with outputs from p.CE by completing the for loop we started for you. *Note: the first column is the WTP values, but we've given some hints in the annotations of the template script for the next step of how to complete the loop.*
 
 * You can now generate a simple plot in base R, using the `plot()` and `lines()` functions. We have provided the code for the plot for you. Note that in base R plots, the 'ylim' argument indicates the high and low values of the y-axis (in this case from 0 to 1), the 'col' argument is for colour, and the 'lty' argument indicates the linetype.  
 
-We can also use ggplot here, however, this will require that the 'CEAC.subgroups' data.frame in reshaped from wide format to long format. We have given some examples of how this can be done below *(note the data here are an example)*: 
+We can also use ggplot here, however, this will require that the 'CEAC.subgroups' data.frame in reshaped from wide format to long format. We have given some examples of how this can be done below *(note the data here are examples for data shaping purposes, not linking to our output results for this exercise)*: 
 
 *Wide format example:*
 
@@ -190,7 +185,7 @@ table
 ```
 
 
-We can do this using the `melt()` function within the 'reshape2' package (which should have been loaded in at the start of this exercise using `library(reshape2)`, if not go back to the beginning of this script and load this in). Type in `?melt.data.frame` into the console to see how to use this function. For those familiar with the 'tidyr' package, the `gather()` function can also be used to reshape from wide to long format. 
+We can do this using the `melt()` function within the 'reshape2' package (which should have been loaded in at the start of this exercise using `library(reshape2)`, if not go back to the beginning of this script and load this in). Type in `?melt.data.frame` into the console to see how to use this function. Have a go at filling out `melt()`. For those familiar with the 'tidyr' package, the `gather()` function can also be used to reshape from wide to long format. 
 
 Finally, we've used plot the resulting CEACs for the different patient characteristics using the pre-defined ggplot function `plot.ceac.all()`.
 
