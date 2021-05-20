@@ -47,10 +47,10 @@ mn<-c(mn.lngamma, mn.cons,mn.ageC,mn.maleC,mn.NP1)
   cholm[5,5] <- sqrt(cov.55[5,5]-(cholm[5,1]^2)-(cholm[5,2]^2)-
                        (cholm[5,3]^2)-(cholm[5,4]^2))
   
-  # ### a note of a more efficient way
+  # ### a note of a more efficient (but less visual) way
   # cholm[1,1] <- sqrt(cov.55[1,1])
   # cholm[2:5,1] <- cov.55[2:5,1]/cholm[1,1]
   # cholm[2,2] <- sqrt(cov.55[2,2]-(cholm[2,1]^2))
   # cholm[3:5,2] <- (cov.55[3:5,2]-cholm[2,1]*cholm[3:5,1])/cholm[2,2]
-  # ### can be expanded accordingly
+
   
