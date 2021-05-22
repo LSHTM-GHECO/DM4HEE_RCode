@@ -206,7 +206,7 @@ ar[,,1] # All rows, all columns, first matrix
 
 ## Matrix Multiplication
 
-Throughout this course matrix multiplication will play an important role in our models. Below is a reminder of some useful information on matrix multiplication in R. (Some code based on https://www.programmingr.com/matrix-multiplication/ , last accessed 19/05/2021) 
+Throughout this course matrix multiplication will play an important role in our models. Below is a reminder of some useful information on matrix multiplication in R. (Some code based on https://www.programmingr.com/matrix-multiplication/, last accessed 19/05/2021) 
 
 ```{r, echo=TRUE}
 a = matrix(c(1,3,5,7), ncol=2, nrow=2)
@@ -224,7 +224,7 @@ c
 ### we can use the %*% operator in R
 c <- a %*% b
 ## c[2,1] = (a[2,1]*b[1,1])+(a[2,2]*b[1,2])
-## c[2,1] = 6 + 28 = 24
+## c[2,1] = 6 + 28 = 34
 c
 
 
