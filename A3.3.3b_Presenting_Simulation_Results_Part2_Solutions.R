@@ -356,8 +356,7 @@ simulation.results <- data.frame("cost.SP0" = rep(as.numeric(NA), sim.runs), ## 
 
 ## adding a progress bar to the simulatio runs allows you to keep track of where the simulation is
 # this is particularly useful for more complex models that may take longer to run
-# we left this out of the template for this exercise, but we will be using this for exercise 4 
-# so please see how it is implemented in the solutions for this exercise
+
 pb = txtProgressBar(min = 0, max = sim.runs, initial = 0, style = 3)
 
 for(i in 1:sim.runs) {
@@ -424,9 +423,14 @@ pCE.3b <-function(WTP, simulation.results) {
   
 }
 
+
+pb = txtProgressBar(min = 0, max = length(WTP.values), initial = 0, style = 3)
+
 for (i in 1:length(WTP.values)) {
+  setTxtProgressBar(pb,i)
   CEAC[i,"WTP"] <- WTP.values[i]
   CEAC[i,2:4]<- pCE.3b(WTP.values[i], simulation.results)
+  
 }
 
 

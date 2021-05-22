@@ -50,20 +50,6 @@ tp.PTHR2dead
 tp.RTHR2dead
 tp.rrr
 
-# calculating deterministic mean and SE as a comparison for these 3 transition probabilities 
-mn.PTHR2dead <- a.PTHR2dead/(a.PTHR2dead+b.PTHR2dead) ## mean tp.PTHR2dead
-se.PTHR2dead <- sqrt(a.PTHR2dead*b.PTHR2dead/((a.PTHR2dead+b.PTHR2dead)^2*
-                                        (a.PTHR2dead+b.PTHR2dead+1))) ## standard error for tp.PTHR2dead
-# the values are the same for revision surgery, as the alpha and beta are assumed to be the same
-mn.PTHR2dead
-se.PTHR2dead 
-
-mn.rrr <- a.rrr/(a.rrr+b.rrr) ## mean value for Re-revision risk 
-se.rrr <- sqrt(a.rrr*b.rrr/((a.rrr+b.rrr)^2*
-                                    (a.rrr+b.rrr+1))) ## standard error value for Re-revision risk 
-
-
-
 ##  Costs
 c.primary <- 0  ## Cost of a primary THR procedure - 
 ## Note that the cost of the primary procedure is excluded (set to 0): since both arms have this procedure it is assumed to net out of the incremental analysis.  However, if the model was to be used to estimate lifetime costs of THR it would be important to include.

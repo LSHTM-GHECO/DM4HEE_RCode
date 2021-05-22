@@ -20,6 +20,7 @@ n.states <- length(state.names)
 
 #  Seed the starting states of the model
 seed <- c(1,0,0,0,0) ## all people start in the first state
+## order defined inline with state.names order
 
 #  Transition probabilities
 tp.PTHR2dead <- 0.02 ## Operative mortality rate (OMR) following primary THR
@@ -33,7 +34,7 @@ c.NP1 <- 579 ## Cost of new prosthesis 1
 c.primary <- 0  ## Cost of a primary THR procedure 
 ## Note that the cost of the primary procedure is excluded (set to 0): since both arms have this procedure it is assumed to net out of the incremental analysis.  However, if the model was to be used to estimate lifetime costs of THR it would be important to include.
 c.success <- 0 ## Cost of one cycle in a 'success' state (primary or revision)
-## Note for c.sucess There are assumed to be no ongoing monitoring costs for successful THR.  However, this parameter is included in case users want to change this assumption.
+## Note for c.success There are assumed to be no ongoing monitoring costs for successful THR.  However, this parameter is included in case users want to change this assumption.
 
 c.revision <- 5294 ## Cost of one cycle in the Revision THR state (national reference costs for revision hip or knee)
 
@@ -46,8 +47,9 @@ state.lys <- c(1,1,1,1,0)  ## a vector of life year effects for each state
 u.success.p <- 0.85 ## Utility score for having had a successful Primary THR
 u.revision <- 0.30 ## Utility score during the revision period
 u.success.r <- 0.75 ## Utility score for having a successful Revision THR
+u.primary <- 0     ## utility for primary procedure
 
-state.utilities <- c(0,u.success.p,u.revision,u.success.r,0) ## a vector with the utilities for each state
+state.utilities <- c(u.primary,u.success.p,u.revision,u.success.r,0) ## a vector with the utilities for each state
 
 #### HAZARD FUNCTION & ASSOCIATED PARAMETERS #####
 
@@ -61,7 +63,7 @@ r.maleC <- hazards$coefficient[4] ## Male coefficient in survival analysis for b
 r.NP1 <- hazards$coefficient[5]
 
 gamma <- exp(r.lnlambda)
-lambda <- exp(r.cons+age*r.ageC+male*r.maleC)
+lambda <- exp(r.cons+(age*r.ageC)+(male*r.maleC))
 RR.NP1 <- exp(r.NP1)
 
 ##### LIFE TABLES #####
@@ -114,7 +116,7 @@ for (i in 1:cycles) {
   tm.SP0["P-THR","successP-THR",i] <- 1 - tp.PTHR2dead ## they go into the success THR state 
   
   ## transitions out of success-P-THR
-  tm.SP0["successP-THR","R-THR",i] <- revision.risk.sp0[i] ## you could also refer to the corersponding tdtps column
+  tm.SP0["successP-THR","R-THR",i] <- revision.risk.sp0[i] ## you could also refer to the corresponding tdtps column
   tm.SP0["successP-THR","Death",i] <- death.risk[i,col.key]
   tm.SP0["successP-THR","successP-THR",i] <- 1-revision.risk.sp0[i] - death.risk[i,col.key]
   
@@ -162,7 +164,7 @@ undisc.QALYs.SP0
 
 ## DISCOUNTING:
 ## this time we use 
-discount.factor.o <- 1/(1+dr.o)^cycle.v ## many different methods to do this, this one simply multiplies the cycle vector with the discount formulae
+discount.factor.o <- 1/(1+dr.o)^cycle.v ## many different methods to do this, this one simply multiplies the cycle vector with the discount formula
 
 discount.factor.o
 

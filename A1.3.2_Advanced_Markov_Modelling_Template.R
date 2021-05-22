@@ -19,7 +19,8 @@ state.names <- c("P-THR","successP-THR","R-THR","successR-THR","Death")
 n.states <- length(state.names)
 
 #  Seed the starting states of the model
-seed <- c(1,0,0,0,0) ## all people start in the first state
+seed <- c(1,0,0,0,0) ## all people start in the first state (P-THR), with state
+## order defined inline with state.names 
 
 #  Transition probabilities
 tp.PTHR2dead <-     ## Operative mortality rate (OMR) following primary THR
@@ -33,7 +34,7 @@ c.NP1 <- 579 ## Cost of new prosthesis 1
 c.primary <- 0  ## Cost of a primary THR procedure 
 ## Note that the cost of the primary procedure is excluded (set to 0): since both arms have this procedure it is assumed to net out of the incremental analysis.  However, if the model was to be used to estimate lifetime costs of THR it would be important to include.
 c.success <- 0 ## Cost of one cycle in a 'success' state (primary or revision)
-## Note for c.sucess There are assumed to be no ongoing monitoring costs for successful THR.  However, this parameter is included in case users want to change this assumption.
+## Note for c.success There are assumed to be no ongoing monitoring costs for successful THR.  However, this parameter is included in case users want to change this assumption.
 
 c.revision <-     ## Cost of one cycle in the Revision THR state (national reference costs for revision hip or knee)
 
@@ -46,7 +47,8 @@ state.lys <-     ## a vector of life year effects for each state
 u.success.p <-      ## Utility score for having had a successful Primary THR
 u.revision <-      ## Utility score during the revision period
 u.success.r <-      ## Utility score for having a successful Revision THR
-
+u.primary <-        ## Utility for primary procedure
+   
 state.utilities <- c()     ## a vector with the utilities for each state
 
 #### HAZARD FUNCTION & ASSOCIATED PARAMETERS #####
@@ -69,7 +71,7 @@ RR.NP1 <- exp(  )
 life.table <- read.csv("life-table.csv") ## importing the life table csv inputs
 colnames(life.table) <- c("Age","Index","Males","Female") ## making sure column names are correct
 
-cycle.v <- 1:cycles ## a vector of cycle numbers 1 - 60
+cycle.v <-        ## a vector of cycle numbers 1 - 60
 current.age <-    ## a vector of cohort age throughout the model
 current.age
 
@@ -115,7 +117,7 @@ for (i in 1:cycles) {
   tm.SP0["P-THR","successP-THR",i] <- 1 - tp.PTHR2dead ## they go into the success THR state 
   
   ## transitions out of success-P-THR
-  tm.SP0["successP-THR","R-THR",i] <- revision.risk.sp0[i] # you could also refer to the corersponding tdtps column
+  tm.SP0["successP-THR","R-THR",i] <- revision.risk.sp0[i] # you could also refer to the corresponding tdtps column
   tm.SP0["successP-THR","Death",i] <- death.risk[i,col.key]
   tm.SP0["successP-THR","successP-THR",i] <- 1-revision.risk.sp0[i] - death.risk[i,col.key]
   
@@ -164,7 +166,7 @@ undisc.QALYs.SP0
 ## DISCOUNTING:
 ## this time we use 
 discount.factor.o <-    ## a vector of a discount factor multiplier for each cycle
-  ## one way to do this is to simply multiplies the cycle vector (cycle.v) with the discount formulae
+  ## one way to do this is to simply multiply the cycle vector (cycle.v) with the discount formulae
 discount.factor.o
 
 disc.QALYs.SP0 <-    ## discounted QALYs from standard treatment
@@ -253,7 +255,7 @@ undisc.cost.NP1 <-  ## total undiscounted costs (including one-off costs)
 undisc.cost.NP1
 
 ## DISCOUNTING
-disc.cost.NP1 <-   ## discounted costs from NP1 pathway
+disc.cost.NP1 <-   ## discounted costs from NP1 pathway (including one-off costs)
 disc.cost.NP1
 
 
