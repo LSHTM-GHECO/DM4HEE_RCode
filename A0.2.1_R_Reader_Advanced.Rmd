@@ -21,7 +21,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Welcome to the R Stream of the Decision Modelling for Health Economic Evaluation - Advanced Course! 
 
-Over the course of the next few modules we will cover how to code Advanced Markov Models (Module 1), Making Models Probablistic (Module 2), Presenting Simulation Results (Module 3) and Value of Information Analyses (Module 4).
+Over the course of the next few modules we will cover how to code Advanced Markov Models (Module 1), Making Models Probabilistic (Module 2), Presenting Simulation Results (Module 3) and Value of Information Analyses (Module 4).
 
 This course stream is not intended to teach you how to use R, but rather to teach potential ways of constructing health economic evaluation models within R. For more information on how to use R seek readily available resources such as:
 
@@ -32,7 +32,7 @@ http://www.cookbook-r.com
 http://www.stackoverflow.com
 
 
-There are often many ways to do the same thing in R. Throughout this course we present one potential way of coding things, often opting for code which is easier to follow (for example, choosing a loop process over something more efficient but less intuitive), and also tending to use base R functions wherever possible. This is not to say another way is "wrong" or that the solutions provided are the only way to code these models. We encourage you to play around with the code, checking whether the results align across the different methods. In some instances, we have also provided two different lines of code to produce the same output, to demonstrate the different approaches available. 
+There are often many ways to do the same thing in R. Throughout this course we present one potential way of coding things, often opting for code which is easier to follow (for example, choosing a loop process over something more efficient but less intuitive), and  tend to use base R functions wherever possible. This is not to say another way is "wrong" or that the solutions provided are the only way to code these models. We encourage you to play around with the code, checking whether the results align across the different methods. In some instances, we have also provided two different lines of code to produce the same output, to demonstrate the different approaches available. 
 
 ## R Exercise Structure
  
@@ -158,7 +158,7 @@ print(x)
 
 ## Subsetting and selecting data 
 
-Another important aspect of the course is selecting the appropraite data. For the various vectors, data frames and arrays, here are some selections of data
+Another important aspect of the course is selecting the appropriate data. For the various vectors, data frames and arrays, here are some way tp select data:
 
 **Vector**
 ```{r, echo=TRUE}
@@ -206,7 +206,7 @@ ar[,,1] # All rows, all columns, first matrix
 
 ## Matrix Multiplication
 
-Throughout this course matrix multiplication will play an important role in our models. Below is a reminder of some useful information on matrix multiplication in R. (Some code based on https://www.programmingr.com/matrix-multiplication/ , last accessed 19/05/2021) 
+Throughout this course matrix multiplication will play an important role in our models. Below is a reminder of some useful information on matrix multiplication in R. (Some code based on https://www.programmingr.com/matrix-multiplication/, last accessed 19/05/2021) 
 
 ```{r, echo=TRUE}
 a = matrix(c(1,3,5,7), ncol=2, nrow=2)
@@ -224,7 +224,7 @@ c
 ### we can use the %*% operator in R
 c <- a %*% b
 ## c[2,1] = (a[2,1]*b[1,1])+(a[2,2]*b[1,2])
-## c[2,1] = 6 + 28 = 24
+## c[2,1] = 6 + 28 = 34
 c
 
 

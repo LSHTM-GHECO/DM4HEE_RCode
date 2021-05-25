@@ -1,5 +1,5 @@
 ---
-title: "Making Models Probablistic"
+title: "Making Models Probabilistic"
 subtitle: Advanced Course Module 2
 author: "Nichola Naylor & Jack Williams"
 date: "May/June 2021 Course"
@@ -25,7 +25,7 @@ source("A2.3.3_Making_Models_Probabilistic_Solutions.R", local = knitr::knit_glo
 
 ## Overview
 
-The aim of this exercise is to demonstrate how a deterministic Markov model can be made probabilistic by fitting distributions to parameters.  Emphasis is on choosing the correct distribution for different types of parameters and on correlating parameters using the Cholesky decomposition of a variance-covariance matrix. This Module will focus on coding the model to perform one probabilistic run (or simulation). In Module 3 we will look at storing and analysing the results of many model simulatons.
+The aim of this exercise is to demonstrate how a deterministic Markov model can be made probabilistic by fitting distributions to parameters.  Emphasis is on choosing the correct distribution for different types of parameters and on correlating parameters using the Cholesky decomposition of a variance-covariance matrix. This Module will focus on coding the model to perform one probabilistic run (or simulation). In Module 3 we will look at storing and analysing the results of many model simulations.
 
 The step-by-step guide below will take you through a number of stages of making the model probabilistic:
 
@@ -52,7 +52,7 @@ To work through this exercise, you will need to have the following csv files ava
 
 Before working on the code within this section, reacquaint yourself with the 'hazardfunction' data - these are the results from the regression analysis used in Module 1. You can also open the 'cov55'  CSV file, which is the corresponding covariance matrix. Take a moment familiarise yourself with these data. You’ll first need to read in these data files using the read.csv functions we've written at the top of the template file.
 
-Firstly, within the 'Deterministic parameters section', we need to start by defining all parameters that are not drawn from distributions for the probabilistic analysis: patient characteristics (age & sex), discount rates and prosthesis costs. These are to be left deterministic, and the parameter values have been provided for you (values in line with Module 1).  Before starting on the exercise, ensure that you are totally happy with why these parameters will not form part of the probabilistic analysis.
+Firstly, within the 'Deterministic parameters section', we need to start by defining all parameters that are not drawn from distributions for the probabilistic analysis: patient characteristics (age & sex), discount rates and prosthesis costs. These are to be left deterministic, and the parameter values have been provided for you (these values are the same as in Module 1).  Before starting on the exercise, ensure that you are totally happy with why these parameters will not form part of the probabilistic analysis.
 
 Next, we will move to the 'Probabilistic parameters' section (Line 34), to sampling values from distributions. 
 
@@ -149,7 +149,7 @@ print(state.utilities)
 We now implement the Cholesky decomposition matrix method in the model.  Look at the 'Hazard function' section, which gives the results of a regression analysis for the hazard ratio.  You have used these results before when constructing the deterministic model, but now we have added the covariance matrix for the parameters.  It should be clear that, while some parameters do not have a strong relationship, there are strong relationships within this set of parameters – particularly between the regression constant and the other parameters.
 
 
-i) Note that the covariance matrix you have been given is from the `cov55.csv` file we read in at the beginning of this exercise.  To turn this into a lower triangular Cholesky decomposition of the covariance matrix we have presented 2 options; (1) in the main script you can use the `chol()` function (we've coded this for you, note that you have to transpose the cov55 matrix using `t()` before reading in and then transpose back to get the correct format of the lower triangular Cholesky decomposition, this is due to the way the function reads in and outputs data), and (2) to understand what is actually happening within this function, you can also take a look at the `cholesky_decomposition.R` script provided within this course. Take a few moments to understand how this was obtained.
+i) Note that the covariance matrix you have been given is from the `cov55.csv` file we read in at the beginning of this exercise.  To turn this into a lower triangular Cholesky decomposition of the covariance matrix we have presented 2 options; (1) in the main script you can use the `chol()` function (we've coded this for you, note that you have to transpose the cov55 matrix using `t()` before reading in and then transpose back to get the correct format of the lower triangular Cholesky decomposition, this is due to the way the function reads in and outputs data), or (2) to understand what is actually happening within this function, you can also take a look at the `cholesky_decomposition.R` script provided within this course to see the manual calculation of the cholesky decomposition matrix. Take a few moments to understand how this was obtained.
 
 ii) Create a vector (`z`) of 5 random values drawn from the standard normal distribution using the `rnorm()` function. This should have a mean of 0 and a standard deviation of 1. 
 
@@ -166,16 +166,16 @@ colnames(temp) <- c("Tz","mean","x")
 print(temp)
 ```
 
-The final task for this section is to link the probabilistic transition probabilities to the relevant cell of the vector you have just created.
+The final task for this section is to link the probabilistic transition probabilities to the relevant vector you have just created.
 
-vi) Remember that we have been working on the log hazard scale for the Weibull regression.  We need to make sure that the model parameters are exponentiated.  Using the parameters just created assign values for `lambda` [Lambda parameter survival analysis (depends on chosen mix of above coefficients)], `gamma` [Ancilliary parameter in Weibull distribution] and `rr.NP1` [Relative risk of revision for new prosthesis 1 compared to standard].
+vi) Remember that we have been working on the log hazard scale for the Weibull regression.  We need to make sure that the model parameters are exponentiated.  Using the parameters just created assign values for `lambda` [Lambda parameter survival analysis (depends on chosen mix of above coefficients)], `gamma` [Ancillary parameter in Weibull distribution] and `rr.NP1` [Relative risk of revision for new prosthesis 1 compared to standard].
 
 
 (@) **Life-table transitions for background mortality**
 
 As we described in Module 1, we can still employ time dependent transitions in other model state providing the time dependency relates to time in the model rather than time in the state itself. This is the case for the background mortality rate, which depends on the age of a subject rather than which state of the model they are in.  
 
-Open the 'Life tables' section of the code, first define the vectors of cycle numbers and cohort age throughout the model. Then re-familiarise yourself with the `findInterval()` function, and how this is used to create the 'death.risk' data.frame, by selecting the appropriate mortality values for each cycle (based on the cohort age at that cycle).  
+Open the 'Life tables' section of the code, first define vectors for the cycle numbers and cohort age throughout the model. Then re-familiarise yourself with the `findInterval()` function, and how this is used to create the 'death.risk' data.frame, by selecting the appropriate mortality values for each cycle (based on the cohort age at that cycle).  
 
 
 (@) **Building the Markov model**

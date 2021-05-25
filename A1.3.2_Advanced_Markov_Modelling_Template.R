@@ -104,7 +104,7 @@ col.key <- 3-male ## 3 indicates the 3rd column of tdps (which is female risk of
 #  Now create a transition matrix for the standard prosthesis arm
 #  We start with a three dimensional array in order to capture the time dependencies
 tm.SP0 <- array(data = , dim = c( , , ),
-                dimnames= list(state.names, state.names, 1:cycles))   # an empty array of dimenions (number of states, number of states, number of cycles)
+                dimnames= list(state.names, state.names, 1:cycles))   # an empty array of dimensions (number of states, number of states, number of cycles)
                 ## naming all dimensions
 
 ### create a loop that creates a time dependent transition matrix for each cycle
@@ -164,7 +164,7 @@ undisc.QALYs.SP0 <-   ## total quality-adjusted life years from lys.SP0
 undisc.QALYs.SP0
 
 ## DISCOUNTING:
-## this time we use 
+
 discount.factor.o <-    ## a vector of a discount factor multiplier for each cycle
   ## one way to do this is to simply multiply the cycle vector (cycle.v) with the discount formulae
 discount.factor.o
@@ -188,7 +188,7 @@ disc.cost.SP0
 
 ##########**** NP1 *****######
 
-tm.NP1 <-   ## an empty array of dimenions (number of states, number of states, number of cycles)
+tm.NP1 <-   ## an empty array of dimensions (number of states, number of states, number of cycles)
 
   
 ### create a loop that creates a time dependent transition matrix for each cycle
