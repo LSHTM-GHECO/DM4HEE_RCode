@@ -1,5 +1,5 @@
 #  Decision Modelling for Health Economic Evaluation
-#  Course Exercise 3a (Part 1): TEMPLATE FILE
+#  Advanced Course Exercise 3a (Part 1): TEMPLATE FILE
 #  Authors: Andrew Briggs, Jack Williams & Nichola Naylor
 
 ### Loading useful packages
@@ -77,11 +77,11 @@ a.uRevision<-mn.uRevision*ab.uRevision ## alpha (a)
 b.uRevision<-a.uRevision*(1-mn.uRevision)/mn.uRevision ## beta(b)
 
 # Discount factor matrices
-## discount matrices
 cycle.v <- 1:cycles ## a vector of cycle numbers 1 - 60
 discount.factor.c <- 1/(1+dr.c)^cycle.v ## the discount factor matrix
 discount.factor.o <- 1/(1+dr.o)^cycle.v  ## discount factor matrix for utility 
 
+####***** THR MODEL FUNCTION ****#####
 
 model.THR <- function(age=60, male=0) {
   ### A function running the THR model, setting age and sex
@@ -297,7 +297,7 @@ simulation.results <- data.frame("cost.SP0" =     , ## use the rep() function to
 ## running the simulations and filling the simulation.results data.frame:
 for(i in 1:sim.runs){
   ## define each row as a result from each run  
-  
+
 }
 
 ## have a look at what you've created so far:

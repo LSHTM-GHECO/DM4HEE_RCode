@@ -50,7 +50,7 @@ The two packages mentioned above are needed as we have added some additional cod
 
 * Please also ensure you have the "ggplot_CEA_functions.R" script stored in the same folder as your template/solution files, with the working directory set to that same folder. Or alternatively make sure you set an appropriate file path to load the script.  
 
-**PART 2**: We will be using the "A3.3.2b" template and "A3.3.3b" solution files. The purpose of this exercise is to introduce a further prosthesis into the THR model in order to illustrate the approach to calculating multiple CEACs for multiple, mutually exclusive treatment options.The step-by-step guide covers two main tasks: 
+**PART 2**: We will be using the "A3.3.2b" template and "A3.3.3b" solution files. The purpose of this exercise is to introduce a further prosthesis into the THR model in order to illustrate the approach to calculating multiple CEACs for multiple, mutually exclusive treatment options. The step-by-step guide covers two main tasks: 
 
 1. Adding in a third prosthesis option
 2. Multiple curves for mutually exclusive treatment options.
@@ -73,13 +73,14 @@ As part of the previous module, we added an additional resource 'THR Model with 
 
 In this exercise we aimed to structure the model function to be slightly more efficient (i.e. run through the code at a faster speed) by trying to avoid repeating some of the unnecesary (deterministic) parts of the code multiple times. 
 
-Since this is the same model structure as you created in Modules 1 and 2, we haven't asked you to re-write the model code, but do read through the `model.THR()` function to check you understand what parts of the model are now within the function, and how "age" and "male" are set/used. You can run the model a few times to see the differences in the results generated across probabilistic runs. This may still take a fair few seconds to run so be patient on first running. You should have similar results to the below (remember actual numbers will differ due to random draws):
+Since this is the same model structure as you created in Modules 1 and 2, we haven't asked you to re-write the model code, but do read through the `model.THR()` function to check you understand what parts of the model are now within the function, and how "age" and "male" are set/used. Once you have looked through the function, we recommend that you use the arrow next to the the function code to close it (i.e. to stop showing the code), to help view the rest of the script, since the `model.THR()` code is around 200 lines long! You can run the model a few times to see the differences in the results generated across probabilistic runs. This may still take a fair few seconds to run so be patient on first running. You should have similar results to the below (remember actual numbers will differ due to random draws):
 
 ```{r, echo=FALSE}
 model.THR()
 ```
 
 *Top tip for your future models: If you want to debug your function, after defining the deterministic parameters, manually set male and age (or equivalents), and work through chunks of the function code (treating it not as a function) to see where the error occurs* 
+
 It should be noted that you can have functions stored in a separate R script within your working directory and run this into your simulation analysis script through using the `source()` function [check `?source` for more information]. However, for the simplicity of teaching this course this was not done here.  
 
 (2) **Running the simulations**
@@ -131,12 +132,12 @@ In the section 'Plotting the cost-effectiveness acceptability curve' we will fir
 
 * Use this value to calculate the average net monetary benefit for the standard and new prostheses respectively based on the average results you obtained in estimating the expected average incremental costs and effects of new treatment (`PSA.inc.cost` and `PSA.inc.qalys`). *Note that the average incremental NMB calculated will be dependent on the WTP threshold defined above.* 
 
-Based on this incremetnal NMB estimate, would you accept or reject the new intervention at this WTP threshold (in terms of it’s net monetary benefit impact)? What is the decision rule you use for this?
+Based on this incremental NMB estimate, would you accept or reject the new intervention at this WTP threshold (in terms of it’s net monetary benefit impact)? What is the decision rule you use for this?
 
 Next, we need to estimate how often the new treatment would be deemed cost-effective over the 1,000 model simulations, with any given WTP threshold.
 There are many ways this can be coded but the aim is to output 1 numeric value of how often (i.e. the probability) that the new treatment would be deemed cost-effective over the standard treatment (at any given WTP threshold). Once we have a mechanism to calculate this, then we can perform this calculation over a range of WTP thresholds, to see how the numeric value changes across WTP thresholds. 
 
-* Based on the above concepts, write a function that calculates for each simulation run the net monetary benefit and whether that is considered cost-effective or not (based on the decision rule with net-monetary benefit) and then calculates the average number of times the new treatment was cost-effective. In the function, allow the willingness-to-pay (WTP) input of the function - you can do this by specifying inputs within the brackets (e.g. `p.CE <- function(WTP, simulation.results) { }`). 
+* Based on the above concepts, write a function that calculates for each simulation run the net monetary benefit and whether that is considered cost-effective or not (based on the decision rule with net monetary benefit) and then calculates the average number of times the new treatment was cost-effective. In the function, allow the willingness-to-pay (WTP) input of the function - you can do this by specifying inputs within the brackets (e.g. `p.CE <- function(WTP, simulation.results) { }`). 
 
 * Then, generate the cost-effectiveness acceptability curve table by using a for loop and the above function to estimate the probability of cost-effectiveness for different WTP values ranging from 0 to £50,000 (by increments of £10). This can be done by first creating a data.frame with 2 columns; with the WTP values, and the probability of cost-effectiveness. *(Hint: you can fill the first column with WTP values already, and leave the second column with numeric, missing values in the first instance, and then replace them with outputs of `p.CE()` using a for loop).*
 
@@ -153,7 +154,7 @@ Up to this point we have been working with a model where the patient characteris
 
 * You may want to have larger increments in the WTP values this time to help with spee (e.g. redefine `WTP.values` with larger increments than 10) 
 
-* Next, create a data.frame called 'CEAC.subgroups', with the number of rows equal to the WTP values and the number of columns euqal to the number of subgroups + 1, to record the probability of cost-effectiveness results by running the code. *(Note that you can also use a matrix instead of a data.frame, however it is generally easier to generate plots using a data frames, particularly if using ggplot).*
+* Next, create a data.frame called 'CEAC.subgroups', with the number of rows equal to the WTP values and the number of columns equal to the number of subgroups + 1, to record the probability of cost-effectiveness results by running the code. *(Note that you can also use a matrix instead of a data.frame, however it is generally easier to generate plots using a data frames, particularly if using ggplot).*
 
 * Now replace the NA values with outputs from p.CE by completing the for loop we started for you. *Note: the first column is the WTP values, but we've given some hints in the annotations of the template script for the next step of how to complete the loop.*
 
@@ -296,7 +297,7 @@ The results from the probabilistic analysis of mutually exclusive options can al
 
 (i) First, calculate the average net monetary benefit for each option by first defining a vector of WTP values from £0 to £50,000 per QALY gained, by increments of your chosing (`WTP.values`). Then create a data.frame (`CEAC`) which has the WTP values and empty columns for standard, NP1 and NP2 columns.   
 
-(ii) Next, create a function (`pCE.3b`), to estimate net monetary benefit for each intervention, and specify WTP as an argument in the function. We've started the function, but left a few definitions blank for you to complete. The aim of the function is to estimates the probability of the new intervention being cost-effective. You will need to use the `apply()` function to first select the maximum 'nmb' value by row (call this `max.nmb`) and then againt to calculate the mean number of times that each treatment pathway was found to be the most cost-effective (i.e. the mean times each column within the `CE` data.frame was found to be the strategy with the maximum NMB) - defining `probCE`.
+(ii) Next, create a function (`pCE.3b`), to estimate net monetary benefit for each intervention, and specify WTP as an argument in the function. We've started the function, but left a few definitions blank for you to complete. The aim of the function is to estimates the probability of the new intervention being cost-effective. You will need to use the `apply()` function to first select the maximum 'nmb' value by row (call this `max.nmb`) and then again to calculate the mean number of times that each treatment pathway was found to be the most cost-effective (i.e. the mean times each column within the `CE` data.frame was found to be the strategy with the maximum NMB) - defining `probCE`.
 
 (iii) Complete the for loop to fill in the CEAC table with the outputs of the `pCE.3b` function.
 
@@ -318,6 +319,6 @@ plot.ceac.all(CEAC.long)
 
 As was noted in the presentation, the interpretation of multiple acceptability curves can be tricky – especially when the model is non-linear.  Fenwick et al (2001) have argued for the use of a cost-effectiveness acceptability frontier (CEAF) in these situations and an example of this applied to the Excel version of the model you have just constructed, which is available on the course website.
 
-Congratulations! You have now created a time-dependent, probablistic Markov model with an additional treatment arm comparator, additionally you've presented results from such analyses graphically. In the next module we'll be building on `model.THR` to explore Value of Information Analyses.
+Congratulations! You have now created a time-dependent, probabilistic Markov model with an additional treatment arm comparator, additionally you've presented results from such analyses graphically. In the next module we'll be building on `model.THR` to explore Value of Information Analyses.
 
 
