@@ -390,7 +390,7 @@ plot.ce.plane.all(plane.sims)
 #### PLOTTING THE COST-EFFECTIVENESS ACCEPTABILITY CURVE #####
 
 # Generate CEAC table
-WTP.values <- seq(from = 0, to = 50000, by = 10) ## use the seq() function to get a vector of specified numeric values
+WTP.values <- seq(from = 0, to = 50000, by = 100) ## use the seq() function to get a vector of specified numeric values
 
 CEAC <- data.frame(WTP = WTP.values, 
                    Standard= rep(as.numeric(NA),length(WTP.values)),
@@ -445,4 +445,55 @@ colnames(CEAC.long) <- c("WTP", "group", "pCE")
 head(CEAC.long)
 
 plot.ceac.all(CEAC.long)
+
+
+
+## Cost-effectiveness acceptability frontier (CEAF) - Additional code
+
+# This code is very similar to the pCE.3b() code (that is used to produce the CEAC table)
+# We have annoted the function to note where the differences are, including how the treatment with the 
+#  maximum NMB is selected from the data
+
+CEAF.function <-function(WTP, simulation.results) {
+
+  # The main code here is the same as that used in the CEAC 
+  nmb <- simulation.results[,c("qalys.SP0",
+                               "qalys.NP1",
+                               "qalys.NP2")]*WTP - 
+    simulation.results[,c("cost.SP0",
+                          "cost.NP1",
+                          "cost.NP2")] 
+  ## this time we want to choose the prothesis with the greatest net monetary benefit:
+  colnames(nmb) <- c("SP0", "NP1", "NP2")
+  
+  # Here we calcualte the probability of cost-effectiveness, as per original function 
+  max.nmb <- apply(nmb, 1, max) # selecting max value indication by row within nmb
+  CE <- nmb[1:nrow(simulation.results),] == max.nmb[1:nrow(simulation.results)] 
+  probCE<- apply(CE, 2, mean) ## averaging over TRUE (=1) and FALE (=0) for each column
+  
+  # However, we want the probability of cost-effectiveness for the treatment with the maximum overall NMB
+  av.nmb <- colMeans(nmb)
+  # This will check if the av.nmb is the highest value, and will subset the prob.CE results accordingly 
+  # (i.e. where av.nmb is maximised, the probCE value will be returned)
+  max.ce <- probCE[av.nmb == max(av.nmb)]
+  # We take the name of the treatment so we can know which of the three treatments produced the highest NMB! 
+  comparator <- names(max.ce) 
+  
+  return(data.frame(comparator, max.ce))
+  
+}
+
+# Create an empty table for the results
+CEAF <- data.frame(WTP = as.numeric(WTP.values), 
+                   group = rep(NA,length(WTP.values)),
+                   pCE = rep(as.numeric(NA),length(WTP.values)))
+
+
+for(i in 1:length(WTP.values)){
+  CEAF[i,2:3] <- CEAF.function(WTP.values[i], simulation.results)
+}
+
+# The same ggplot code can be used for the CEAF plot 
+plot.ceac.all(CEAF)
+
 
