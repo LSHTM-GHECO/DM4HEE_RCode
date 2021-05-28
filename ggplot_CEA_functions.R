@@ -125,7 +125,7 @@ plot.evpi <- function(results){
           panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
           legend.key.width=unit(1.8,"line"), text = element_text(size=12)) + 
     scale_x_continuous(labels = scales::comma, expand = c(0, 0.1)) + 
-    scale_y_continuous(labels = scales::comma, expand = c(0, 0))
+    scale_y_continuous(labels = scales::comma, limits = c(0, max(results$EVPI)*1.1), expand = c(0, 0))
   
   return(plot)
   

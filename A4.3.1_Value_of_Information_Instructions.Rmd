@@ -25,7 +25,7 @@ source("A4.3.3b_Value_of_Information_Part 2_Solution.R")
 
 ## Overview
 
-The purpose of this exercise is to show how the model you have already developed can be adapted to calculate the expected value of perfect information (EVPI).  As a first step, the overall EVPI for the model is calculated in order to summarise the overall importance of uncertainty for decision-making.  Secondly, the partial EVPI for individual parameters (or groups of parameters) can be calculated in order to examine the individual contribution of different parameter (combinations) to the overall uncertainty.
+The purpose of this exercise is to show how the model you have already developed can be adapted to calculate the expected value of perfect information (EVPI).  As a first step, the overall EVPI for the model is calculated in order to summarise the overall importance of uncertainty for decision-making.  Secondly, the partial EVPI for individual parameters (or groups of parameters) can be calculated in order to examine the contribution of different parameters to the overall uncertainty.
 
 The step-by-step guide below will take you through the following stages for calculating expected value of information for the overall decision problem and for the parameters of the decision model. There are 2 parts to this exercise:
 
@@ -34,7 +34,10 @@ The step-by-step guide below will take you through the following stages for calc
 * "A4.3.2a_Value_of_Information_Part 1_Template.R"
 * "A4.3.3a_Value_of_Information_Part 1_Solutions.R" 
 
-Additionally, the solution file from the previous exercise will be sourced ("A3.3.3a_Presenting_Simulation_Results_Part1_Solutions.R").
+Additionally, the solution file from the previous exercise will be sourced:
+
+* ("A3.3.3a_Presenting_Simulation_Results_Part1_Solutions.R").
+
 The exercise will involve completing the following tasks:
 
 1. Calculating per patient EVPI from simulation output
@@ -47,12 +50,12 @@ The exercise will involve completing the following tasks:
 * "A4.3.3b_Value_of_Information_Part 2_Solutions.R" 
 * "A4.3.3b_VoI_Model_Script" 
 
-The last template and solutions scripts will run the main model code from another pre-filled script ('A4.3.3b_VoI_Model_Script'). This allows you to call in the model and explore the key concepts of how to use the model functions in this exercise.
+The last template and solutions scripts will run the main model code from another pre-filled script ('A4.3.3b_VoI_Model_Script'). This allows you to call in the model function, and explore the key concepts of this module in a seperate script.
 
 In this part of the exercise you will:
 
 1. Look at the adaptations to the model, to see how the model function has been developed to allow for parameters to provided as arguments in the function. 
-2. Work through an Expected Value of Partially Perfect Information (EVPPI) manually, to ensure that you understand the process involved in each step
+2. Work through an Expected Value of Partially Perfect Information (EVPPI) manually, to ensure that you understand the process involved in each step.
 3. Look through the EVPPI analyses coded for each parameter (or group of parameters), and ensuring you understand how the appropraite parameters are being selected.
 4. Plot EVPPI results across a range of willingness to pay thresholds.
 
@@ -64,23 +67,25 @@ Across the whole exercise we will be using the data inputs and packages discusse
 
 (1) **Calculating per patient EVPI from simulation output**
 
-In the "A4.3.2a..." template file you will see that we've begun the exercise by sourcing in the model we created in Exercise 3a and storing the simulation results as we did in exercise 3a for intended group of interest (in this case females aged 60).
+In the "A4.3.2a..." template file you will see that we've begun the exercise by sourcing in the model we created in Exercise 3a and storing the simulation results as we did in exercise 3a for intended group of interest (in this case the function will run the model for females aged 60, unless other values for these are provided).
 
 Recall that, under a decision theoretic approach, it is the expected outcome that should guide the decision.  That is, we will use the new prosthesis if it has an expected net benefit that is greater than that of the standard prosthesis.  However, due to uncertainty, sometimes we will make the wrong decision and the losses associated with the wrong decision are the net-benefits forgone. 
 
 So we first need to estimate the EVPI for individual patients. 
 
-(i) First, define a willingness-to-pay (WTP) threshold of your choice, to assess the EVPI (we show an example using £100,000 per QALY gained within the solutions).
+(i) First, define a willingness-to-pay (WTP) threshold of your choice, to assess the EVPI (we show an example using £10,000 per QALY gained within the solutions).
 
-(ii) Estimate the net monetary benefit (NMB) for SP0 and NP1 for each run using columns from the `simulation.results` data.frame, and your defined WTP. Once you have estimated the NMB for each model simulation, ensure that you have these in a data.frame (one column for each treatment). [*We've coded this for you, but try to understand what is happening*]
+(ii) Estimate the net monetary benefit (NMB) for SP0 and NP1 for each run using columns from the `simulation.results` data.frame, and your defined WTP. Once you have estimated the NMB for each model simulation, ensure that you have these in a data.frame (one column for each treatment). [*We've coded this for you already, but do make sure you understand the calculations*]
 
 (iii) Using the `apply()` function, estimate the the mean NMB for both treatments, across all simulations. This is the average NMB under current information. We can save this as `av.current`.  
 
-(iv) Next, to consider the decision making under perfect information, estimate the maximum NMB for each treatment, acrosss each model simulation (i.e. the NMB for the favoured treatment, at that WTP) and save this as `max.nmb`. The average of all these maximum NMB values can be calculated using the `max()` function, and saved as `av.perfect`. This represents the average NMB across all simulations, if the correct was chosen every time. 
+*Note: We will be using the *`apply()` *functions in several parts of this module. You can check the help file to make sure you understand how to use the function, but it essentially requires three arguments. First, a data frame, second, whether to look across rows or columns, and last, what function you wish to perform.*
 
-(v) Calculate the maximum NMB out of the two treatments under current knowledge, and call this (`max.current`). 
+(iv) Calculate the maximum NMB out of the two treatments under current knowledge, and call this (`max.current`). 
 
-(vi) Finally, you can calculate the difference between the NMB from the preferred treatment across all simulations, versus the NMB if the best treatment was chosen across every simulation. This is the EVPI for each individual, and you can save this as `EVPI.indiv`. We've given some further hints in the template to help you through this, but remember that these results are all specific to the WTP defined above. 
+(v) Next, to consider the decision making under perfect information, estimate the maximum NMB for each treatment, for each model simulation performed (i.e. the NMB for the favoured treatment, at that WTP) and save this as `max.nmb`. This will be a vector of values, the same length as the number of simulations. The average of all these maximum NMB values can be calculated using the `mean()` function, and saved as `av.perfect`. This represents the average NMB across all simulations, if the correct was chosen every time. 
+
+(vi) Finally, you can calculate the difference between the NMB from the preferred treatment across all simulations, versus the NMB if the best treatment was chosen across every simulation. This is the EVPI for each individual, and you can save this as `EVPI.indiv`. We've given some further hints in the template to help you through this, but remember that these results are all specific to the WTP defined above (and if you have chosen a very high WTP threshold, the EVPI may be 0!). 
 
 (2) **Calculating the effective population**
 
@@ -90,7 +95,7 @@ Of course, there will be more than one patient eligible for a particular treatme
 
 (i) Using the above information, set the population, number of years and discount rate in the template script. 
 
-(ii) We can then define a discounted population sequence for you, estimate the effective population by summing across this (i.e. summing across `population.seq`).
+(ii) We have now defined a discounted population sequence for you (the annual population, discounted each year, for the number of years the technology is assumed to apply for). Next, estimate the effective population by summing across this (i.e. summing across `population.seq`).
 
 (iii) Estimate the population level EVPI by multiplying the effective population (`effective.population`) by the `EVPI.indiv` we calculated earlier on in the exercise.
 
@@ -104,20 +109,22 @@ Since EVPI is calculated using net-benefit and net-benefit is a function of the 
 
 (iii) Create a data frame (`EVPI.results`) to capture the WTP values and subsequent population EVPI results (the latter can be set to NA first).
 
-(iv) Fill in the rest of the for loop we've started to run the `est.EVPI.pop()` along different `WTP.values`. The top of your `EVPI.results` should look similar to the below (although remember these won't be the exact same due to the sampling methods used!):
+(iv) Fill in the rest of the for loop we've started to run the `est.EVPI.pop()` along different `WTP.values`. Remember that this function requires three arguments to be provided. The top of your `EVPI.results` should look similar to the below (although remember these won't be the exact same due to the sampling methods used!):
 
 ```{r, echo=FALSE}
 head(EVPI.results)
 ```
 
 
-Congratulations! You've completed your first EVPI in R. Take a look at the results you've got.
+Congratulations! You've completed your first EVPI in R. 
 
-Now plot these results using the predefined ggplot functions given. 
+Take a look at the results you've got. You can plot these results using the predefined ggplot functions given. *These don't need adapting from the code already given within the template file, just run the code and check out the plots!*
 
-*These don't need adapting from the code already given within the template file, just run the code and check out the plots!*
+The population EVPI results should look similar to the plot below. Notice the peak in EVPI – where does this occur?
 
-Notice the peak in EVPI – where does this occur?
+```{r evpiplot, echo = FALSE}
+plot.evpi(EVPI.results)
+```
 
 \newpage 
 
