@@ -124,7 +124,7 @@ WTP.values <- seq(0, 50000, 100)
 inner.results <- matrix(0, inner.loops, 4)
 colnames(inner.results) <- c("Cost SP0", "QALY SP0", "Cost NP1", "QALY NP1")
 
-evppi.results.SP0 <- matrix(0, ncol = length(WTP.values), nrow = outer.loops)
+evppi.results.SP0 <- matrix(0, nrow = outer.loops, ncol = length(WTP.values))
 colnames(evppi.results.SP0) <- as.character(WTP.values)
 evppi.results.NP1 <- evppi.results.SP0 
 
@@ -134,8 +134,7 @@ evppi.results.NP1 <- evppi.results.SP0
 population <- 40000 
 years <- 10
 evpi.disc <- 0.06
-population.seq <- sum(population * (1/(1+evpi.disc) ^ c(0:(years-1))))
-effective.population <- sum(population.seq)
+effective.population <- sum(population * (1/(1+evpi.disc) ^ c(0:(years-1))))
 
 # creating a function to estimate NMB across WTP values:
 nmb.function <- function(WTP, results){

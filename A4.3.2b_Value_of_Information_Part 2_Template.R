@@ -107,20 +107,20 @@ evppi <-
 #### EVPPI Model runs #### 
 
 ## Enter inner and outer loop numbers - note these must be higher than sim.runs 
-inner.loops <- 100
-outer.loops <- 100
+inner.loops <- 
+outer.loops <- 
 
 # Note that these need to be less than or equal to sim.runs - since that determins the parameter samples
 sim.runs >= inner.loops
 sim.runs >= outer.loops
 
 # Generate matrices to store EVPPI results 
-WTP.values <- seq(0, 50000, 100)
+WTP.values <- 
 
 inner.results <- matrix(0, inner.loops, 4)
 colnames(inner.results) <- c("Cost SP0", "QALY SP0", "Cost NP1", "QALY NP1")
 
-evppi.results.SP0 <- matrix(0, ncol = length(WTP.values), nrow = outer.loops)
+evppi.results.SP0 <- matrix(0, nrow = outer.loops, ncol = length(WTP.values))
 colnames(evppi.results.SP0) <- as.character(WTP.values)
 evppi.results.NP1 <- evppi.results.SP0 
 
@@ -130,8 +130,7 @@ evppi.results.NP1 <- evppi.results.SP0
 population <- 40000 
 years <- 10
 evpi.disc <- 0.06
-population.seq <- sum(population * (1/(1+evpi.disc) ^ c(0:(years-1))))
-effective.population <- sum(population.seq)
+effective.population <- sum(population * (1/(1+evpi.disc) ^ c(0:(years-1))))
 
 
 # creating a function to estimate NMB across WTP values:
