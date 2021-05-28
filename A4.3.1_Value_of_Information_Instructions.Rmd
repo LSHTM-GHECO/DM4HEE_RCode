@@ -205,7 +205,7 @@ We will use the letter 'a' to indicate the outer loop number, and the letter 'b'
 
 (ii) Note that the value for the relative risk will be constant within the inner loop (this is now the 'perfect information for the parameter'. Next, we can run 100 model simulations within the inner loop, and ensure that all other probabilistic parameters in the model are sampled. To do this, all other parameters inside the inner loop will be selected using 'b' so that they will change for each inner loop, whilst the relative risk value remains fixed (in each inner loop, because a is fixed, and equal to 1). To ensure that the relative risk remains fixed, whilst the other parameters are sampled inside the loop, the following code should be used to run the model. 
 
-```{r model run, eval = FALSE}
+```{r, eval = FALSE}
   for(b in 1:100){
     inner.results[b,] <-  model.THR.voi(RR.vec[a], omr.df[b,],  tp.rrr.vec[b], 
                                         survival.df[b,],c.revision.vec[b], 
@@ -215,7 +215,7 @@ We will use the letter 'a' to indicate the outer loop number, and the letter 'b'
 
 The results of one model run (which will be saved in the inner results matrix) will look like this:
 
-```{r model run, echo = TRUE}
+```{r, echo = TRUE}
 model.THR.voi(RR.vec[a], omr.df[b,],  tp.rrr.vec[b], 
               survival.df[b,],c.revision.vec[b], 
               state.utilities.df[b,]) 
