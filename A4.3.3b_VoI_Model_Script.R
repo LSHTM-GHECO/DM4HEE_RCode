@@ -278,6 +278,7 @@ model.THR.voi <- function(RR.NP1, ## from RR.vec
 }
 
 ## testing the function:
+i = 1
 model.THR.voi(RR.vec[i], omr.df[i,],  tp.rrr.vec[i], 
               survival.df[i,],c.revision.vec[i], 
               state.utilities.df[i,]) 

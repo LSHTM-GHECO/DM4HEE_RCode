@@ -130,27 +130,54 @@ plot.evpi(EVPI.results)
 
 ## PART 2: Step-by-step guide
 
-(@) **Loading the appropriate model script and function**
-
 The overall EVPI for the model is a useful upper limit on returns to future research.  However, of crucial importance is which particular parameters (or groups of related parameters) are most important in terms of having the greatest value of information.  Partial EVPI - also known as Expected Value of Partially Perfect Information (EVPPI)- approaches are designed to look at just that.  They work by looking at the value of information of the remaining parameters of the model if we assume perfect information for the parameter of interest. 
 
-Begin by loading up the template file. First, you can run the 'A4.3.3b_VoI_Model_Script' using the `source()` function. This is an adapted version of the model, which includes a function to run the Markov model - which we have labelled `model.THR.voi()`. Take a look at this script and the function. We have annoted the script to highlight changes that have been made. You will notice that in this version of the model, rather than proabilistic parameters being included within the model function (i.e. sampling one value within each model simulation), these parameters are now sampled and stored before the model function is run. This tends to be a quicker (more efficient) way of running the model, but it does mean some additional complexity. 
+In this practical session we want to look at the EVPPI of six groups of parameters (where parameters are related, such as utilities or survival parameters, it makes sense to consider their partial EVPI together):
 
-As such, we have to slightly adapt the function in order to pass these probabilistic values into the model function. Notice how `model.THR.voi()` calls in vectors which contain our sampled probabilistic values. The model function will then use the parameters that we pass to it, to generate the transition matrices and the Markov trace, and estimate the costs and QALYs for the two treatments. The remainder of the model function is the same as you have seen previously, except in some areas we have tried to speed up some of the code by avoiding loops. *(For those interested, check how the transition matrices are now calculated using vectorisation rather than using a loop. This vectorisation works because the length of time varying parameters (as vectors) is the same as the number of matrices in the array, so R knows that the first value is for the first matrix, and so on).* 
+* Relative risk of revision for new prosthesis 1 compared to standard
+* Operative mortality following primary and revision surgeries
+* Re-revision risk
+* Survival parameters (the lamda and gamma parameters derived from the hazard function outputs)
+* Costs (in this case the only probablistic cost is cost of revision surgery)
+* Utilities (utility values from successful and revision surgeries)
 
-To ensure you understand the data provided to the model function,consider the following. The previous model samples 10,000 value for each parameter: 
+In this practical you will first look at the the new model function `model.THR.voi()` that is loaded in from a seperate script. The adapted function is described in detail in the next section, but essentially it allows us to pass specific parameters values into the model (rather than these values being sampled within the model). This gives control over which values are selected and used in the model. This is needed for the inner and outer loops of the EVPPI calculations.  
+
+
+(@) **Loading the appropriate model script and function**
+
+Begin by loading up the template file. First, you can run the 'A4.3.3b_VoI_Model_Script' using the `source()` function. This is an adapted version of the model, which includes a function to run the Markov model - which we have labelled `model.THR.voi()`. Take a look at this script and the function. We have annoted the script to highlight changes that have been made. You will notice that in this version of the model, rather than proabilistic parameters being sampled and assigned within the model function (i.e. sampling one each time the model function is run), all of these parameters are now sampled and stored outside of the model function. This tends to be a quicker (more efficient) way of running model simulations, but it does mean some additional complexity. 
+
+Since the probabilistic parameters are no longer being generated within the model function, we have to adapt the function to take these probabilistic values as arguments in the function. This means that these parameters are provided as inputs for the model function. Notice how the `model.THR.voi()` function requires data which contain our sampled probabilistic values. The model function will then use the parameters provided to it to generate the transition matrices and the Markov trace, and estimate the costs and QALYs for the two treatments. The remainder of the model function is the same as you have seen previously, except in some areas we have tried to speed up some of the code by avoiding loops. *(For those interested in more efficient coding, check how the transition matrices are now calculated using vectorisation rather than using a loop. This vectorisation works because the length of time varying parameters (as vectors) is the same as the number of matrices in the array, so R knows that the first value is for the first matrix, and so on).* 
+
+To ensure you understand the data provided to the model function, consider the following. The previous model samples 10,000 value for each parameter: 
 
 ```{r, echo = TRUE}
 
-dim(state.utilities.df) ## This provides the dimensions of the data frame (rows and colums)
-head(state.utilities.df) ## Now let's take a look at the first 5 rows 
+## This provides the dimensions of the data frame 
+dim(state.utilities.df) # (10000 rows and 5 colums)
 
-## Now we will select one row of sampled values from this data.frame, in this case the first row: 
+
+head(state.utilities.df) ## Now let's take a look at the first 6 rows 
+
+# Now we will select one row of sampled values from data.frame, 
+#  in this case the first row: 
 state.utilities.df[1,] 
 
 ```
 
-Once the correct selection of parameters is done, these can be given to the model. If for example we wanted to performed a PSA, then we could write the following code, and perform and save the results of 10,000 probabilistic analyses (note this is just an example, but if you want to check you could run this code). For each value of `i` given in the loop, a new selection of sampled data, for each parameter, is provided to the model, which then in turns gives the corresponding results: 
+This data can then be passed to the model. You can also check the other parameters that are provided to the `model.THR.voi()` function too. You can check the bottom of the code in the 'A4.3.3b_VoI_Model_Script' R script and see an example of the model function being performed (the code is also provided below). 
+
+```{r, echo = TRUE}
+i = 1
+model.THR.voi(RR.vec[i], omr.df[i,],  tp.rrr.vec[i], 
+              survival.df[i,],c.revision.vec[i], 
+              state.utilities.df[i,]) 
+```
+
+Check each the data provided to the model. Notice that if you re-run this code (with i = 1 each time), the same parameter values are provided to the model, and therefore the model results will be the same since the input data remain the same. 
+
+In order to consider the results of the model using many different samples of data, we can select the appropriate samples of probabilistic values and run the model each time, in a loop. You don't need to replicate this code, it is provided below as an example, but if you wanted to performed a PSA then the following code would perform and save the results of 10,000 probabilistic analyses (this is just an example, but you could run this code to check if you wanted). For each value of `i` given in the loop, a new selection of sampled data for each parameter is provided to the model, which then produces a different set of model results: 
 
 ```{r, eval = FALSE}
 
@@ -164,18 +191,9 @@ for(i in 1:sim.runs) {
 
 ```
 
+The reason that selecting the appropriate data within each model simulation becomes very important for the EVPPI loops, since each loop will take different sampled values depending on the parameter, or groups of parameters, for which we have perfect information.
 
-
-In this practical session we want to look at the EVPPI of six groups of parameters (where parameters are related, such as utilities or survival parameters, it makes sense to consider their partial EVPI together):
-
-* Relative risk of revision for new prosthesis 1 compared to standard
-* Operative mortality following primary and revision surgeries
-* Re-revision risk
-* Survival parameters (the lamda and gamma parameters derived from the hazard function outputs)
-* Costs (in this case the only probablistic cost is cost of revision surgery)
-* Utilities (utility values from successful and revision surgeries)
-
-You will see in `model.THR.voi()`, therefore, that data.frames (or vectors) containing the simulation values for these paramater groups (or individual parameters) are the inputs to the function. This allows us to pass specific parameters values into the model, but having control over which values are selected (e.g. which are sampled versus which are not). This is needed for the inner and outer loops of the EVPPI calculations.  
+\ 
 
 (@) **EVPPI Example walkthrough**
 
@@ -293,7 +311,7 @@ Remember the results generated at this point are per patient, not for the popula
 (iv) Next, it's time to visualise the results! Run the `plot.evppi()` function (remember this has been loaded in at the top of the script through the sourced `ggplot_CEA_functions.R` script) to see the EVPPI results across the WTP thresholds, for the six sets of parameters. If you want to view the plot in more detail, click the 'zoom' button above the plot in the 'Plots' pane of R. The plot should look similar to this:
 
 ```{r evppi plot, echo = FALSE, warning=FALSE, message=FALSE, error=FALSE}
-plot.evppi(evppi.long.pop)
+plot.evppi(evppi.long.pop, 15000)
 ```
 
 (v) Finally, if you want to see the specific EVPPI results at any given WTP threshold value, you can use the `subset()` function to do this. We have provided some code to do this at £2,200 (where the EVPPI is high!)
