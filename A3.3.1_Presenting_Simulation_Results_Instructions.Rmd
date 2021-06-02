@@ -186,9 +186,13 @@ table
 ```
 
 
-We can do this using the `melt()` function within the 'reshape2' package (which should have been loaded in at the start of this exercise using `library(reshape2)`, if not go back to the beginning of this script and load this in). Type in `?melt.data.frame` into the console to see how to use this function. Have a go at filling out `melt()`. For those familiar with the 'tidyr' package, the `gather()` function can also be used to reshape from wide to long format. 
+We can do this using the `melt()` function within the 'reshape2' package (which should have been loaded in at the start of this exercise using `library(reshape2)`, if not go back to the beginning of this script and load this in). Type in `?melt.data.frame` into the console to see how to use this function. Have a go at filling out `melt()`. For those familiar with the 'tidyr' and 'dplyr' packages, the `gather()` function can also be used to reshape from wide to long format. For those interested, the following code would also convert the code from wide to long format *(note that this alternative is not in the template or solutions files)*:
 
-Finally, we've used plot the resulting CEACs for the different patient characteristics using the pre-defined ggplot function `plot.ceac.all()`.
+```{r, eval = FALSE}
+CEAC.subgroups %>% gather(group, pCE, 2:7)
+```
+
+Finally, you can plot the resulting CEACs for the different patient characteristics using the pre-defined ggplot function `plot.ceac.all()`.
 
 You should find that the curves can be quite different for different patient characteristics (your final graph for Part 1 should look similar to the below). For example, the new prosthesis seems to be more cost-effective generally for men (due to the fact that men have higher failure rates on average and so the absolute benefits of reducing failure risk are greater) and that the new prosthesis is not so cost-effective for elderly patients (where death is an important competing risk for prosthesis failure).
 
@@ -311,15 +315,17 @@ tail(CEAC)
 
 Now run the final lines of code that uses our pre-defined `plot.ceac.all()` from the "ggplot_CEA_functions.R" script, first reshaping the data to match the format needed. The final CEAC should look like this: 
 
-\  
 
 ```{r CEAC , echo=FALSE}
 plot.ceac.all(CEAC.long)
 ```
 
+\  
+
+
 As was noted in the presentation, the interpretation of multiple acceptability curves can be tricky – especially when the model is non-linear.  Fenwick et al (2001) have argued for the use of a cost-effectiveness acceptability frontier (CEAF) in these situations and an example of this has been provided for you at the bottom of the R script. 
 
-The `CEAF.function()` function has been written for you, which is similar to the function used earlier in the script to estimate the probability of cost-effectiveness, except that rather than selecting the treatment with the highest probability of cost-effectiveness, the function selects the probability of cost-effectiveness for the treatment with the highest net monetary benefit (based on average net monetary benefit across all simulations run). We can also use the same plot function (`plot.ceac.all()`) to create a plot to show the results, this time for the CEAF.  
+The `CEAF.function()` function has been written for you, which is similar to the function used earlier in the script to estimate the probability of cost-effectiveness, except that rather than selecting the treatment with the highest probability of cost-effectiveness, the function selects the probability of cost-effectiveness for the treatment with the highest net monetary benefit (based on average net monetary benefit across all simulations run). We can also use the same plot function '`plot.ceac.all()`' to create a plot to show the results, this time for the CEAF.  
 
 Congratulations! You have now created a time-dependent, probabilistic Markov model with an additional treatment arm comparator, additionally you've presented results from such analyses graphically. In the next module we'll be building on `model.THR` to explore Value of Information Analyses.
 
