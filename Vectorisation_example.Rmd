@@ -1,12 +1,18 @@
 ---
-title: "Untitled"
-author: "Jack Williams"
-date: "1 June 2021"
+title: "Model Efficiency: Vectorised approach example"
+subtitle: "Supplementary file for Advanced Course"
+author: "Jack Williams & Nichola Naylor"
+date: "May/June 2021 Course"
 output:
   pdf_document: default
   html_document: default
+header-includes:
+- \usepackage{titling}
+- \pretitle{\begin{center}\LARGE\includegraphics[width=7.5cm]{logo.png}\\[\bigskipamount]}
+- \posttitle{\end{center}}
+urlcolor: blue
+linkcolor: red
 ---
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -139,7 +145,6 @@ A more efficient method, without the use of a loop, would be to assign the value
 ```{r, eval = FALSE}
   tm.SP0["P-THR","Death",] <- tp.PTHR2dead
 ```
-
 
 
 Where the transition probabilities are time dependent, this can also be done as long as the length of the vector (containing time-dependent transition probabilities) is the same as the dimensions of the matrix that it is replacing. The first value in the vector will replace the first position in the array, and so on... 
