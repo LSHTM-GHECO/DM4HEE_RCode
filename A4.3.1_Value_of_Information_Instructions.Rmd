@@ -168,7 +168,7 @@ state.utilities.df[1,]
 
 This data can then be passed to the model. You can also check the other parameters that are provided to the `model.THR.voi()` function too. You can check the bottom of the code in the 'A4.3.3b_VoI_Model_Script' R script and see an example of the model function being performed (the code is also provided below). 
 
-```{r, echo = TRUE}
+```{r, eval = FALSE}
 i = 1
 model.THR.voi(RR.vec[i], omr.df[i,],  tp.rrr.vec[i], 
               survival.df[i,],c.revision.vec[i], 
