@@ -123,16 +123,17 @@ plot.evpi <- function(results){
           axis.title.x = element_text(margin = margin(t = 7, r = 0, b = 3, l = 0)), 
           axis.title.y = element_text(margin = margin(t = 0, r = 7, b = 0, l = 3)), 
           panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-          legend.key.width=unit(1.8,"line"), text = element_text(size=12)) + 
+          legend.key.width=unit(1.8,"line"), text = element_text(size=12),
+          plot.margin=unit(c(0.5,0.5,0,0.5),"cm")) + 
     scale_x_continuous(labels = scales::comma, expand = c(0, 0.1)) + 
-    scale_y_continuous(labels = scales::comma, expand = c(0, 0))
+    scale_y_continuous(labels = scales::comma, limits = c(0, max(results$EVPI)*1.1), expand = c(0, 0))
   
   return(plot)
   
 }
 
 
-plot.evppi <- function(results, xlimit = 20000){
+plot.evppi <- function(results, xlimit = 12000){
   ## FUNCTION: Expected Value of Partial Perfect Information (EVPPI)
   ## This function allows for a limit on the X-axis, to help show the graph with adjusted axes
   ## INPUTS: results table equivalent to evppi.long.pop (see A3.3.b solutions)
@@ -149,7 +150,8 @@ plot.evppi <- function(results, xlimit = 20000){
           axis.title.x = element_text(margin = margin(t = 7, r = 0, b = 3, l = 0)), 
           axis.title.y = element_text(margin = margin(t = 0, r = 7, b = 0, l = 3)), 
           panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-          legend.key.width=unit(1.8,"line"), text = element_text(size=12)) + 
+          legend.key.width=unit(1.8,"line"), text = element_text(size=12),
+          plot.margin=unit(c(0.5,0.5,0,0.5),"cm")) + 
     scale_x_continuous(labels = scales::comma, limits = c(0, xlimit), expand = c(0, 0.1)) + 
     scale_y_continuous(labels = scales::comma, expand = c(0, 0))
   

@@ -27,20 +27,20 @@ for(i in 1:sim.runs){
 
 ### Estimating EVPI for individuals ####
 
-WTP <- 100000
-
-# simulation.results <- as.data.table(simulation.results)
-# simulation.results[ , nmbSP0 := qalys.SP0*WTP - cost.SP0]
-# simulation.results[ , nmbNP1 := qalys.NP1*WTP - cost.NP1]
+WTP <- 10000
 
 nmb.SP0 <- simulation.results$qalys.SP0 * WTP - simulation.results$cost.SP0
 nmb.NP1 <- simulation.results$qalys.NP1 * WTP - simulation.results$cost.NP1
 nmb.table <- data.frame(nmb.SP0, nmb.NP1)
 
 av.current <- apply(nmb.table, 2, mean)
-max.nmb <- apply(nmb.table, 1, max) 
-av.perfect <- mean(max.nmb)
+
 max.current <-  max(av.current)
+
+max.nmb <- apply(nmb.table, 1, max) 
+
+av.perfect <- mean(max.nmb)
+
 
 EVPI.indiv <- av.perfect - max.current
 
@@ -76,10 +76,11 @@ est.EVPI.pop <-function(WTP, effective.population,
   nmb.table <- data.frame(nmb.SP0, nmb.NP1)
 
   av.current <- apply(nmb.table, 2, mean)
+  max.current <- max(av.current)
   max.nmb <- apply(nmb.table, 1, max) 
   av.perfect <- mean(max.nmb)
   
-  EVPI.indiv <- av.perfect - max(av.current)
+  EVPI.indiv <- av.perfect - max.current
   pop.EVPI <- effective.population * EVPI.indiv
 
   return(pop.EVPI)

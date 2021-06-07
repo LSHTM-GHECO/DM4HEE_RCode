@@ -11,9 +11,6 @@ hazards <- read.csv("hazardfunction.csv", header=TRUE) ## importing the hazard i
 cov.55 <- read.csv("cov55.csv",row.names=1,header=TRUE) ## importing the covariance matrix
 life.table <- read.csv("life-table.csv", header=TRUE)
 
-
-####***** THR MODEL FUNCTION ****#####
-
 #########**** PARAMETERS *****######
 
 # SETTING CONSTANT PARAMETERS OUTSIDE THE FUNCTION 
@@ -30,6 +27,7 @@ c.SP0 <- 394 ## Cost of standard prosthesis
 c.NP1 <- 579 ## Cost of new prosthesis 1
 
 ### alpha and beta values
+
 # FOR TRANSITION PROBABILITY ESTIMATION
 a.PTHR2dead <- 2 ## alpha value for operative mortality from primary surgery
 b.PTHR2dead <- 100- a.PTHR2dead ## beta value for operative mortality from primary surgery
@@ -78,11 +76,12 @@ ab.uRevision<-mn.uRevision*(1-mn.uRevision)/(se.uRevision^2)-1 ## alpha + beta (
 a.uRevision<-mn.uRevision*ab.uRevision ## alpha (a)
 b.uRevision<-a.uRevision*(1-mn.uRevision)/mn.uRevision ## beta(b)
 
-## discount matrices
+# Discount factor matrices
 cycle.v <- 1:cycles ## a vector of cycle numbers 1 - 60
 discount.factor.c <- 1/(1+dr.c)^cycle.v ## the discount factor matrix
 discount.factor.o <- 1/(1+dr.o)^cycle.v  ## discount factor matrix for utility 
 
+####***** THR MODEL FUNCTION ****#####
 
 model.THR <- function(age=60, male=0) {
   ### A function running the THR model, setting age and sex
@@ -284,7 +283,6 @@ model.THR <- function(age=60, male=0) {
 ## testing the function:
 model.THR(age=60, male=0) 
 
-
 #### RUNNING THE SIMULATIONS ########
 sim.runs <- 1000 ## the number of simulation runs
 
@@ -299,6 +297,7 @@ simulation.results <- data.frame("cost.SP0" = rep(as.numeric(NA), sim.runs), ## 
 ## running the simulations and filling the simulation.results data.frame:
 for(i in 1:sim.runs){
   simulation.results[i,] <- model.THR(age=60, male=0) ## running the model 1,000 times
+  
 }
 
 ## have a look at what you've created so far:
@@ -314,6 +313,7 @@ source("ggplot_CEA_functions.R")
 plot.ce.plane(simulation.results) 
 
 ## Estimating average ICER from the simulation
+
 PSA.inc.cost <- mean(simulation.results$cost.NP1)-mean(simulation.results$cost.SP0)
 PSA.inc.qalys <- mean(simulation.results$qalys.NP1)-mean(simulation.results$qalys.SP0)
 PSA.icer <- PSA.inc.cost/PSA.inc.qalys
@@ -333,6 +333,7 @@ p.CE<-function(WTP, simulation.results) {
 #         simulation.results = a data.frame output of PSA simulations which includes
 #         columns names "inc.qalys" and "inc.cost"   
 # OUTPUTS: A numeric value specifying the probability of cost-effectiveness given the inputs
+  
   
   nmb <- simulation.results[,"inc.qalys"]*WTP - simulation.results[,"inc.cost"] ## vector of NMB estimates for each simulation length 1:sim.runs
   CE <- nmb>0   ## vector of TRUE/FALSE for each simulation length 1:sim.runs
@@ -426,3 +427,4 @@ head(CEAC.subgroups.long)
 
 # Plots of results using pre-defined ggplot functions
 plot.ceac.all(CEAC.subgroups.long)
+
