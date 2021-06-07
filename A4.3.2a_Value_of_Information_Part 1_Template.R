@@ -29,14 +29,16 @@ for(i in 1:sim.runs){
 
 WTP <-    ## define a WTP value 
 
-
 nmb.SP0 <- simulation.results$qalys.SP0 * WTP - simulation.results$cost.SP0  ## estimate the NMB for SP0 
 nmb.NP1 <- simulation.results$qalys.NP1 * WTP - simulation.results$cost.NP1  ## estimate the NMB for NP1  
 nmb.table <- data.frame(nmb.SP0, nmb.NP1)
 
 av.current <- apply(  )     ## use the apply and mean functions, applying to columns within the nmb.table
   ## This provides the average NMB across all simulations, for each treatment  
-  
+
+max.current <- max(av.current) ## this represnets the maximum NMB for SP0 or NP1 when averaging across 
+  #  the NMB for all simulations - this represents 'current knowledge'
+
 max.nmb <- apply(   )        ## use the apply and max functions, applying to rows within the nmb.table
   ## This provides the maximum NMB for each simulations (hence the apply functions moves across rows) 
   ## This selects the NMB for whichever treatment has the highest NMB in each simulation
@@ -44,19 +46,18 @@ max.nmb <- apply(   )        ## use the apply and max functions, applying to row
 av.perfect <- mean(max.nmb) ## the average of the vector of maximum NMB's, derived from 
   # having perfect information for each simulation 
 
-max.current <- max(av.current) ## this represnets the maximum NMB for SP0 or NP1 when averaging across 
-  #  the NMB for all simulations - this represents 'current knowledge'
+
 
 EVPI.indiv <-   ## use 2 of the variables defined above, to find the difference between perfect info and current info
 
 #### ESTIMATING POPULATION EVPI #####
 
 # EVPI table
-population <-    ## set population number 
+population <-    ## set population number (per year)
 years <-     ## set years
 evpi.disc <-     ## set discount rate
 
-population.seq <- sum(population * (1/(1+evpi.disc) ^ c(0:(years-1))))
+population.seq <- population * (1/(1+evpi.disc) ^ c(0:(years-1)))
 effective.population <-     ## calculate the effective population as a sum of population.seq
 
 pop.EVPI <-     ## calculate the population level EVPI based on variables we've defined in this exercise
@@ -80,9 +81,10 @@ est.EVPI.pop <-function(WTP, effective.population,
   nmb.table <- data.frame(nmb.SP0, nmb.NP1)
   
   av.current <- 
+  max.current <- 
   max.nmb <- 
   av.perfect <- 
-  max.current <- 
+
     
   EVPI.indiv <- 
   pop.EVPI <- 

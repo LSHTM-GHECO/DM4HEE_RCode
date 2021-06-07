@@ -10,8 +10,6 @@ library(reshape2)
 hazards <- read.csv("hazardfunction.csv", header=TRUE) ## importing the hazard inputs from the regression analysis
 cov.55 <- read.csv("cov55.csv",row.names=1,header=TRUE) ## importing the covariance matrix
 life.table <- read.csv("life-table.csv", header=TRUE)
-life.table<- as.data.table(life.table)
-
 
 # Setting sampling numbers
 sim.runs <- 10000 ## the number of simulation runs 
@@ -280,6 +278,7 @@ model.THR.voi <- function(RR.NP1, ## from RR.vec
 }
 
 ## testing the function:
+i = 1
 model.THR.voi(RR.vec[i], omr.df[i,],  tp.rrr.vec[i], 
               survival.df[i,],c.revision.vec[i], 
               state.utilities.df[i,]) 
