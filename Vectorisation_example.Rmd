@@ -23,9 +23,7 @@ source("A1.3.3_Advanced_Markov_Modelling_Solutions.R", local = knitr::knit_globa
 
 ## Simple example of vectorisation 
 
-Two functions - once which uses a loop, and appends to existing data, the other which performs a function once
-
-Below we provide a very simple example of using a loop versus vectorisation. The purpose of the code is to compare two alternatives and check their speed. 
+Let us start by describing two functions - one which uses a loop, and appends to existing data, and the other which performs a function once using vectorisation. The purpose of the code is to compare two alternatives and check their speed. *Note the process used here, involving the function `system.time()` to highlight running time of functions, can also be used to compare different model running times in general, which can be handy for figuring out run times of certain sections of code to see where optimisation would be most beneficial!.*
 
 Both functions involve taking random draws from a beta distribution. The functions requires three arguments: the number of samples to be drawn from the distribution, and the alpha and beta parameters that provide the shape of the underlying beta distribution.  
 
@@ -66,18 +64,26 @@ function2(6, 10, 15)
 Finally, we can run one million samples using each function, and see the difference in time between using a loop and saving each output individually (loop), and running all the samples at once and saving them (vector approach). The time displayed is in seconds. 
 
 ```{r, echo = TRUE}
-system.time(function1(1000000, 10, 15))
-system.time(function2(1000000, 10, 15))
+a <- system.time(function1(1000000, 10, 15))
+b <- system.time(function2(1000000, 10, 15))
+
+a
+b
+
+a[3]/b[3] ## vectorisation ~10x faster in terms of user time
+
 ```
 
-Whilst this is a very simplistic example, it is worth thinking about when considering how data is assigned within a model function, if that function will be run many times in probabilistic analyses (such as PSA, or EVPPI simulations). 
+*From `?proc.time` information (which is used in `system.time()`) - "The ‘user time’ is the CPU time charged for the execution of user instructions of the calling process. The ‘system time’ is the CPU time charged for execution by the system on behalf of the calling process...and the third entry is the ‘real’ elapsed time since the process was started"*
 
-\newpage
+Whilst this is a very simplistic example, it is worth thinking about when considering how data is assigned within a model function, if that function will be run many times in probabilistic analyses (such as PSA, or EVPPI simulations - see Module 4 exercise materials). 
 
 
 ## Example of vectorisation in transition probabilities 
 
-The code to produce the transition probability matrices (one for each model cycle) in the course uses a loop. Whilst the loop is an easy way to code this, there are quicker ways for those who want to learn about more efficient ways to code in R. 
+Here we use the model created in Module 1 as the foundation for our example. The code to produce the transition probability matrices (one for each model cycle) in the course uses a loop. Whilst the loop is an easy way to code this, there are quicker ways for those who want to learn about more efficient ways to code in R. 
+
+First lets take a look at the loop approach:
 
 ```{r, eval = FALSE}
 
@@ -101,7 +107,9 @@ for (i in 1:cycles) {
 }
 ```
 
-Alternatively there is a vectorised approach that can be taken, which is shown below. Here, where transition probabilities are constant, R will apply the same value across all specified positions in the array. Where values are time-dependent, since the length of the vector is equal to the number of cycles (and therefore also the length third dimension for the array), the first position will be filled with the first value, and so on... 
+Alternatively there is a vectorised approach that can be taken, which is shown below. Here, where transition probabilities are constant, R will apply the same value across all specified positions in the array. Where values are time-dependent, since the length of the vector is equal to the number of cycles (and therefore also the length third dimension for the array), the first position will be filled with the first value, and so on...
+
+This can be written as such:
 
 ```{r, eval = FALSE}
 
@@ -128,7 +136,7 @@ This vectorised approach is easy to code, and will be quicker than using a loop.
 
 ### Walkthrough of how the vectorised approach works
 
-First, let's look at the transitions with a fixed probability over time (i.e. not a time-dependent transition probability). For example, the `tp.PTHR2dead` is equal to 0.02. In the loop, the following, the parameter is assigned to the following position in each loop. This means that in all 60 positions in the array, the same value is assigned. 
+First, let's look at the transitions with a fixed probability over time (i.e. not a time-dependent transition probability). For example, the `tp.PTHR2dead` is equal to 0.02. In the loop (below), the parameter is assigned to the following position in each loop. This means that in all 60 positions in the array, the same value is assigned. 
 
 ```{r, eval = FALSE}
 tm.SP0["P-THR","Death",i] <- tp.PTHR2dead 
@@ -175,3 +183,6 @@ tm.SP0[,,1:4]
 
 ```
 
+However, as hinted above, when using the vectorisation approach you need to ensure that the length of the vectors used is correct and appropriate for the assignment processes it is being used for. As always, test and de-bug (i.e. remove errors from) your code as you go through when creating your models to make sure the outputs are looking how they are expected to. 
+
+There are also other ways to speed up code and assignments (such as using functions within the `tidyverse` or `data.table` packages), if this is something you are interested in, why not have a go at different approaches for our models and post any new super-fast methods on the discussion boards! 
