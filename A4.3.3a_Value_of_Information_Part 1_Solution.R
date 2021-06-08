@@ -68,7 +68,7 @@ est.EVPI.pop <-function(WTP, effective.population,
   ###  INPUTS: WTP - numeric WTP value
   ###          effective.population - numeric effective population value
   ###          results - data.table object from simulation.runs with 
-  ###          qalys.SP0 and cost.SP0 columns
+  ###          qalys.SP0 and cost.SP0 columns & equivalents for NP1
   ###  OUTPUTS: A numeric value for population EVPI
 
   nmb.SP0 <- simulation.results$qalys.SP0 * WTP - simulation.results$cost.SP0
