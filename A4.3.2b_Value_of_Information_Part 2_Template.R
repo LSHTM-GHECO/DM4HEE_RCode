@@ -24,7 +24,7 @@ colnames(inner.results) <- c("Cost SP0", "QALY SP0", "Cost NP1", "QALY NP1")
 
 WTP <- 2200
   
-## The parameter values (10,000 (=sim.runs) of them each) sampled in the model script 
+## The parameter values (10,000 (=sim.runs) of them each) are sampled in the model script 
 # this is the model script sourced above
 
 # parameter groups: (data.frames)
@@ -100,7 +100,7 @@ perfect.info <- mean(apply(evppi.df, 1, max))
 evppi <- 
 
 ## Make sure that you understand what calculations are being done, and why. 
-# In the next section, the code will run similar calculating, but will be more complex, 
+# In the next section, the code will run similar calculations, but will be more complex, 
 # as the NMB will be evaluated across a range of WTP values, and analyses will be 
 # performed for all the parameters (or parameter groups) of interest.
 
@@ -183,7 +183,7 @@ gen.evppi.results <- function(evppi.results1 = evppi.results.SP0, evppi.results2
 }
 
 
-# EVPPI Sampling 
+# EVPPI Sampling #####
 ## Now the EVPPI loops will be run - each selected different values for inner and outer loops
 
 #### EVPPI loops - NP1 parameter   ####
