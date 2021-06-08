@@ -113,3 +113,8 @@ plot.ceac(CEAC)
 
 # EVPI, per population
 plot.evpi(EVPI.results)
+
+## the peak occurs where the EVPI is at it's highest;
+EVPI.results[EVPI.results$EVPI == max(EVPI.results$EVPI),] ## returns the row with the max EVPI value
+## in other words, when the WTP value is around £2,100 per QALY gained (in our test run, the number may be slightly different in your simualtions),
+## there is the largest expected value of perfected information
