@@ -34,9 +34,10 @@ The step-by-step guide below will take you through the following stages for calc
 * "A4.3.2a_Value_of_Information_Part 1_Template.R"
 * "A4.3.3a_Value_of_Information_Part 1_Solutions.R" 
 
-Additionally, the solution file from the previous exercise will be sourced:
+Additionally, the solution file from the previous exercise, and the file with ggplot functions, will be sourced:
 
-* ("A3.3.3a_Presenting_Simulation_Results_Part1_Solutions.R").
+* "A3.3.3a_Presenting_Simulation_Results_Part1_Solutions.R"
+* "ggplot_CEA_functions.R"
 
 The exercise will involve completing the following tasks:
 
@@ -50,7 +51,7 @@ The exercise will involve completing the following tasks:
 * "A4.3.3b_Value_of_Information_Part 2_Solutions.R" 
 * "A4.3.3b_VoI_Model_Script" 
 
-The last template and solutions scripts will run the main model code from another pre-filled script ('A4.3.3b_VoI_Model_Script'). This allows you to call in the model function, and explore the key concepts of this module in a seperate script.
+The last template and solutions scripts will run the main model code from another pre-filled script ('A4.3.3b_VoI_Model_Script'). This allows you to call in the model function, and explore the key concepts of this module in a separate script.
 
 In this part of the exercise you will:
 
@@ -141,7 +142,7 @@ In this practical session we want to look at the EVPPI of six groups of paramete
 * Costs (in this case the only probablistic cost is cost of revision surgery)
 * Utilities (utility values from successful and revision surgeries)
 
-In this practical you will first look at the the new model function `model.THR.voi()` that is loaded in from a seperate script. The adapted function is described in detail in the next section, but essentially it allows us to pass specific parameters values into the model (rather than these values being sampled within the model). This gives control over which values are selected and used in the model. This is needed for the inner and outer loops of the EVPPI calculations.  
+In this practical you will first look at the the new model function `model.THR.voi()` that is loaded in from a separate script. The adapted function is described in detail in the next section, but essentially it allows us to pass specific parameters values into the model (rather than these values being sampled within the model). This gives control over which values are selected and used in the model. This is needed for the inner and outer loops of the EVPPI calculations.  
 
 
 (@) **Loading the appropriate model script and function**
@@ -252,7 +253,7 @@ You will see that each model simulation is then saved in the `inner.results` mat
 
 Next, you will calculate the value of information in the same way as we did for the EVPI in the previous section. First though, run the code to add our results into a data.frame (`evppi.df`). 
 
-(vii) We first calculate the average NMB across the outer loops for both treatments. Whichever treatment has the maximum NMB, on average across the simulations, is preferred, so we take the maximum value NMB (from the two treatments). We do this by first creating a data.frame of the NMB for both treatments, then use the `apply()` function. The code is provided for you, and uses the `apply()` function. Whichever treatment has the maximum NMB, on average across the simulations, is preferred, so take the maximum value NMB (from the two treatments). This is saved as `current.info`. We then use a similar process to define `perfect.info`, but this time calculating for the scenario of perfect information (note that this is based on perfect information of the relative risk parameter only), we want to take the maximum NMB of either treatment across each model simulation. This means that for every value of the relative risk parameter, the correct treatment (with the highest NMB) would be selected. *Check the ?apply documentation for a reminder of what goes into the apply() function & if you are confused about having the mean and maximum within and outside of the apply functions for the different calculations, then try to seperate these out to understand what is happening, or refer back to Part 1 of this exercise to see what we did.* 
+(vii) We first calculate the average NMB across the outer loops for both treatments. Whichever treatment has the maximum NMB, on average across the simulations, is preferred, so we take the maximum value NMB (from the two treatments). We do this by first creating a data.frame of the NMB for both treatments, then use the `apply()` function. The code is provided for you. This is saved as `current.info`. We then use a similar process to define `perfect.info`, but this time calculating for the scenario of perfect information (note that this is based on perfect information of the relative risk parameter only), we want to take the maximum NMB of either treatment across each model simulation. This means that for every value of the relative risk parameter, the correct treatment (with the highest NMB) would be selected. Then take the mean value of these, to give the average NMB across the simulations, when choosing the correct treatment at each simulation. *Check the ?apply documentation for a reminder of what goes into the apply() function, and if you are confused about having the mean and maximum within and outside of the apply functions for the different calculations, then try to separate these out to understand what is happening, or refer back to Part 1 of this exercise to see what we did.* 
 
 (viii) The EVPPI is the difference between these two values. You can subtract the current NMB from the NMB with perfect information for the parameter to calculate EVPPI. 
 
@@ -306,10 +307,12 @@ Remember the results generated at this point are per patient, not for the popula
 
 (iii) Now run the reshape function, to move the data from wide format to long format (so we can plot it in ggplot). This will be named `evppi.long.pop`.
 
-(iv) Next, it's time to visualise the results! Run the `plot.evppi()` function (remember this has been loaded in at the top of the script through the sourced `ggplot_CEA_functions.R` script) to see the EVPPI results across the WTP thresholds, for the six sets of parameters. If you want to view the plot in more detail, click the 'zoom' button above the plot in the 'Plots' pane of R. The plot should look similar to this:
+(iv) Next, it's time to visualise the results! Run the `plot.evppi()` function (remember this has been loaded in at the top of the script through the sourced `ggplot_CEA_functions.R` script) to see the EVPPI results across the WTP thresholds, for the six sets of parameters. If you want to view the plot in more detail, click the 'zoom' button above the plot in the 'Plots' pane of R. *Note that ggplot will give a warning for removed rows if not all of the data in the data.frame is plotted. This can happen when we calculate the EVPPI from willingness to pay thresholds from £0 to £50,000 (as in this example), but then only plot values up to a willingness to pay of £15,000 (to observe the data).* 
+
+The plot should look similar to this:
 
 ```{r evppi plot, echo = FALSE, warning=FALSE, message=FALSE, error=FALSE}
-plot.evppi(evppi.long.pop, 15000)
+plot.evppi(evppi.long.pop, 10000)
 ```
 
 (v) Finally, if you want to see the specific EVPPI results at any given WTP threshold value, you can use the `subset()` function to do this. We have provided some code to do this at £2,200 (where the EVPPI is high!)
@@ -321,5 +324,5 @@ plot.sub.evppi(sub.evppi)
 
 \ 
 
-**Congratulations!** You have now calculated the EVPPI for six sets of parameters in the model, and plotted them! Although we have done this using a relatively low number of inner and outer loops (100 each), you can always go back and run these at higher numbers to ensure that the results are robust (perhaps keeping in mind how long it took to run the 100 inner and outer loops the first time!). 
+**Congratulations!** You have now calculated the EVPPI for six sets of parameters in the model, and plotted them! Although we have done this using a relatively low number of inner and outer loops (100 each), you can always go back and run these at higher numbers to ensure that the results are robust (perhaps keeping in mind how long it took to run the 100 inner and outer loops the first time!). This will also improve the quality of the plots too. 
 
