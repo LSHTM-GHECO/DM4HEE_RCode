@@ -133,7 +133,7 @@ plot.evpi <- function(results){
 }
 
 
-plot.evppi <- function(results, xlimit = 12000){
+plot.evppi <- function(results, xlimit = 15000){
   ## FUNCTION: Expected Value of Partial Perfect Information (EVPPI)
   ## This function allows for a limit on the X-axis, to help show the graph with adjusted axes
   ## INPUTS: results table equivalent to evppi.long.pop (see A3.3.b solutions)
