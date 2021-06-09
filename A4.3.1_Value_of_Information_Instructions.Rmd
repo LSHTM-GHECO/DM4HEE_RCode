@@ -54,9 +54,9 @@ The last template and solutions scripts will run the main model code from anothe
 
 In this part of the exercise you will:
 
-1. Look at the adaptations to the model, to see how the model function has been developed to allow for parameters to provided as arguments in the function. 
+1. Look at the adaptations to the model, to see how the model function has been developed to allow for parameters being provided as arguments in the function. 
 2. Work through an Expected Value of Partially Perfect Information (EVPPI) manually, to ensure that you understand the process involved in each step.
-3. Look through the EVPPI analyses coded for each parameter (or group of parameters), and ensuring you understand how the appropraite parameters are being selected.
+3. Look through the EVPPI analyses coded for each parameter (or group of parameters), and ensure you understand how the appropraite parameters are being selected.
 4. Plot EVPPI results across a range of willingness to pay thresholds.
 
 Across the whole exercise we will be using the data inputs and packages discussed in previous exercises. No new data and/or packages will be used. 
@@ -67,23 +67,23 @@ Across the whole exercise we will be using the data inputs and packages discusse
 
 (1) **Calculating per patient EVPI from simulation output**
 
-In the "A4.3.2a..." template file you will see that we've begun the exercise by sourcing in the model we created in Exercise 3a and storing the simulation results as we did in exercise 3a for intended group of interest (in this case the function will run the model for females aged 60, unless other values for these are provided).
+In the "A4.3.2a..." template file you will see that we've begun the exercise by sourcing in the model we created in Exercise 3a and storing the simulation results as we did in exercise 3a for intended group of interest (in this case the function will run the model for females aged 60, unless other values for these are provided). Once sourced, you can see the same outputs we created in Module 3 are now available in the 'Environment' panel, e.g. "`CEAC`". *Note: this might take a few seconds depending on the capability of the device you are working on.*
 
 Recall that, under a decision theoretic approach, it is the expected outcome that should guide the decision.  That is, we will use the new prosthesis if it has an expected net benefit that is greater than that of the standard prosthesis.  However, due to uncertainty, sometimes we will make the wrong decision and the losses associated with the wrong decision are the net-benefits forgone. 
 
 So we first need to estimate the EVPI for individual patients. 
 
-(i) First, define a willingness-to-pay (WTP) threshold of your choice, to assess the EVPI (we show an example using £10,000 per QALY gained within the solutions).
+(i) Within the 'Estimating EVPI for individuals' section, first define a willingness-to-pay (WTP) threshold of your choice, to assess the EVPI (we show an example using £10,000 per QALY gained within the solutions).
 
-(ii) Estimate the net monetary benefit (NMB) for SP0 and NP1 for each run using columns from the `simulation.results` data.frame, and your defined WTP. Once you have estimated the NMB for each model simulation, ensure that you have these in a data.frame (one column for each treatment). [*We've coded this for you already, but do make sure you understand the calculations*]
+(ii) Estimate the net monetary benefit (NMB) for SP0 and NP1 for each run using columns from the `simulation.results` data.frame, and your defined WTP. Once you have estimated the NMB for each model simulation (`nmb.SP0` and `nmb.NP1`), ensure that you have these in a data.frame (one column for each treatment) - `nmb.table`. [*We've coded this for you already, but do make sure you understand the calculations*]
 
 (iii) Using the `apply()` function, estimate the the mean NMB for both treatments, across all simulations. This is the average NMB under current information. We can save this as `av.current`.  
 
 *Note: We will be using the *`apply()` *functions in several parts of this module. You can check the help file to make sure you understand how to use the function, but it essentially requires three arguments. First, a data frame, second, whether to look across rows or columns, and last, what function you wish to perform.*
 
-(iv) Calculate the maximum NMB out of the two treatments under current knowledge, and call this (`max.current`). 
+(iv) Calculate the maximum NMB out of the two treatments under current knowledge, and call this (`max.current`), by running the relevant line of code we've written out for you.
 
-(v) Next, to consider the decision making under perfect information, estimate the maximum NMB for each treatment, for each model simulation performed (i.e. the NMB for the favoured treatment, at that WTP) and save this as `max.nmb`. This will be a vector of values, the same length as the number of simulations. The average of all these maximum NMB values can be calculated using the `mean()` function, and saved as `av.perfect`. This represents the average NMB across all simulations, if the correct was chosen every time. 
+(v) Next, to consider the decision making under perfect information, estimate the maximum NMB across treatments, for each model simulation performed (i.e. the NMB for the favoured treatment, at that WTP) and save this as `max.nmb`. This will be a vector of values, the same length as the number of simulations (in our example this would mean a vector of 1000 values). The average of all these maximum NMB values can be calculated using the `mean()` function, and saved as `av.perfect`. This represents the average NMB across all simulations, if the correct treatment option was chosen every time. 
 
 (vi) Finally, you can calculate the difference between the NMB from the preferred treatment across all simulations, versus the NMB if the best treatment was chosen across every simulation. This is the EVPI for each individual, and you can save this as `EVPI.indiv`. We've given some further hints in the template to help you through this, but remember that these results are all specific to the WTP defined above (and if you have chosen a very high WTP threshold, the EVPI may be 0!). 
 
@@ -93,7 +93,7 @@ Of course, there will be more than one patient eligible for a particular treatme
 
 *For the hip replacement example, we are going to assume an effective technology life of ten years with 40,000 new patients eligible for treatment each year. With a discount rate of 6% used in this case.*
 
-(i) Using the above information, set the population, number of years and discount rate in the template script. 
+(i) Using the above information, set the population, number of years and discount rate in the template script within the 'ESTIMATING POPULATION EVPI' section. 
 
 (ii) We have now defined a discounted population sequence for you (the annual population, discounted each year, for the number of years the technology is assumed to apply for). Next, estimate the effective population by summing across this (i.e. summing across `population.seq`).
 
@@ -146,11 +146,11 @@ In this practical you will first look at the the new model function `model.THR.v
 
 (@) **Loading the appropriate model script and function**
 
-Begin by loading up the template file. First, you can run the 'A4.3.3b_VoI_Model_Script' using the `source()` function. This is an adapted version of the model, which includes a function to run the Markov model - which we have labelled `model.THR.voi()`. Take a look at this script and the function. We have annoted the script to highlight changes that have been made. You will notice that in this version of the model, rather than proabilistic parameters being sampled and assigned within the model function (i.e. sampling one each time the model function is run), all of these parameters are now sampled and stored outside of the model function. This tends to be a quicker (more efficient) way of running model simulations, but it does mean some additional complexity. 
+Begin by loading up the template file for Part 2 of this exercise ("A4.3.2b_Value_of_Information_Part 2_Template.R"). First, you can run the 'A4.3.3b_VoI_Model_Script' using the `source()` function. This is an adapted version of the model, which includes a function to run the Markov model - which we have labelled `model.THR.voi()`. Take a look at this script and the function. We have annoted the script to highlight changes that have been made. You will notice that in this version of the model, rather than proabilistic parameters being sampled and assigned within the model function (i.e. sampling one each time the model function is run), all of these parameters are now sampled and stored outside of the model function. This tends to be a quicker (more efficient) way of running model simulations, but it does mean some additional complexity. 
 
-Since the probabilistic parameters are no longer being generated within the model function, we have to adapt the function to take these probabilistic values as arguments in the function. This means that these parameters are provided as inputs for the model function. Notice how the `model.THR.voi()` function requires data which contain our sampled probabilistic values. The model function will then use the parameters provided to it to generate the transition matrices and the Markov trace, and estimate the costs and QALYs for the two treatments. The remainder of the model function is the same as you have seen previously, except in some areas we have tried to speed up some of the code by avoiding loops. *(For those interested in more efficient coding, check how the transition matrices are now calculated using vectorisation rather than using a loop. This vectorisation works because the length of time varying parameters (as vectors) is the same as the number of matrices in the array, so R knows that the first value is for the first matrix, and so on).* 
+Since the probabilistic parameters are no longer being generated within the model function, we have to adapt the function to take these probabilistic values as arguments in the function. This means that these parameters are provided as inputs for the model function. Notice how the `model.THR.voi()` function requires data which contain our sampled probabilistic values (see in particular the 'PROBABILISTIC PARAMETERS' section. The model function will then use the parameters provided to it to generate the transition matrices and the Markov trace, and estimate the costs and QALYs for the two treatments. The remainder of the model function is the same as you have seen previously, except in some areas we have tried to speed up some of the code by avoiding loops. *(For those interested in more efficient coding, check how the transition matrices are now calculated using vectorisation rather than using a loop. This vectorisation works because the length of time varying parameters (as vectors) is the same as the number of matrices in the array, so R knows that the first value is for the first matrix, and so on). We have included as additional material for this module "Vectorisation_example.pdf" for further information related to this.* 
 
-To ensure you understand the data provided to the model function, consider the following. The previous model samples 10,000 value for each parameter: 
+To ensure you understand the data provided to the model function, consider the following. The model samples 10,000 utiliy values for each parameter: 
 
 ```{r, echo = TRUE}
 
@@ -175,7 +175,7 @@ model.THR.voi(RR.vec[i], omr.df[i,],  tp.rrr.vec[i],
               state.utilities.df[i,]) 
 ```
 
-Check each the data provided to the model. Notice that if you re-run this code (with i = 1 each time), the same parameter values are provided to the model, and therefore the model results will be the same since the input data remain the same. 
+Check each the of the data input passed through the model. Notice that if you re-run this code (with i = 1 each time), the same parameter values are provided to the model, and therefore the model results will be the same since the input data remain the same. 
 
 In order to consider the results of the model using many different samples of data, we can select the appropriate samples of probabilistic values and run the model each time, in a loop. You don't need to replicate this code, it is provided below as an example, but if you wanted to performed a PSA then the following code would perform and save the results of 10,000 probabilistic analyses (this is just an example, but you could run this code to check if you wanted). For each value of `i` given in the loop, a new selection of sampled data for each parameter is provided to the model, which then produces a different set of model results: 
 
@@ -191,7 +191,7 @@ for(i in 1:sim.runs) {
 
 ```
 
-The reason that selecting the appropriate data within each model simulation becomes very important for the EVPPI loops, since each loop will take different sampled values depending on the parameter, or groups of parameters, for which we have perfect information.
+Selecting the appropriate data within each model simulation becomes very important for the EVPPI loops, since each loop will take different sampled values depending on the parameter, or groups of parameters, for which we have perfect information.
 
 \ 
 
@@ -205,7 +205,7 @@ Before we perform the EVPPI analyses, we will show a walkthrough of the calculat
 
 (iii) Define a WTP value (we've set this to £2,200 this value is chosen to give a high EVPI for this part of the exercise!)
 
-(iv) Remember, from looking through the model script above, that we need to pass the appropriate parameters into the model function. Familiarise yourself with the input parameters sampled in the '`A4.3.3b_VoI_Model_Script`' script that you ran earlier. We have provided these in the script for you, and have also provided the code to show you how these parameters can be selected and given to the model (see below). **It is very important that you understand how this data is being selected and passed to the model function for you to understand the rest of the exericse!** 
+(iv) Remember, from looking through the model script above, that we need to pass the appropriate parameters into the model function. Familiarise yourself with the input parameters sampled in the '`A4.3.3b_VoI_Model_Script`' script that you ran earlier. We have provided these in the script for you, and have also provided the code to show you how these parameters can be selected and given to the model (see below). **It is very important that you understand how this data is being selected and passed to the model function for you to understand the rest of the exericse** 
 
 In the below example, we have selected the first row (or value) for each of the 1000 samples, for each parameter. In the code, you should check the results using another set of sampled parameters.    
 
@@ -231,7 +231,7 @@ We will use the letter 'a' to indicate the outer loop number, and the letter 'b'
   }
 ```
 
-The results of one model run (which will be saved in the inner results matrix) will look like this:
+The results of one model run will look like this:
 
 ```{r, echo = TRUE}
 model.THR.voi(RR.vec[a], omr.df[b,],  tp.rrr.vec[b], 
@@ -248,15 +248,13 @@ You will see that each model simulation is then saved in the `inner.results` mat
 
 (v) Do this 10 times, so that you have considered 10 samples of the parameter of interest for the EVPPI analysis (the relative risk parameter in this case)
 
-(vi) Once you have done this, you should be able to view the NMB values for each outer loop. *(Hint: the NMB will be the same for the comparator across model runs, since the relative risk parameter selected does not influence the standard prosthesis)*
+(vi) Once you have done this, you should be able to view the NMB values for each outer loop. *(Hint: the NMB should be the same for the comparator across model runs, since the relative risk parameter selected does not influence the standard prosthesis)*
 
 Next, you will calculate the value of information in the same way as we did for the EVPI in the previous section. First though, run the code to add our results into a data.frame (`evppi.df`). 
 
-(vii) Calculate the average NMB across the outer loops for both treatments. The code is provided for you, and uses the `apply()` function. Whichever treatment has the maximum NMB, on average across the simulations, is preferred, so take the maximum value NMB (from the two treatments). This is saved as `current.info`. *(Hint: if you are confused about having the mean and apply function returning the maximum value on one line, then try to seperate these out to understand what is happening)*
+(vii) We first calculate the average NMB across the outer loops for both treatments. Whichever treatment has the maximum NMB, on average across the simulations, is preferred, so we take the maximum value NMB (from the two treatments). We do this by first creating a data.frame of the NMB for both treatments, then use the `apply()` function. The code is provided for you, and uses the `apply()` function. Whichever treatment has the maximum NMB, on average across the simulations, is preferred, so take the maximum value NMB (from the two treatments). This is saved as `current.info`. We then use a similar process to define `perfect.info`, but this time calculating for the scenario of perfect information (note that this is based on perfect information of the relative risk parameter only), we want to take the maximum NMB of either treatment across each model simulation. This means that for every value of the relative risk parameter, the correct treatment (with the highest NMB) would be selected. *Check the ?apply documentation for a reminder of what goes into the apply() function & if you are confused about having the mean and maximum within and outside of the apply functions for the different calculations, then try to seperate these out to understand what is happening, or refer back to Part 1 of this exercise to see what we did.* 
 
-(viii) For the scenario of perfect information (note that this is based on perfect information of the relative risk parameter only), take the maximum NMB of either treatment across each model simulation. This means that for every value of the relative risk parameter, the correct treatment, with the highest NMB, would be selected. Now take the mean value of these, to give the average NMB across the simulations (where the correct treatment is always selected due to us having perfect information). We do this by first creating a data.frame of the NMB for both treatments, then use the `apply()` function. *We've written this out for you, check the ?apply documentation for a reminder of what goes into the apply() function*
-
-(ix) The EVPPI is the difference between these two values. You can subtract the current NMB from the NMB with perfect information for the parameter to calculate EVPPI. 
+(viii) The EVPPI is the difference between these two values. You can subtract the current NMB from the NMB with perfect information for the parameter to calculate EVPPI. 
 
 Note that in this walkthrough, the EVPPI is estimated per individual (since the model using a cohort size of 1).  Also, the results shown are only evaluating the EVPPI at one WTP value. Later on, you will see that we can evaluate the EVPPI across a range of WTP values. 
 
@@ -268,9 +266,9 @@ Now we will walk through the code to perform EVPPI analyses for six sets of mode
 
 However – and this is very important – accurate estimation of partial EVPIs takes many more runs than this – and we would recommend at least 1000 inner and 1000 outer loops. This is one of the advantages of using R, as doing this across each parameter in Excel would take a very long time (if it even manages to finish!). This is also one of the reasons that we should be aware of how we are coding our model in R, since a model with lots of loops and inefficient code will take a lot longer to run. Whilst this is less important when running a PSA or EVPI analysis, it will begin to have a big impact when using the nested loops used in EVPPI analyses (for example, 1000 inner and outer loops means 1 million simulations being performed). 
 
-(ii) Now create a vector of WTP values, so that we can evalauate the EVPPI across a range of thresholds. Also create the matrices to evaluate the inner loop results, and the overall `evppi.results`, to store results. You can see that the structure of the `inner.results` matrix remains the same as used in the walkthrough above. However, for the `evppi.results` matrix, the number of rows is equal to the outer loop number, but now there is a column for each WTP value being considered. In the next steps we will see how the results can be evaluated and stored here. *(Note: in previous sessions (Module 3) we created functions that evaluate one WTP value at a time, wheras now we will provide all the WTP values into the function and calculate them all at once)*
+(ii) Now create a vector of WTP values, so that we can evalauate the EVPPI across a range of thresholds. Also (by running the code already written) we can create the matrices to evaluate the inner loop results, and the overall `evppi.results`, to store results. You can see that the structure of the `inner.results` matrix remains the same as used in the walkthrough above. However, for the `evppi.results` matrix, the number of rows is equal to the outer loop number, but now there is a column for each WTP value being considered. In the next steps we will see how the results can be evaluated and stored here. *(Note: in previous sessions (Module 3) we created functions that evaluate one WTP value at a time, wheras now we will provide all the WTP values into the function and calculate them all at once)*
 
-(iii) Calculate the effective population that will benefit from the intervention over an appropriate time horizon. We have provided the information from part 1 of this exercise for you to run here. 
+(iii) Calculate the effective population that will benefit from the intervention over an appropriate time horizon. We have provided the information from Part 1 of this exercise for you to run here. 
 
 (iv) Next, run the code that provides the functions to estimate NMB for the inner loop results - `nmb.function`. This is essentially a function that estimates the mean NMB across all inner loop simulations (as you did in the initial part of this exercise after running the inner loops), except now it does this for a range of WTP values. The mean NMB values across all WTP thresholds are saved for each treatment. 
 
@@ -291,14 +289,14 @@ model.THR.voi(RR.vec[b], omr.df[b,],tp.rrr.vec[b],
 
 The above code is evaluating the EVPPI with perfect information with the cost of revision. What if you wanted to evaluate the value of partial information for two paramters that are arguments in the model function? If you wanted to, you should be able to work out how to write the above code, but including two parameters in the outer loop, whilst all other remain in the inner loop.  
 
-Once you've had a look at all the EVPPI loops and have understood them, run the code to perform them all. We have added a progress bar for you, for each of the six groups, so that you can see how long each EVPPI simulation takes. 
+Once you've had a look at all the EVPPI loops and have understood them, run the code to perform them all (i.e. run all the sections beginning with with 'EVPPI loops -'). We have added a progress bar for you, for each of the six groups, so that you can see how long each EVPPI simulation takes. 
 
 The speed to complete these analyses will depend on your computer (and what else your computer might be doing too), as well as the complexity of the model. In this example, each EVPPI analysis should be less than a minute, which is pretty good for 100 inner and outer loops (10,000 simulations in total). Needless to say, this where the efficiency of your code can start to make a meaninful difference to how long your simulations will take to run. *This is why we made some minor edits within the 'A4.3.3b_VoI_Model_Script.R' code earlier!*
 
 
 (@) **Plotting and selecting the results of interest**
 
-Now you have run and stored the results for the six different EVPPI analyses, we need to store them all in a data frame, and then to help us plot these in ggplot, reshape the data to 'long' format (instead of 'wide' format). 
+Now you have run and stored the results for the six different EVPPI analyses, we need to store them all in a data frame, and then to help us plot these in ggplot, reshape the data to 'long' format (instead of 'wide' format). Turn to the 'Analysis of EVPPI results' section of the template script.
 
 Remember the results generated at this point are per patient, not for the population. 
 

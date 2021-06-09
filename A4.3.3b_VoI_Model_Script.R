@@ -1,5 +1,5 @@
 #  Decision Modelling for Health Economic Evaluation
-#  Advanced Course Exercise 3a (Part 1): SOLUTION FILE
+#  Advanced Course Exercise 3a (Part 1): ADDITIONAL SOLUTION FILE FOR MODEL FUNCTION
 #  Authors: Andrew Briggs, Jack Williams & Nichola Naylor
 
 ### Loading useful packages
@@ -13,9 +13,9 @@ life.table <- read.csv("life-table.csv", header=TRUE)
 
 # Setting sampling numbers
 sim.runs <- 10000 ## the number of simulation runs 
-## ! note - this needs to be more than or equal to 
+## ! note - this needs to be more than or equal to 1
 ## the number of inner and outer runs in VoI scripts
-## see "A4.3.3b_Value_of_Information_Part 2_Solution.R" to see their definition
+## see "A4.3.3b_Value_of_Information_Part 2_Solution.R" to see their definitions
 
 #########**** PARAMETERS *****######
 
@@ -176,9 +176,9 @@ model.THR.voi <- function(RR.NP1, ## from RR.vec
   ##           on 6 pre-specified parameter/parameter groups
   ## INPUTS: 3 data.frame rows (1 row from omr.df, survival.df & state.utilities.df) 
   ##        and 3 vector values (1 value from vectors; c.revision.vector, tp.rrr.vector, RR.vec)
-  ## OUTPUTS: 
+  ## OUTPUTS: a labelled numeric output providing costs and qalys for SP0 and NP1, given the set of input parameters
   
-  ## First, need to unpack values from the data.frames provided to the function 
+  ## First, we need to unpack values from the data.frames provided to the function 
   
   tp.PTHR2dead <- unlist(omr[1,1])
   tp.RTHR2dead <- unlist(omr[1,2])

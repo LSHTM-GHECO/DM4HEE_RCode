@@ -158,7 +158,7 @@ print(x)
 
 ## Subsetting and selecting data 
 
-Another important aspect of the course is selecting the appropriate data. For the various vectors, data frames and arrays, here are some way tp select data:
+Another important aspect of the course is selecting the appropriate data. For the various vectors, data frames and arrays, here are some ways to select data:
 
 **Vector**
 ```{r, echo=TRUE}

@@ -68,7 +68,7 @@ est.EVPI.pop <-function(WTP, effective.population,
   ###  INPUTS: WTP - numeric WTP value
   ###          effective.population - numeric effective population value
   ###          results - data.table object from simulation.runs with 
-  ###          qalys.SP0 and cost.SP0 columns
+  ###          qalys.SP0 and cost.SP0 columns & equivalents for NP1
   ###  OUTPUTS: A numeric value for population EVPI
 
   nmb.SP0 <- simulation.results$qalys.SP0 * WTP - simulation.results$cost.SP0
@@ -113,3 +113,8 @@ plot.ceac(CEAC)
 
 # EVPI, per population
 plot.evpi(EVPI.results)
+
+## the peak occurs where the EVPI is at it's highest;
+EVPI.results[EVPI.results$EVPI == max(EVPI.results$EVPI),] ## returns the row with the max EVPI value
+## in other words, when the WTP value is around £2,100 per QALY gained (in our test run, the number may be slightly different in your simualtions),
+## there is the largest expected value of perfected information
