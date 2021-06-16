@@ -57,7 +57,7 @@ In this part of the exercise you will:
 
 1. Look at the adaptations to the model, to see how the model function has been developed to allow for parameters being provided as arguments in the function. 
 2. Work through an Expected Value of Partially Perfect Information (EVPPI) manually, to ensure that you understand the process involved in each step.
-3. Look through the EVPPI analyses coded for each parameter (or group of parameters), and ensure you understand how the appropraite parameters are being selected.
+3. Look through the EVPPI analyses coded for each parameter (or group of parameters), and ensure you understand how the appropriate parameters are being selected.
 4. Plot EVPPI results across a range of willingness to pay thresholds.
 
 Across the whole exercise we will be using the data inputs and packages discussed in previous exercises. No new data and/or packages will be used. 
@@ -139,7 +139,7 @@ In this practical session we want to look at the EVPPI of six groups of paramete
 * Operative mortality following primary and revision surgeries
 * Re-revision risk
 * Survival parameters (the lamda and gamma parameters derived from the hazard function outputs)
-* Costs (in this case the only probablistic cost is cost of revision surgery)
+* Costs (in this case the only probabilistic cost is cost of revision surgery)
 * Utilities (utility values from successful and revision surgeries)
 
 In this practical you will first look at the the new model function `model.THR.voi()` that is loaded in from a separate script. The adapted function is described in detail in the next section, but essentially it allows us to pass specific parameters values into the model (rather than these values being sampled within the model). This gives control over which values are selected and used in the model. This is needed for the inner and outer loops of the EVPPI calculations.  
@@ -147,16 +147,16 @@ In this practical you will first look at the the new model function `model.THR.v
 
 (@) **Loading the appropriate model script and function**
 
-Begin by loading up the template file for Part 2 of this exercise ("A4.3.2b_Value_of_Information_Part 2_Template.R"). First, you can run the 'A4.3.3b_VoI_Model_Script' using the `source()` function. This is an adapted version of the model, which includes a function to run the Markov model - which we have labelled `model.THR.voi()`. Take a look at this script and the function. We have annoted the script to highlight changes that have been made. You will notice that in this version of the model, rather than proabilistic parameters being sampled and assigned within the model function (i.e. sampling one each time the model function is run), all of these parameters are now sampled and stored outside of the model function. This tends to be a quicker (more efficient) way of running model simulations, but it does mean some additional complexity. 
+Begin by loading up the template file for Part 2 of this exercise ("A4.3.2b_Value_of_Information_Part 2_Template.R"). First, you can run the 'A4.3.3b_VoI_Model_Script' using the `source()` function. This is an adapted version of the model, which includes a function to run the Markov model - which we have labelled `model.THR.voi()`. Take a look at this script and the function. We have annotated the script to highlight changes that have been made. You will notice that in this version of the model, rather than probabilistic parameters being sampled and assigned within the model function (i.e. sampling one each time the model function is run), all of these parameters are now sampled and stored outside of the model function. This tends to be a quicker (more efficient) way of running model simulations, but it does mean some additional complexity. 
 
 Since the probabilistic parameters are no longer being generated within the model function, we have to adapt the function to take these probabilistic values as arguments in the function. This means that these parameters are provided as inputs for the model function. Notice how the `model.THR.voi()` function requires data which contain our sampled probabilistic values (see in particular the 'PROBABILISTIC PARAMETERS' section. The model function will then use the parameters provided to it to generate the transition matrices and the Markov trace, and estimate the costs and QALYs for the two treatments. The remainder of the model function is the same as you have seen previously, except in some areas we have tried to speed up some of the code by avoiding loops. *(For those interested in more efficient coding, check how the transition matrices are now calculated using vectorisation rather than using a loop. This vectorisation works because the length of time varying parameters (as vectors) is the same as the number of matrices in the array, so R knows that the first value is for the first matrix, and so on). We have included as additional material for this module "Vectorisation_example.pdf" for further information related to this.* 
 
-To ensure you understand the data provided to the model function, consider the following. The model samples 10,000 utiliy values for each parameter: 
+To ensure you understand the data provided to the model function, consider the following. The model samples 10,000 utility values for each parameter: 
 
 ```{r, echo = TRUE}
 
 ## This provides the dimensions of the data frame 
-dim(state.utilities.df) # (10000 rows and 5 colums)
+dim(state.utilities.df) # (10000 rows and 5 columns)
 
 
 head(state.utilities.df) ## Now let's take a look at the first 6 rows 
@@ -206,7 +206,7 @@ Before we perform the EVPPI analyses, we will show a walkthrough of the calculat
 
 (iii) Define a WTP value (we've set this to £2,200 this value is chosen to give a high EVPI for this part of the exercise!)
 
-(iv) Remember, from looking through the model script above, that we need to pass the appropriate parameters into the model function. Familiarise yourself with the input parameters sampled in the '`A4.3.3b_VoI_Model_Script`' script that you ran earlier. We have provided these in the script for you, and have also provided the code to show you how these parameters can be selected and given to the model (see below). **It is very important that you understand how this data is being selected and passed to the model function for you to understand the rest of the exericse** 
+(iv) Remember, from looking through the model script above, that we need to pass the appropriate parameters into the model function. Familiarise yourself with the input parameters sampled in the '`A4.3.3b_VoI_Model_Script`' script that you ran earlier. We have provided these in the script for you, and have also provided the code to show you how these parameters can be selected and given to the model (see below). **It is very important that you understand how this data is being selected and passed to the model function for you to understand the rest of the exercise** 
 
 In the below example, we have selected the first row (or value) for each of the 1000 samples, for each parameter. In the code, you should check the results using another set of sampled parameters.    
 
@@ -267,7 +267,7 @@ Now we will walk through the code to perform EVPPI analyses for six sets of mode
 
 However – and this is very important – accurate estimation of partial EVPIs takes many more runs than this – and we would recommend at least 1000 inner and 1000 outer loops. This is one of the advantages of using R, as doing this across each parameter in Excel would take a very long time (if it even manages to finish!). This is also one of the reasons that we should be aware of how we are coding our model in R, since a model with lots of loops and inefficient code will take a lot longer to run. Whilst this is less important when running a PSA or EVPI analysis, it will begin to have a big impact when using the nested loops used in EVPPI analyses (for example, 1000 inner and outer loops means 1 million simulations being performed). 
 
-(ii) Now create a vector of WTP values, so that we can evalauate the EVPPI across a range of thresholds. Also (by running the code already written) we can create the matrices to evaluate the inner loop results, and the overall `evppi.results`, to store results. You can see that the structure of the `inner.results` matrix remains the same as used in the walkthrough above. However, for the `evppi.results` matrix, the number of rows is equal to the outer loop number, but now there is a column for each WTP value being considered. In the next steps we will see how the results can be evaluated and stored here. *(Note: in previous sessions (Module 3) we created functions that evaluate one WTP value at a time, wheras now we will provide all the WTP values into the function and calculate them all at once)*
+(ii) Now create a vector of WTP values, so that we can evaluate the EVPPI across a range of thresholds. Also (by running the code already written) we can create the matrices to evaluate the inner loop results, and the overall `evppi.results`, to store results. You can see that the structure of the `inner.results` matrix remains the same as used in the walkthrough above. However, for the `evppi.results` matrix, the number of rows is equal to the outer loop number, but now there is a column for each WTP value being considered. In the next steps we will see how the results can be evaluated and stored here. *(Note: in previous sessions (Module 3) we created functions that evaluate one WTP value at a time, whereas now we will provide all the WTP values into the function and calculate them all at once)*
 
 (iii) Calculate the effective population that will benefit from the intervention over an appropriate time horizon. We have provided the information from Part 1 of this exercise for you to run here. 
 
@@ -278,7 +278,7 @@ However – and this is very important – accurate estimation of partial EVPIs 
 
 (@) **Running the code for 100 inner and outer loops, for 6 parameter groups of interest**
 
-Now that you understand the process behind calculating partial EVPIs, and have created the matrices and functions to save the results appropriately, take a moment to examine the EVPPI lopps coded for you, for each of the six groups of parameters. The code is similar in structure to the walkthrough you did earlier, albeit with more simulations, and with more WTP thresholds considered. Notice that for each EVPPI analysis, the parameter of interest will be selected in the outer loop (using 'a'), and the other parameters are included in the inner loop (sampled using 'b'). We've labelled each section of the code accordingly, to help guide you through. 
+Now that you understand the process behind calculating partial EVPIs, and have created the matrices and functions to save the results appropriately, take a moment to examine the EVPPI loops coded for you, for each of the six groups of parameters. The code is similar in structure to the walkthrough you did earlier, albeit with more simulations, and with more WTP thresholds considered. Notice that for each EVPPI analysis, the parameter of interest will be selected in the outer loop (using 'a'), and the other parameters are included in the inner loop (sampled using 'b'). We've labelled each section of the code accordingly, to help guide you through. 
 
 Looking at the model code below, you should be able to recognise which EVPPI analysis this code is from:
 ```{r, eval = FALSE}
@@ -288,11 +288,11 @@ model.THR.voi(RR.vec[b], omr.df[b,],tp.rrr.vec[b],
                                         state.utilities.df[b,])
 ```
 
-The above code is evaluating the EVPPI with perfect information with the cost of revision. What if you wanted to evaluate the value of partial information for two paramters that are arguments in the model function? If you wanted to, you should be able to work out how to write the above code, but including two parameters in the outer loop, whilst all other remain in the inner loop.  
+The above code is evaluating the EVPPI with perfect information with the cost of revision. What if you wanted to evaluate the value of partial information for two parameters that are arguments in the model function? If you wanted to, you should be able to work out how to write the above code, but including two parameters in the outer loop, whilst all other remain in the inner loop.  
 
 Once you've had a look at all the EVPPI loops and have understood them, run the code to perform them all (i.e. run all the sections beginning with with 'EVPPI loops -'). We have added a progress bar for you, for each of the six groups, so that you can see how long each EVPPI simulation takes. 
 
-The speed to complete these analyses will depend on your computer (and what else your computer might be doing too), as well as the complexity of the model. In this example, each EVPPI analysis should be less than a minute, which is pretty good for 100 inner and outer loops (10,000 simulations in total). Needless to say, this where the efficiency of your code can start to make a meaninful difference to how long your simulations will take to run. *This is why we made some minor edits within the 'A4.3.3b_VoI_Model_Script.R' code earlier!*
+The speed to complete these analyses will depend on your computer (and what else your computer might be doing too), as well as the complexity of the model. In this example, each EVPPI analysis should be less than a minute, which is pretty good for 100 inner and outer loops (10,000 simulations in total). Needless to say, this where the efficiency of your code can start to make a meaningful difference to how long your simulations will take to run. *This is why we made some minor edits within the 'A4.3.3b_VoI_Model_Script.R' code earlier!*
 
 
 (@) **Plotting and selecting the results of interest**
