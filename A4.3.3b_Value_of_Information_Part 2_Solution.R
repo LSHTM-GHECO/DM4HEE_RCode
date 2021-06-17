@@ -93,7 +93,7 @@ current.info <- max(apply(evppi.df, 2, mean)) ## 2 indicates columns
 # so we want the maximum value out of the 2 column averages
 # try looking at apply(evppi.df, 2, mean) and then max(apply(evppi.df, 2, mean))
 
-# The perfect infromation for the relative risk parameter
+# The perfect information for the relative risk parameter
 perfect.info <- mean(apply(evppi.df, 1, max)) ## 1 indicates rows
 # so we want the average value of maximum NMB selected for each row
 # try looking at apply(evppi.df, 1, max) and then mean(apply(evppi.df, 1, max))
