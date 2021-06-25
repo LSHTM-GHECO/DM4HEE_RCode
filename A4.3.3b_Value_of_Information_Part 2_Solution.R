@@ -93,7 +93,7 @@ current.info <- max(apply(evppi.df, 2, mean)) ## 2 indicates columns
 # so we want the maximum value out of the 2 column averages
 # try looking at apply(evppi.df, 2, mean) and then max(apply(evppi.df, 2, mean))
 
-# The perfect infromation for the relative risk parameter
+# The perfect information for the relative risk parameter
 perfect.info <- mean(apply(evppi.df, 1, max)) ## 1 indicates rows
 # so we want the average value of maximum NMB selected for each row
 # try looking at apply(evppi.df, 1, max) and then mean(apply(evppi.df, 1, max))
@@ -355,9 +355,11 @@ evppi.long.pop <- reshape2::melt(evppi.wide.pop, id.vars = c("WTP"))
 head(evppi.long.pop)
 
 ## ggplot - this function has been imported from the ggplot functions sheet (in graphs folder)
+# Note you will get a warning here that the plot does not show all the data in the data.frame
+# This is because the plot only shows WTP from 0 to 15000, rather than the 50000 maximum in the data.frame
 plot.evppi(evppi.long.pop)
 
-# This code will also show you the plot across a smaller x-axis, help you see the results more clearly
+# This code will also show you the plot across a smaller x-axis, help you see the results more clearly (note you will get a warning here about removed data)
 plot.evppi(evppi.long.pop, 10000)
 
 # If you want to retrieve the EVPPI at a specific point

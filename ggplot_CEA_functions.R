@@ -133,7 +133,7 @@ plot.evpi <- function(results){
 }
 
 
-plot.evppi <- function(results, xlimit = 12000){
+plot.evppi <- function(results, xlimit = 15000){
   ## FUNCTION: Expected Value of Partial Perfect Information (EVPPI)
   ## This function allows for a limit on the X-axis, to help show the graph with adjusted axes
   ## INPUTS: results table equivalent to evppi.long.pop (see A3.3.b solutions)
@@ -143,7 +143,7 @@ plot.evppi <- function(results, xlimit = 12000){
   xlabel = "Willingness to pay threshold"
   ylabel = "Expected Value of Perfect Partial Information"
   
-  plot = ggplot(results) + geom_line(aes(x=WTP, y=value, colour = variable), size=1) + 
+  plot = ggplot(results) + geom_line(aes(x=WTP, y=value, colour = variable), size=0.75) + 
     labs(x = xlabel, text = element_text(size=10)) + 
     labs(y = ylabel, text = element_text(size=10)) + theme_classic() +
     theme(legend.title = element_blank(), axis.title=element_text(face="bold"), 
@@ -151,7 +151,7 @@ plot.evppi <- function(results, xlimit = 12000){
           axis.title.y = element_text(margin = margin(t = 0, r = 7, b = 0, l = 3)), 
           panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
           legend.key.width=unit(1.8,"line"), text = element_text(size=12),
-          plot.margin=unit(c(0.5,0.5,0,0.5),"cm")) + 
+          plot.margin=unit(c(0.5,0,0,0.5),"cm")) + 
     scale_x_continuous(labels = scales::comma, limits = c(0, xlimit), expand = c(0, 0.1)) + 
     scale_y_continuous(labels = scales::comma, expand = c(0, 0))
   

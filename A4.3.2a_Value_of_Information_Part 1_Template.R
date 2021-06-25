@@ -6,8 +6,9 @@
 library(ggplot2)
 library(reshape2) 
 
-# Reading in the model function from Exercise 3a (Part 1)
+# Reading in the model function from Exercise 3a (Part 1) and ggplot functions
 source("A3.3.3a_Presenting_Simulation_Results_Part1_Solutions.R")
+source("ggplot_CEA_functions.R")
 
 #### RUNNING THE SIMULATIONS ########
 sim.runs <- 1000 ## the number of simulation runs
@@ -99,7 +100,6 @@ EVPI.results <- data.frame(WTP=    , ## hint: use vector already created
 
 ## replace NA EVPI values with estimated population EVPI values
 for (i in 1:length(WTP.values)) {
-  EVPI.results[i,1] <- WTP.values[i]
   EVPI.results[i,2]<-     ## use est.EVPI.pop()
 }
 

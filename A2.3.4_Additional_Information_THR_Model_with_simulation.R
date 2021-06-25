@@ -9,7 +9,7 @@ hazards <- read.csv("hazardfunction.csv", header=TRUE) ## importing the hazard i
 cov.55<-read.csv("cov55.csv",row.names=1,header=TRUE) ## importing the 
 
 life.table <- read.csv("life-table.csv", header=TRUE)
-life.table<- as.data.table(life.table)
+
 
 #########**** PARAMETERS *****######
 #  Start by defining parameters
