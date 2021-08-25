@@ -2,6 +2,16 @@
 ## think easier to have as much as poss in one script that matches
 ## the paper run through in this case? 
 
+
+### !!! set working directory as the folder this is stored in
+## added this in to allow for the running of instruction pdf knitting
+## whilst reading in data from the same subfolder
+## students can ignore if not re-knitting the pdfs, just make sure data files
+## are stored in the same file as template/solution files
+
+require("rstudioapi")
+setwd(dirname(getActiveDocumentContext()$path)) # Set working directory to source file
+
 #########**** PARAMETERS *****######
 #  Start by defining parameters
 
@@ -98,9 +108,9 @@ state.utilities <- c(0,uSuccessP,uRevision,uSuccessR,0) ## a vector of health st
 ##  Hazard function ####
 
 #  Reading the data needed from csv files
-hazards <- read.csv("Manuscript/hazardfunction.csv", header=TRUE) ## importing the hazard inputs from the regression analysis
+hazards <- read.csv("hazardfunction.csv", header=TRUE) ## importing the hazard inputs from the regression analysis
 
-cov.55 <- read.csv("Manuscript/cov55.csv",row.names=1,header=TRUE) ## importing the covariance data
+cov.55 <- read.csv("cov55.csv",row.names=1,header=TRUE) ## importing the covariance data
 
 ## Coefficients - on the log hazard scale
 mn.lngamma <- hazards$coefficient[1] ## Ancilliary parameter in Weibull distribution - equivalent to lngamma coefficient
@@ -131,7 +141,7 @@ lambda <- exp(r.cons+age*r.ageC+male*r.maleC) ##Lambda parameter survival analys
 RR.NP1 <- exp(r.NP1) ##Relative risk of revision for new prosthesis 1 compared to standard
 
 ##### LIFE TABLES #####
-life.table <- read.csv("Manuscript/life-table.csv", header=TRUE) ## importing the life table 
+life.table <- read.csv("life-table.csv", header=TRUE) ## importing the life table 
 
 colnames(life.table) <- c("Age","Index","Males","Female") ## making sure column names are correct
 
