@@ -2,6 +2,16 @@
 #  Cholesky Decomposition by hanD
 #  Authors: Nichola Naylor & Jack Williams
 
+### !!! set working directory as the folder this is stored in
+## added this in to allow for the running of instruction pdf knitting
+## whilst reading in data from the same subfolder
+## students can ignore if not re-knitting the pdfs, just make sure data files
+## are stored in the same file as template/solution files
+
+# require("rstudioapi")  
+# setwd(dirname(getActiveDocumentContext()$path)) # Set working directory to source file 
+
+
 ## importing data.table library
 library(data.table) ## install this package if not already installed before continuing
 
