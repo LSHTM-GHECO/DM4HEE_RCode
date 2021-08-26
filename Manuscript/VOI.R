@@ -1,13 +1,21 @@
-#  Decision Modelling for Health Economic Evaluation
-#  Advanced Course Exercise 4a (Part 1): SOLUTION FILE
-#  Authors: Andrew Briggs, Jack Williams & Nichola Naylor
+
+### !!! set working directory as the folder this is stored in
+## added this in to allow for the running of instruction pdf knitting
+## whilst reading in data from the same subfolder
+## students can ignore if not re-knitting the pdfs, just make sure data files
+## are stored in the same file as template/solution files
+
+# require("rstudioapi")  
+# setwd(dirname(getActiveDocumentContext()$path)) # Set working directory to source file 
+
 
 ### Loading useful packages
 library(ggplot2)
 library(reshape2) 
 
 # Reading in the model function from Exercise 3a (Part 1) and ggplot functions
-source("A3.3.3a_Presenting_Simulation_Results_Part1_Solutions.R")
+source("A3.3.3a_Presenting_Simulation_Results_Part1_Solutions.R") ### !! need to update 
+## set to "THR_Model.R" ??
 source("ggplot_CEA_functions.R")
 
 #### RUNNING THE SIMULATIONS ########
@@ -71,11 +79,11 @@ est.EVPI.pop <-function(WTP, effective.population,
   ###          results - data.table object from simulation.runs with 
   ###          qalys.SP0 and cost.SP0 columns & equivalents for NP1
   ###  OUTPUTS: A numeric value for population EVPI
-
+  
   nmb.SP0 <- simulation.results$qalys.SP0 * WTP - simulation.results$cost.SP0
   nmb.NP1 <- simulation.results$qalys.NP1 * WTP - simulation.results$cost.NP1
   nmb.table <- data.frame(nmb.SP0, nmb.NP1)
-
+  
   av.current <- apply(nmb.table, 2, mean)
   max.current <- max(av.current)
   max.nmb <- apply(nmb.table, 1, max) 
@@ -83,7 +91,7 @@ est.EVPI.pop <-function(WTP, effective.population,
   
   EVPI.indiv <- av.perfect - max.current
   pop.EVPI <- effective.population * EVPI.indiv
-
+  
   return(pop.EVPI)
   
 }

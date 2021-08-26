@@ -1,6 +1,16 @@
 #  Decision Modelling for Health Economic Evaluation
-#  Advanced Course Exercise 3b (Part 2): TEMPLATE FILE
+#  Advanced Course Exercise 3b (Part 2): SOLUTION FILE
 #  Authors: Andrew Briggs, Jack Williams & Nichola Naylor
+
+### !!! set working directory as the folder this is stored in
+## added this in to allow for the running of instruction pdf knitting
+## whilst reading in data from the same subfolder
+## students can ignore if not re-knitting the pdfs, just make sure data files
+## are stored in the same file as template/solution files
+
+# require("rstudioapi")  
+# setwd(dirname(getActiveDocumentContext()$path)) # Set working directory to source file 
+
 
 ### Loading useful packages
 library(ggplot2)
@@ -96,7 +106,7 @@ model.THR.3b <- function(age=60, male=0) {
   colnames(life.table) <- c("Age","Index","Males","Female") ## making sure column names are correct
   cycle.v <- 1:cycles ## a vector of cycle numbers 1 - 60
   current.age <- age + cycle.v ## a vector of cohort age throughout the model
-  
+
   # This finds the position of age, within the life table 
   interval <- findInterval(current.age, life.table$Index)
   # These positions can then be used to subset the appropriate values from life.table
@@ -123,8 +133,8 @@ model.THR.3b <- function(age=60, male=0) {
   uRevision<-rbeta(1,a.uRevision,b.uRevision) ## drawing from the Beta distribution based on a and b
   
   state.utilities<-c(0,uSuccessP,uRevision,uSuccessR,0)
-  
-  ##  Hazard function
+ 
+   ##  Hazard function
   z<-rnorm(6,0,1) ## 6 random draws from the normal distribution
   x<-mn + cholm %*%z
   Tz<-cholm%*%z ## Tz which is the Cholesky matrix multiplied by the 5 random draws
@@ -134,12 +144,12 @@ model.THR.3b <- function(age=60, male=0) {
   r.ageC<-x[3,1]  ## Age coefficient in survival analysis for baseline hazard based on x
   r.maleC<-x[4,1] 
   r.NP1<-x[5,1]
-  r.NP2<-          ## the new treatment arm coefficient
+  r.NP2<-x[6,1] ## the new treatment arm coefficient
   
   gamma <- exp(r.lngamma) ## Ancilliary parameter in Weibull distribution (exponential of lngamma coefficient)
   lambda <- exp(r.cons+age*r.ageC+male*r.maleC) ## Lambda parameter survival analysis (depends on mix of above coefficients)
   RR.NP1 <- exp(r.NP1) ## Relative risk of revision for new prosthesis 1 compared to standard
-  RR.NP2 <-        ## Relative risk of revision for new prosthesis 2 compared to standard
+  RR.NP2 <- exp(r.NP2) ## Relative risk of revision for new prosthesis 2 compared to standard
   
   #####MARKOV MODEL #####
   
@@ -148,8 +158,8 @@ model.THR.3b <- function(age=60, male=0) {
   #  We start with a three dimensional array in order to capture the time dependencies
   revision.risk.sp0 <- 1- exp(lambda * ((cycle.v-1) ^gamma-cycle.v ^gamma))
   revision.risk.np1 <- 1- exp(lambda * RR.NP1 * ((cycle.v-1) ^gamma-cycle.v ^gamma))
-  revision.risk.np2 <- 
-  
+  revision.risk.np2 <- 1- exp(lambda * RR.NP2 * ((cycle.v-1) ^gamma-cycle.v ^gamma))
+    
   revision.risk.sp0 ## the time dependent risk of revision for standard treatment
   revision.risk.np1 ## the time dependent risk of revision for NP1
   revision.risk.np2 ## the time dependent risk of revision for NP2
@@ -249,18 +259,42 @@ model.THR.3b <- function(age=60, male=0) {
   rowSums(trace.NP1)
   
   #  NP2 ARM
-  ### ADD CODE CREATING THE TRANSITION MATRIX FOR NP2
+  tm.NP2 <- array(data=0,dim=c(n.states, n.states, cycles),
+                  dimnames= list(state.names, state.names, 1:cycles)) ## an empty array of dimenions (number of states, number of states, number of cycles)
+  ## naming all dimensions
   
-  
-  
+  ### create a loop that creates a time dependent transition matrix for each cycle
+  for (i in 1:cycles) {
+    
+    ## tranisitions out of P-THR
+    tm.NP2["P-THR","Death",i] <- tp.PTHR2dead ## Primary THR either enter the death state or.. or..
+    tm.NP2["P-THR","successP-THR",i] <- 1 - tp.PTHR2dead ## they go into the success THR state 
+    ## transitions out of success-P-THR
+    tm.NP2["successP-THR","R-THR",i] <- revision.risk.np2[i] ## revision risk with NP2 treatment arm 
+    tm.NP2["successP-THR","Death",i] <- mortality.vec[i]
+    tm.NP2["successP-THR","successP-THR",i] <- 1 - revision.risk.np2[i] - mortality.vec[i]
+    ## transitions out of R-THR 
+    tm.NP2["R-THR","Death",i] <- tp.RTHR2dead + mortality.vec[i]
+    tm.NP2["R-THR","successR-THR",i] <- 1 - tp.RTHR2dead - mortality.vec[i]
+    ## transitions out of success-THR
+    tm.NP2["successR-THR","R-THR",i] <- tp.rrr
+    tm.NP2["successR-THR",5,i] <- mortality.vec[i]
+    tm.NP2["successR-THR","successR-THR",i] <- 1 - tp.rrr - mortality.vec[i]
+    
+    tm.NP2["Death","Death",i] <- 1 ## no transitions out of death
+  }
   
   tm.NP2
   
   #  Create a trace for the standard prosthesis arm
-  ### ADD CODE CREATING THE TRACE MATRIX FOR NP2
+  trace.NP2 <- matrix(data=0,nrow=cycles,ncol=n.states)
+  colnames(trace.NP2) <- state.names
   
+  trace.NP2[1,] <- seed%*%tm.NP2[,,1]
   
-  
+  for (i in 2:cycles) {
+    trace.NP2[i,] <- trace.NP2[i-1,]%*%tm.NP2[,,i]
+  }
   trace.NP2
   
   rowSums(trace.NP2)
@@ -278,7 +312,10 @@ model.THR.3b <- function(age=60, male=0) {
   disc.cost.NP1 <- (discount.factor.c%*%cost.NP1) + c.NP1  ## the discouted sum of cost.SP0 plus the 1 off Cost of a primary THR procedure (c.NP1)
   
   # NP2 ARM
-  ## ADD IN THE VARIABLE DEFINITIONS NEEDED AS ABOVE
+  cost.NP2 <- trace.NP2%*%state.costs  ## the cost of NP2 based on cost per state and numbers in each state per cycle 
+  undisc.cost.NP2 <- colSums(cost.NP2) + c.NP2  ## the (undiscouted) sum of cost.NP2 plus the 1 off Cost of a primary THR procedure (c.NP2)
+  disc.cost.NP2 <- (discount.factor.c%*%cost.NP2) + c.NP2  ## the discouted sum of cost.SP0 plus the 1 off Cost of a primary THR procedure (c.NP2)
+  
   
   ###QALYS######
   # STANDARD ARM
@@ -294,16 +331,19 @@ model.THR.3b <- function(age=60, male=0) {
   disc.QALYs.NP1 <- discount.factor.o%*%QALYs.NP1
   
   # NP2 ARM
-  ## ADD IN THE VARIABLE DEFINITIONS NEEDED AS ABOVE
-  
+  QALYs.NP2 <- trace.NP2%*%state.utilities ## utility per cycle
+  undisc.QALYs.NP2 <- colSums(QALYs.NP2) ## total undiscounted utility 
+  disc.QALYs.NP2 <- colSums(discount.factor.o%*%QALYs.NP2) ## total discounted utility
+  undisc.QALYs.NP2 <- colSums(QALYs.NP2)
+  disc.QALYs.NP2 <- discount.factor.o%*%QALYs.NP2
   
   ####ANALYSIS####
-  output <- c(cost.SP0 =  ,  ## fill in the output table with discounted results
-              qalys.SP0 =  ,
-              cost.NP1 =  ,
-              qalys.NP1 =  ,
-              cost.NP2 =  ,
-              qalys.NP2 =  )
+  output <- c(cost.SP0 = disc.cost.SP0,
+              qalys.SP0 = disc.QALYs.SP0,
+              cost.NP1 = disc.cost.NP1,
+              qalys.NP1 = disc.QALYs.NP1,
+              cost.NP2 = disc.cost.NP2,
+              qalys.NP2 = disc.QALYs.NP2)
   
   return(output)
   
@@ -324,16 +364,21 @@ simulation.results <- data.frame("cost.SP0" = rep(as.numeric(NA), sim.runs), ## 
                                  "cost.NP2" = rep(as.numeric(NA),sim.runs),
                                  "qalys.NP2"=  rep(as.numeric(NA),sim.runs))
 
+## adding a progress bar to the simulatio runs allows you to keep track of where the simulation is
+# this is particularly useful for more complex models that may take longer to run
+
+pb = txtProgressBar(min = 0, max = sim.runs, initial = 0, style = 3)
+
 for(i in 1:sim.runs) {
-  
-  simulation.results[i,] <-      ## fill in this code rerunning the model 
+  setTxtProgressBar(pb,i)  
+  simulation.results[i,] <- model.THR.3b(60,0)
 }
 
 ## have a look at what you've created so far:
 head(simulation.results)
 
 # calculate the mean results across simulations
-mean.results <- apply() ## fill in the apply function to calculate mean values across the columns
+mean.results <- apply(simulation.results, 2, mean)
 mean.results
 
 #### PLOTTING THE COST-EFFECTIVENESS PLANE #####
@@ -352,16 +397,15 @@ plane.sims <- rbind(standard.sims, NP1.sims, NP2.sims)
 ## plotting this using predefined functions:
 plot.ce.plane.all(plane.sims)
 
-
 #### PLOTTING THE COST-EFFECTIVENESS ACCEPTABILITY CURVE #####
 
 # Generate CEAC table
-WTP.values <-  ## use the seq() function to get a vector of specified numeric values
+WTP.values <- seq(from = 0, to = 50000, by = 100) ## use the seq() function to get a vector of specified numeric values
 
 CEAC <- data.frame(WTP = WTP.values, 
-                   Standard=   ,  ## use the rep function as done previously in this course, specify the lenght = WTP.values
-                   NP1=        ,
-                   NP2=         )
+                   Standard= rep(as.numeric(NA),length(WTP.values)),
+                   NP1= rep(as.numeric(NA),length(WTP.values)),
+                   NP2= rep(as.numeric(NA),length(WTP.values)))
 
 pCE.3b <-function(WTP, simulation.results) {
   ## a function that estimates the probability of the new intervention
@@ -375,25 +419,30 @@ pCE.3b <-function(WTP, simulation.results) {
   nmb <- simulation.results[,c("qalys.SP0",
                                "qalys.NP1",
                                "qalys.NP2")]*WTP - 
-    simulation.results[,c("cost.SP0",
-                          "cost.NP1",
-                          "cost.NP2")] 
+                                    simulation.results[,c("cost.SP0",
+                                                          "cost.NP1",
+                                                          "cost.NP2")] 
   ## this time we want to choose the prothesis with the greatest net monetary benefit:
-  max.nmb <-  ## selecting max value indication by row within nmb
+  max.nmb <- apply(nmb, 1, max) # selecting max value indication by row within nmb
   
   ## creating an indication of TRUE/FALSE as to whether each treatment column == that max value:
-  CE <- nmb[1:nrow(simulation.results),] == max.nmb[1:nrow(simulation.results)]
-  probCE<-   ## averaging over TRUE (=1) and FALE (=0) for each column
+  CE <- nmb[1:nrow(simulation.results),] == max.nmb[1:nrow(simulation.results)] 
+  probCE<- apply(CE, 2, mean) ## averaging over TRUE (=1) and FALE (=0) for each column
   
   return(probCE)
   
 }
 
 
+pb = txtProgressBar(min = 0, max = length(WTP.values), initial = 0, style = 3)
+
 for (i in 1:length(WTP.values)) {
+  setTxtProgressBar(pb,i)
   CEAC[i,"WTP"] <- WTP.values[i]
-  CEAC[i,2:4]<-    ## complete using the pCE.3b function
+  CEAC[i,2:4]<- pCE.3b(WTP.values[i], simulation.results)
+  
 }
+
 
 # Look at the results
 head(CEAC)  
@@ -401,7 +450,6 @@ tail(CEAC)
 
 # Plotting the CEAC with a plot function
 # reshape to show all in on plot
-
 CEAC.long <- melt(CEAC, id.vars = c("WTP"))
 colnames(CEAC.long) <- c("WTP", "group", "pCE")
 head(CEAC.long)
@@ -417,7 +465,7 @@ plot.ceac.all(CEAC.long)
 #  maximum NMB is selected from the data
 
 CEAF.function <-function(WTP, simulation.results) {
-  
+
   # The main code here is the same as that used in the CEAC 
   nmb <- simulation.results[,c("qalys.SP0",
                                "qalys.NP1",
@@ -457,6 +505,5 @@ for(i in 1:length(WTP.values)){
 
 # The same ggplot code can be used for the CEAF plot 
 plot.ceac.all(CEAF)
-
 
 

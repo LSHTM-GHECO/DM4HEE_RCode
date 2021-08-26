@@ -1,12 +1,22 @@
 #  Decision Modelling for Health Economic Evaluation
-#  Advanced Course Exercise 3a (Part 1): SOLUTION FILE
+#  Advanced Course Exercise 3a (Part 1): TEMPLATE FILE
 #  Authors: Andrew Briggs, Jack Williams & Nichola Naylor
+
+### !!! set working directory as the folder this is stored in
+## added this in to allow for the running of instruction pdf knitting
+## whilst reading in data from the same subfolder
+## students can ignore if not re-knitting the pdfs, just make sure data files
+## are stored in the same file as template/solution files
+
+# require("rstudioapi")  
+# setwd(dirname(getActiveDocumentContext()$path)) # Set working directory to source file 
+
 
 ### Loading useful packages
 library(ggplot2)
 library(reshape2) 
 
-#  Reading the data needed from csv files
+###  Reading in the data needed from csv files
 hazards <- read.csv("hazardfunction.csv", header=TRUE) ## importing the hazard inputs from the regression analysis
 cov.55 <- read.csv("cov55.csv",row.names=1,header=TRUE) ## importing the covariance matrix
 life.table <- read.csv("life-table.csv", header=TRUE)
@@ -26,8 +36,8 @@ seed <- c(1,0,0,0,0) #  Seed the starting states of the model (a vector of 1 and
 c.SP0 <- 394 ## Cost of standard prosthesis
 c.NP1 <- 579 ## Cost of new prosthesis 1
 
-### alpha and beta values
-
+### alpha and beta values :
+  
 # FOR TRANSITION PROBABILITY ESTIMATION
 a.PTHR2dead <- 2 ## alpha value for operative mortality from primary surgery
 b.PTHR2dead <- 100- a.PTHR2dead ## beta value for operative mortality from primary surgery
@@ -92,7 +102,7 @@ model.THR <- function(age=60, male=0) {
   # This is included within the function as it varies by age and sex (which are inputs into the function)
   colnames(life.table) <- c("Age","Index","Males","Female") ## making sure column names are correct
   current.age <- age + cycle.v ## a vector of cohort age throughout the model
-
+  
   # This finds the position of age, within the life table 
   interval <- findInterval(current.age, life.table$Index)
   # These positions can then be used to subset the appropriate values from life.table
@@ -133,8 +143,8 @@ model.THR <- function(age=60, male=0) {
   gamma <- exp(r.lngamma) ## Ancilliary parameter in Weibull distribution (exponential of lngamma coefficient)
   lambda <- exp(r.cons+age*r.ageC+male*r.maleC) ## Lambda parameter survival analysis (depends on mix of above coefficients)
   RR.NP1 <- exp(r.NP1) ## Relative risk of revision for new prosthesis 1 compared to standard
- 
-   #####MARKOV MODEL #####
+  
+  #####MARKOV MODEL #####
   
   #### TRANS AND TRACE ######
   #  Now create a transition matrix for the standard prosthesis arm and NP1 arm
@@ -266,7 +276,7 @@ model.THR <- function(age=60, male=0) {
   
   undisc.QALYs.NP1 <- colSums(QALYs.NP1)
   disc.QALYs.NP1 <- discount.factor.o%*%QALYs.NP1
-
+  
   ####ANALYSIS####
   output <- c(cost.SP0 = disc.cost.SP0,
               qalys.SP0 = disc.QALYs.SP0,
@@ -276,28 +286,28 @@ model.THR <- function(age=60, male=0) {
               inc.qalys = disc.QALYs.NP1 - disc.QALYs.SP0)
   
   return(output)
-
+  
   
 }
 
 ## testing the function:
 model.THR(age=60, male=0) 
 
-#### RUNNING THE SIMULATIONS ########
-sim.runs <- 1000 ## the number of simulation runs
+#### RUNNING THE SIMULATION ####
+sim.runs <-    ## the number of simulation runs
 
 ## creating an empty data.frame for simulation results to fill:
-simulation.results <- data.frame("cost.SP0" = rep(as.numeric(NA), sim.runs), ## use the rep() function to create sim.runs rows of values
-                                 "qalys.SP0"= rep(as.numeric(NA),sim.runs),
-                                 "cost.NP1" = rep(as.numeric(NA),sim.runs),
-                                 "qalys.NP1" = rep(as.numeric(NA), sim.runs),
-                                 "inc.cost" = rep(as.numeric(NA),sim.runs),
-                                 "inc.qalys"=  rep(as.numeric(NA),sim.runs))
+simulation.results <- data.frame("cost.SP0" =     , ## use the rep() function to create sim.runs rows of values
+                                 "qalys.SP0"=     ,
+                                 "cost.NP1" =     ,
+                                 "qalys.NP1" =    ,
+                                 "inc.cost" =     ,
+                                 "inc.qalys"=     )
 
 ## running the simulations and filling the simulation.results data.frame:
 for(i in 1:sim.runs){
-  simulation.results[i,] <- model.THR(age=60, male=0) ## running the model 1,000 times
-  
+  ## define each row as a result from each run  
+
 }
 
 ## have a look at what you've created so far:
@@ -306,51 +316,51 @@ head(simulation.results)
 #### PLOTTING THE COST-EFFECTIVENESS PLANE #####
 
 # simple base plot of incremental QALYs and costs
-plot(simulation.results$inc.qalys,simulation.results$inc.cost)
+plot(   ,    ) ## try ?plot() if not used before
 
 ## using pre-created ggplot2 functions for nicer cost-effectiveness plane graphs
 source("ggplot_CEA_functions.R")
 plot.ce.plane(simulation.results) 
 
-## Estimating average ICER from the simulation
-
-PSA.inc.cost <- mean(simulation.results$cost.NP1)-mean(simulation.results$cost.SP0)
-PSA.inc.qalys <- mean(simulation.results$qalys.NP1)-mean(simulation.results$qalys.SP0)
-PSA.icer <- PSA.inc.cost/PSA.inc.qalys
+## Estimating average ICER from the simulation:
+# note you don't have to do this all in one calculation/variable definition
+PSA.inc.cost <- 
+PSA.inc.qalys <- 
+PSA.icer <- 
 
 #### PLOTTING THE COST-EFFECTIVENESS ACCEPTABILITY CURVE #####
 
 # Estimating the average net monetary benefit of the new treatment
-WTP <- 100000 ## the ceiling ratio / willingness-to-pay
-av.nmb <- PSA.inc.qalys*WTP - PSA.inc.cost  ## average net monetary benefit based on mean incremental costs and qalys from the simulation
+WTP <-    ## the ceiling ratio / willingness-to-pay
+av.nmb <-   ## average net monetary benefit based on mean incremental costs and qalys from the simulation
 
 # Estimate the probability of cost-effectiveness for a given willingness-to-pay ceiling ratio
 
 p.CE<-function(WTP, simulation.results) {
-## a function that estimates the probability of the new intervention
-# being cost-effective 
-# INPUTS: WTP = willingness to pay value (numeric)
-#         simulation.results = a data.frame output of PSA simulations which includes
-#         columns names "inc.qalys" and "inc.cost"   
-# OUTPUTS: A numeric value specifying the probability of cost-effectiveness given the inputs
+  ## a function that estimates the probability of the new intervention
+  # being cost-effective 
+  # INPUTS: WTP = willingness to pay value (numeric)
+  #         simulation.results = a data.frame output of PSA simulations which includes
+  #         columns names "inc.qalys" and "inc.cost"   
+  # OUTPUTS: A numeric value specifying the probability of cost-effectiveness given the inputs
   
+  ## write the function here that returns the probability of cost-effectiveness vector
   
-  nmb <- simulation.results[,"inc.qalys"]*WTP - simulation.results[,"inc.cost"] ## vector of NMB estimates for each simulation length 1:sim.runs
-  CE <- nmb>0   ## vector of TRUE/FALSE for each simulation length 1:sim.runs
-  probCE<- mean(CE) ## the mean value of TRUE (=1) and FALSE (=0)
-   
+  nmb <-       ## vector of NMB estimates for each simulation length 1:sim.runs
+  CE <-         ## vector of TRUE/FALSE for each simulation length 1:sim.runs
+  probCE<-       ## the mean value of TRUE (=1) and FALSE (=0) [which equates to probability of cost-effectiveness]
+  
   return(probCE)
   
 }
 
-
 # Generate CEAC table
-WTP.values <- seq(from = 0, to = 50000, by = 10) ## use the seq() function to get a vector of specified numeric values
+WTP.values <-   ## use the seq() function to get a vector of numeric values in the specified range and increments
 CEAC <- data.frame(WTP = WTP.values, 
-                   pCE = rep(as.numeric(NA),length(WTP.values)))
+                   pCE =   ) ## for pCE; use the rep() function to fill with missing numeric values
 
 for (i in 1:length(WTP.values)) {
-  CEAC[i,"pCE"]<- p.CE(CEAC[i,"WTP"], simulation.results)
+  CEAC[i,"pCE"]<-  ## use the p.CE function created above
 }
 
 # Display the top and bottom of the CEAC table
@@ -359,31 +369,25 @@ tail(CEAC)
 
 
 # Plotting the CEAC with a plot function
-plot(CEAC$WTP,CEAC$pCE, type="l")
+plot() ## fill in accordingly 
 
 # Plotting the CEAC with the pre-defined ggplot functions
 plot.ceac(CEAC)
 
 ##### SUBGROUP ANALYSES ######
-# CREATE ARRAY TO STORE THE RESULTS OF THE MODEL IN EACH SUBGROUP
 
+# CREATE ARRAY TO STORE THE RESULTS OF THE MODEL IN EACH SUBGROUP
 subgroups.names <- c("Male 40", "Male 60", "Male 80", "Female 40", "Female 60", "Female 80")
 subgroups.n <- length(subgroups.names)
 
-simulation.subgroups <- array(data = 0, dim = c(sim.runs, length(colnames(simulation.results)), subgroups.n),
-                              dimnames = list(1:sim.runs, colnames(simulation.results),subgroups.names))
+simulation.subgroups <-  ## use array() and specify dimensions and dimension names using dimnames=
 
 # Run model for each subgroup, inputting the age and sex into the function, and record results within the array
 for(i in 1:sim.runs){
   simulation.subgroups[i,,1] <- model.THR(age = 40, male = 1)
-  simulation.subgroups[i,,2] <- model.THR(age = 60, male = 1)
-  simulation.subgroups[i,,3] <- model.THR(age = 80, male = 1)
-  simulation.subgroups[i,,4] <- model.THR(age = 40, male = 0)
-  simulation.subgroups[i,,5] <- model.THR(age = 60, male = 0)
-  simulation.subgroups[i,,6] <- model.THR(age = 80, male = 0)
+  ### do the same for the other subgroups here
+  
 }
-
-
 
 # Create a CEAC table with lambda value sequence
 WTP.values <- seq(from = 0, to = 50000, by = 50)
@@ -395,15 +399,12 @@ colnames(CEAC.subgroups) <- c("WTP", subgroups.names)
 
 # Estimate probability cost-effective for all subgroups
 for (i in 1:length(WTP.values)) {
-
-  CEAC.subgroups[i,1]<-WTP.values[i]
-  CEAC.subgroups[i,2]<-p.CE(WTP.values[i], simulation.subgroups[,,1])
-  CEAC.subgroups[i,3]<-p.CE(WTP.values[i], simulation.subgroups[,,2])
-  CEAC.subgroups[i,4]<-p.CE(WTP.values[i], simulation.subgroups[,,3])
-  CEAC.subgroups[i,5]<-p.CE(WTP.values[i], simulation.subgroups[,,4])
-  CEAC.subgroups[i,6]<-p.CE(WTP.values[i], simulation.subgroups[,,5])
-  CEAC.subgroups[i,7]<-p.CE(WTP.values[i], simulation.subgroups[,,6])
-
+  
+  CEAC.subgroups[i,1] <- WTP.values[i]
+  ### by using CEAC.subgroups[i,2]<-p.CE( )  define the reat of CEAC.subgroups values for i here
+  ### for the remainging 7 columns (i.e. the 6 subgroups):
+  
+ 
 }
 
 # Show the structure of the subgroup results 
@@ -412,18 +413,19 @@ head(CEAC.subgroups)
 ## Base R plot (col indicates colour, lty indicates linetype, where 1 = fill and 2 = dasshed) 
 
 plot(CEAC.subgroups$WTP, CEAC.subgroups$`Male 40`, type="l", ylim = c(0,1), col = "red", lty = 2)
-  lines(CEAC.subgroups$WTP, CEAC.subgroups$`Male 60`, col = "blue", lty = 2)
-  lines(CEAC.subgroups$WTP, CEAC.subgroups$`Male 80`, col = "green", lty = 2)
-  lines(CEAC.subgroups$WTP, CEAC.subgroups$`Female 40`, col = "red", lty = 1)
-  lines(CEAC.subgroups$WTP, CEAC.subgroups$`Female 60`, col = "blue", lty = 1)
-  lines(CEAC.subgroups$WTP, CEAC.subgroups$`Female 80`, col = "green", lty = 1)
+lines(CEAC.subgroups$WTP, CEAC.subgroups$`Male 60`, col = "blue", lty = 2)
+lines(CEAC.subgroups$WTP, CEAC.subgroups$`Male 80`, col = "green", lty = 2)
+lines(CEAC.subgroups$WTP, CEAC.subgroups$`Female 40`, col = "red", lty = 1)
+lines(CEAC.subgroups$WTP, CEAC.subgroups$`Female 60`, col = "blue", lty = 1)
+lines(CEAC.subgroups$WTP, CEAC.subgroups$`Female 80`, col = "green", lty = 1) ## use the lines() function with plot() to generate 
 
 ## Alternative ggplot function for CEAC  
-    
+
 ## We need to reshape the data from wide to long to use in ggplot 
-CEAC.subgroups.long <- melt(CEAC.subgroups, id.vars = c("WTP"))
+CEAC.subgroups.long <- melt(  )  ## use the melt function 
 colnames(CEAC.subgroups.long) <- c("WTP", "group", "pCE")
-head(CEAC.subgroups.long)
+
+head(CEAC.subgroups.long) ## have a check of your long-format data
 
 # Plots of results using pre-defined ggplot functions
 plot.ceac.all(CEAC.subgroups.long)

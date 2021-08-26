@@ -1,6 +1,16 @@
 #  Decision Modelling for Health Economic Evaluation
-#  Advanced Course Exercise 2: TEMPLATE FILE
+#  Advanced Course Exercise 2: SOLUTION FILE
 #  Authors: Andrew Briggs, Jack Williams & Nichola Naylor
+
+### !!! set working directory as the folder this is stored in
+## added this in to allow for the running of instruction pdf knitting
+## whilst reading in data from the same subfolder
+## students can ignore if not re-knitting the pdfs, just make sure data files
+## are stored in the same file as template/solution files
+
+# require("rstudioapi")  
+# setwd(dirname(getActiveDocumentContext()$path)) # Set working directory to source file 
+
 
 #  Reading the data needed from csv files
 hazards <- read.csv("hazardfunction.csv", header=TRUE) ## importing the hazard inputs from the regression analysis
@@ -34,16 +44,16 @@ seed <- c(1,0,0,0,0)
 
 ###  Transition probabilities
 
-a.PTHR2dead <-     ## alpha value for operative mortality from primary surgery
-b.PTHR2dead <-     ## beta value for operative mortality from primary surgery
+a.PTHR2dead <- 2 ## alpha value for operative mortality from primary surgery
+b.PTHR2dead <- 100- a.PTHR2dead ## beta value for operative mortality from primary surgery
 
-tp.PTHR2dead <-   rbeta(n = , shape1 = , shape2 = )   ## Operative mortality rate  (OMR) following primary THR
+tp.PTHR2dead <- rbeta(1,a.PTHR2dead,b.PTHR2dead) ## Operative mortality rate  (OMR) following primary THR
 # since we assume the same shape parameters for RTHR : 
-tp.RTHR2dead <-   rbeta( )   ## Operative mortality rate (OMR) following revision THR
+tp.RTHR2dead <- rbeta(1,a.PTHR2dead,b.PTHR2dead)  ## Operative mortality rate (OMR) following revision THR
 
-a.rrr <-     ## alpha value for re-revision risk
-b.rrr <-     ## beta value for re-revision risk
-tp.rrr <-    ## Re-revision risk transition probability (beta distribution)
+a.rrr <- 4   ## alpha value for re-revision risk
+b.rrr <- 100-a.rrr  ## beta value for re-revision risk
+tp.rrr <-rbeta(1,a.rrr,b.rrr) ## Re-revision risk transition probability
 
 tp.PTHR2dead
 tp.RTHR2dead
@@ -52,87 +62,87 @@ tp.rrr
 ##  Costs
 c.primary <- 0  ## Cost of a primary THR procedure - 
 ## Note that the cost of the primary procedure is excluded (set to 0): since both arms have this procedure it is assumed to net out of the incremental analysis.  However, if the model was to be used to estimate lifetime costs of THR it would be important to include.
+mn.cRevision <- 5294 ## mean cost of revision surgery
+se.cRevision <- 1487 ## standard error of cost of revision surgery
 
-mn.cRevision <-    ## mean cost of revision surgery
-se.cRevision <-    ## standard error of cost of revision surgery
-
-a.cRevision <-      ## alpha value for cost of revision surgery 
-b.cRevision <-      ## beta value for cost of revision surgery
-c.revision <- rgamma(n =  ,shape =  , scale =  )    ## Gamma distribution draw for cost of revision surgery
+a.cRevision <- (mn.cRevision/se.cRevision)^2 ## alpha value for cost of revision surgery 
+b.cRevision <- (se.cRevision^2)/mn.cRevision ## beta value for cost of revision surgery
+c.revision <- rgamma(1,shape=a.cRevision,scale=b.cRevision) ## Gamma distribution draw for cost of revision surgery
 
 c.success <- 0 ## Cost of one cycle in a 'success' state (primary or revision)
 ## Note for c.sucess There are assumed to be no ongoing monitoring costs for successful THR.  However, this parameter is included in case users want to change this assumption.
 
 ## remember that c.SP0 and c.NP1 are fixed and were defined at the beginning of this exercise
 
-state.costs<-   ## a vector with the costs for each state
+state.costs<-c(c.primary, c.success, c.revision,c.success,0) ## a vector with the costs for each state
 
 
 ##  Utilities
 
 # primary prosthesis
-mn.uSuccessP <-      ## mean utility value for successful primary prosthesis
-se.uSuccessP <-      ## standard errror utility value for successful primary prosthesis
+mn.uSuccessP <- 0.85 ## mean utility value for successful primary prosthesis
+se.uSuccessP <- 0.03 ## standard errror utility value for successful primary prosthesis
 
-ab.uSuccessP <-  ## estimating alpha plus beta (ab)
-a.uSuccessP <-    ## estimating alpha (a)
-b.uSuccessP <-     ## estimating beta (b)
-uSuccessP <-       ## drawing from the Beta distribution based on a and b
+ab.uSuccessP <- mn.uSuccessP*(1-mn.uSuccessP)/(se.uSuccessP^2)-1 ## estimating alpha plus beta (ab)
+a.uSuccessP <- mn.uSuccessP*ab.uSuccessP ## estimating alpha (a)
+b.uSuccessP <- a.uSuccessP*(1-mn.uSuccessP)/mn.uSuccessP ## estimating beta (b)
+uSuccessP <- rbeta(1,a.uSuccessP,b.uSuccessP) ## drawing from the Beta distribution based on a and b
 
 ## revision surgery
-mn.uSuccessR <-    ## mean utility value for having a successful Revision THR
-se.uSuccessR <-    ## standard error utility value for having a successful Revision THR
+mn.uSuccessR <- 0.75 ## mean utility value for having a successful Revision THR
+se.uSuccessR <- 0.04 ## standard error utility value for having a successful Revision THR
 
-ab.uSuccessR <-       ## alpha + beta (ab)
-a.uSuccessR <-        ## alpha (a)
-b.uSuccessR <-        ## beta(b)
-uSuccessR <-          ## drawing from the Beta distribution based on a and b
+ab.uSuccessR <- mn.uSuccessR*(1-mn.uSuccessR)/(se.uSuccessR^2)-1 ## alpha + beta (ab)
+a.uSuccessR <- mn.uSuccessR*ab.uSuccessR ## alpha (a)
+b.uSuccessR <- a.uSuccessR*(1-mn.uSuccessR)/mn.uSuccessR ## beta(b)
+uSuccessR <- rbeta(1,a.uSuccessR,b.uSuccessR) ## drawing from the Beta distribution based on a and b
 
 ## during the revision period 
-mn.uRevision <-       ## mean utility score during the revision period
-se.uRevision <-       ## standard error utility score during the revision period
+mn.uRevision <- 0.30 ## mean utility score during the revision period
+se.uRevision <- 0.03 ## standard error utility score during the revision period
 
-ab.uRevision <-       ## alpha + beta (ab)
-a.uRevision  <-       ## alpha (a)
-b.uRevision  <-       ## beta(b)
-uRevision    <-       ## drawing from the Beta distribution based on a and b
+ab.uRevision <- mn.uRevision*(1-mn.uRevision)/(se.uRevision^2)-1 ## alpha + beta (ab)
+a.uRevision  <- mn.uRevision*ab.uRevision ## alpha (a)
+b.uRevision  <- a.uRevision*(1-mn.uRevision)/mn.uRevision ## beta(b)
+uRevision  <- rbeta(1,a.uRevision,b.uRevision) ## drawing from the Beta distribution based on a and b
 
-state.utilities <-    ## a vector of health state utilities
+state.utilities <- c(0,uSuccessP,uRevision,uSuccessR,0) ## a vector of health state utilities
 
 ##  Hazard function ####
 ## Coefficients - on the log hazard scale
-mn.lngamma <- hazards$coefficient[1] ## lngamma coefficient
-mn.cons <- hazards$coefficient[2] ##Constant 
-mn.ageC <- hazards$coefficient[3] ## Age coefficient
-mn.maleC <- hazards$coefficient[4] ## Male coefficient 
-mn.NP1 <- hazards$coefficient[5] ## NP1 coefficient
+mn.lngamma <- hazards$coefficient[1] ## Ancilliary parameter in Weibull distribution - equivalent to lngamma coefficient
+mn.cons <- hazards$coefficient[2] ##Constant in survival analysis for baseline hazard
+mn.ageC <- hazards$coefficient[3] ## Age coefficient in survival analysis for baseline hazard
+mn.maleC <- hazards$coefficient[4] ## Male coefficient in survival analysis for baseline hazard
+mn.NP1 <- hazards$coefficient[5]
 
 mn <- c(mn.lngamma, mn.cons,mn.ageC,mn.maleC,mn.NP1) ## vector of mean values from the regression analysis
 
 cholm <- t(chol(t(cov.55))) ## lower triangle of the Cholesky decomposition
 
-z <- rnorm() ## 5 random draws from the normal distribution
+z <- rnorm(5,0,1) ## 5 random draws from the normal distribution
 
-Tz <- %*%  ## Tz which is the Cholesky matrix multiplied by the 5 random draws (z)
+Tz <- cholm%*%z ## Tz which is the Cholesky matrix multiplied by the 5 random draws
 
-x <-   ## mn plus Tz
+x <- mn+Tz ## mu plus Tz
 
 r.lngamma<-x[1,1] 
+
 r.cons<-x[2,1]
 r.ageC<-x[3,1]
 r.maleC<-x[4,1]
 r.NP1<-x[5,1]
 
-gamma <- exp(  )    ##Ancilliary parameter in Weibull distribution
-lambda <- exp(  )    ##Lambda parameter survival analysis
-RR.NP1 <- exp(  )    ##Relative risk of revision for new prosthesis 1 compared to standard
+gamma <- exp(r.lngamma)  ##Ancilliary parameter in Weibull distribution
+lambda <- exp(r.cons+age*r.ageC+male*r.maleC) ##Lambda parameter survival analysis
+RR.NP1 <- exp(r.NP1) ##Relative risk of revision for new prosthesis 1 compared to standard
 
 ##### LIFE TABLES #####
 
 colnames(life.table) <- c("Age","Index","Males","Female") ## making sure column names are correct
 
-cycle.v <-       ## a vector of cycle numbers 1 - 60
-current.age <-   ## a vector of cohort age throughout the model
+cycle.v <- 1:cycles ## a vector of cycle numbers 1 - 60
+current.age <- age + cycle.v ## a vector of cohort age throughout the model
 current.age
 
 ## Creating a table that has every age of the cohort plus death risks associated with that age
@@ -142,7 +152,6 @@ interval <- findInterval(current.age, life.table$Index)
 death.risk <- data.frame(age = current.age, 
                          males = life.table[interval,3],
                          females = life.table[interval,4])
-
 
 #####***** MARKOV MODEL ****#####
 
@@ -299,11 +308,11 @@ disc.QALYs.NP1
 
 ####****ANALYSIS****####
 
-output <- c(inc.cost = , ## incremental cost
-            inc.qalys =  ,  ## incremental effect 
-            icer = NA)  ## incremental cost-effectiveness ratioe
-output["icer"] <- 
-  
+output <- c(inc.cost = disc.cost.NP1 - disc.cost.SP0,
+            inc.qalys = disc.QALYs.NP1 - disc.QALYs.SP0,
+            icer = NA)
+output["icer"] <- output["inc.cost"]/output["inc.qalys"]
+
 output
 
-round(output,3) ## we can round the output table for printing also
+round(output,3)

@@ -1,41 +1,116 @@
-#  Decision Modelling for Health Economic Evaluation
-#  Advanced Course Exercise 3a (Part 1): TEMPLATE FILE
-#  Authors: Andrew Briggs, Jack Williams & Nichola Naylor
+## !!! need to copy over the graphics function codes - 
+## think easier to have as much as poss in one script that matches
+## the paper run through in this case? 
 
-### Loading useful packages
-library(ggplot2)
-library(reshape2) 
 
-###  Reading in the data needed from csv files
-hazards <- read.csv("hazardfunction.csv", header=TRUE) ## importing the hazard inputs from the regression analysis
-cov.55 <- read.csv("cov55.csv",row.names=1,header=TRUE) ## importing the covariance matrix
-life.table <- read.csv("life-table.csv", header=TRUE)
+### !!! set working directory as the folder this is stored in
+## added this in to allow for the running of instruction pdf knitting
+## whilst reading in data from the same subfolder
+## students can ignore if not re-knitting the pdfs, just make sure data files
+## are stored in the same file as template/solution files
+
+require("rstudioapi")
+setwd(dirname(getActiveDocumentContext()$path)) # Set working directory to source file
 
 #########**** PARAMETERS *****######
+#  Start by defining parameters
 
-# SETTING CONSTANT PARAMETERS OUTSIDE THE FUNCTION 
 ##### DETERMINISTIC PARAMETERS ######
+age <- 60 ## set age group for analyses
+male <- 0 ## set sex identified, 0 = female and 1 = male
+## the specific number (0,1) becomes important for reasons you'll see further down the script
 dr.c <- 0.06 ## set the discount rate for costs (6%)
 dr.o <- 0.015 ## set the discount rate for outcomes (15%)
-cycles <- 60 ## number of cycles running the model
-state.names <- c("P-THR","successP-THR","R-THR","successR-THR","Death") ## a vector of state names
-n.states <- length(state.names) ## number of states in the model
-seed <- c(1,0,0,0,0) #  Seed the starting states of the model (a vector of 1 and 0s for this exercise)
 
-## Cost of standard prosthesis and new prosthesis
+cycles <- 60 ## number of cycles running the model
+
+state.names <- c("P-THR","successP-THR","R-THR","successR-THR","Death")
+n.states <- length(state.names)
+
 c.SP0 <- 394 ## Cost of standard prosthesis
 c.NP1 <- 579 ## Cost of new prosthesis 1
 
-### alpha and beta values :
-  
-# FOR TRANSITION PROBABILITY ESTIMATION
+#  Seed the starting states of the model
+seed <- c(1,0,0,0,0)
+
+### !!! discount.factor.c missing as a definition and needed in the function below
+
+#### PROBABLISTIC PARAMETERS #####
+### !!! think some of these still need defining outside the function
+# as lifetable already read in within the function
+
+###  Transition probabilities
+
 a.PTHR2dead <- 2 ## alpha value for operative mortality from primary surgery
 b.PTHR2dead <- 100- a.PTHR2dead ## beta value for operative mortality from primary surgery
 
-a.rrr <- 4 ## alpha value for revision risk 
-b.rrr <- 100-a.rrr ## beta value for revision risk
+tp.PTHR2dead <- rbeta(1,a.PTHR2dead,b.PTHR2dead) ## Operative mortality rate  (OMR) following primary THR
+# since we assume the same shape parameters for RTHR : 
+tp.RTHR2dead <- rbeta(1,a.PTHR2dead,b.PTHR2dead)  ## Operative mortality rate (OMR) following revision THR
 
-# HAZARD FUNCTION PARAMETERS
+a.rrr <- 4   ## alpha value for re-revision risk
+b.rrr <- 100-a.rrr  ## beta value for re-revision risk
+tp.rrr <-rbeta(1,a.rrr,b.rrr) ## Re-revision risk transition probability
+
+tp.PTHR2dead
+tp.RTHR2dead
+tp.rrr
+
+##  Costs
+c.primary <- 0  ## Cost of a primary THR procedure - 
+## Note that the cost of the primary procedure is excluded (set to 0): since both arms have this procedure it is assumed to net out of the incremental analysis.  However, if the model was to be used to estimate lifetime costs of THR it would be important to include.
+mn.cRevision <- 5294 ## mean cost of revision surgery
+se.cRevision <- 1487 ## standard error of cost of revision surgery
+
+a.cRevision <- (mn.cRevision/se.cRevision)^2 ## alpha value for cost of revision surgery 
+b.cRevision <- (se.cRevision^2)/mn.cRevision ## beta value for cost of revision surgery
+c.revision <- rgamma(1,shape=a.cRevision,scale=b.cRevision) ## Gamma distribution draw for cost of revision surgery
+
+c.success <- 0 ## Cost of one cycle in a 'success' state (primary or revision)
+## Note for c.sucess There are assumed to be no ongoing monitoring costs for successful THR.  However, this parameter is included in case users want to change this assumption.
+
+## remember that c.SP0 and c.NP1 are fixed and were defined at the beginning of this exercise
+
+state.costs<-c(c.primary, c.success, c.revision,c.success,0) ## a vector with the costs for each state
+
+
+##  Utilities
+
+# primary prosthesis
+mn.uSuccessP <- 0.85 ## mean utility value for successful primary prosthesis
+se.uSuccessP <- 0.03 ## standard errror utility value for successful primary prosthesis
+
+ab.uSuccessP <- mn.uSuccessP*(1-mn.uSuccessP)/(se.uSuccessP^2)-1 ## estimating alpha plus beta (ab)
+a.uSuccessP <- mn.uSuccessP*ab.uSuccessP ## estimating alpha (a)
+b.uSuccessP <- a.uSuccessP*(1-mn.uSuccessP)/mn.uSuccessP ## estimating beta (b)
+uSuccessP <- rbeta(1,a.uSuccessP,b.uSuccessP) ## drawing from the Beta distribution based on a and b
+
+## revision surgery
+mn.uSuccessR <- 0.75 ## mean utility value for having a successful Revision THR
+se.uSuccessR <- 0.04 ## standard error utility value for having a successful Revision THR
+
+ab.uSuccessR <- mn.uSuccessR*(1-mn.uSuccessR)/(se.uSuccessR^2)-1 ## alpha + beta (ab)
+a.uSuccessR <- mn.uSuccessR*ab.uSuccessR ## alpha (a)
+b.uSuccessR <- a.uSuccessR*(1-mn.uSuccessR)/mn.uSuccessR ## beta(b)
+uSuccessR <- rbeta(1,a.uSuccessR,b.uSuccessR) ## drawing from the Beta distribution based on a and b
+
+## during the revision period 
+mn.uRevision <- 0.30 ## mean utility score during the revision period
+se.uRevision <- 0.03 ## standard error utility score during the revision period
+
+ab.uRevision <- mn.uRevision*(1-mn.uRevision)/(se.uRevision^2)-1 ## alpha + beta (ab)
+a.uRevision  <- mn.uRevision*ab.uRevision ## alpha (a)
+b.uRevision  <- a.uRevision*(1-mn.uRevision)/mn.uRevision ## beta(b)
+uRevision  <- rbeta(1,a.uRevision,b.uRevision) ## drawing from the Beta distribution based on a and b
+
+state.utilities <- c(0,uSuccessP,uRevision,uSuccessR,0) ## a vector of health state utilities
+
+##  Hazard function ####
+
+#  Reading the data needed from csv files
+hazards <- read.csv("hazardfunction.csv", header=TRUE) ## importing the hazard inputs from the regression analysis
+
+cov.55 <- read.csv("cov55.csv",row.names=1,header=TRUE) ## importing the covariance data
 
 ## Coefficients - on the log hazard scale
 mn.lngamma <- hazards$coefficient[1] ## Ancilliary parameter in Weibull distribution - equivalent to lngamma coefficient
@@ -43,48 +118,55 @@ mn.cons <- hazards$coefficient[2] ##Constant in survival analysis for baseline h
 mn.ageC <- hazards$coefficient[3] ## Age coefficient in survival analysis for baseline hazard
 mn.maleC <- hazards$coefficient[4] ## Male coefficient in survival analysis for baseline hazard
 mn.NP1 <- hazards$coefficient[5]
-mn<-c(mn.lngamma, mn.cons,mn.ageC,mn.maleC,mn.NP1) ## vector of mean values from the regression analysis
+
+mn <- c(mn.lngamma, mn.cons,mn.ageC,mn.maleC,mn.NP1) ## vector of mean values from the regression analysis
 
 cholm <- t(chol(t(cov.55))) ## lower triangle of the Cholesky decomposition
 
-# FOR COST ESTIMATION
-c.primary <- 0  ## Cost of a primary THR procedure - 
-## Note that the cost of the primary procedure is excluded (set to 0): since both arms have this procedure it is assumed to net out of the incremental analysis.  However, if the model was to be used to estimate lifetime costs of THR it would be important to include.
-mn.cRevision <- 5294 ## mean cost of revision surgery
-se.cRevision <- 1487 ## standard error of cost of revision surgery
-a.cRevision <- (mn.cRevision/se.cRevision)^2 ## alpha value for cost of revision surgery 
-b.cRevision <- (se.cRevision^2)/mn.cRevision ## beta value for cost of revision surgery
-c.success <- 0 ## Cost of one cycle in a 'success' state (primary or revision)
+z <- rnorm(5,0,1) ## 5 random draws from the normal distribution
 
-# FOR UTILITY ESTIMATION
-## during the revision period 
-mn.uSuccessP <- 0.85 ## mean utility value for successful primary prosthesis
-se.uSuccessP <- 0.03 ## standard errror utility value for successful primary prosthesis
-ab.uSuccessP <- mn.uSuccessP*(1-mn.uSuccessP)/(se.uSuccessP^2)-1 ## estimating alpha plus beta (ab)
-a.uSuccessP<-mn.uSuccessP*ab.uSuccessP ## estimating alpha (a)
-b.uSuccessP<-a.uSuccessP*(1-mn.uSuccessP)/mn.uSuccessP ## estimating beta (b)
+Tz <- cholm%*%z ## Tz which is the Cholesky matrix multiplied by the 5 random draws
 
-mn.uSuccessR<-0.75 ## mean utility value for having a successful Revision THR
-se.uSuccessR<-0.04 ## standard error utility value for having a successful Revision THR
-ab.uSuccessR<-mn.uSuccessR*(1-mn.uSuccessR)/(se.uSuccessR^2)-1 ## alpha + beta (ab)
-a.uSuccessR<-mn.uSuccessR*ab.uSuccessR ## alpha (a)
-b.uSuccessR<-a.uSuccessR*(1-mn.uSuccessR)/mn.uSuccessR ## beta(b)
+x <- mn+Tz ## mu plus Tz
 
-mn.uRevision<-0.30 ## mean utility score during the revision period
-se.uRevision<-0.03 ## standard error utility score during the revision period
-ab.uRevision<-mn.uRevision*(1-mn.uRevision)/(se.uRevision^2)-1 ## alpha + beta (ab)
-a.uRevision<-mn.uRevision*ab.uRevision ## alpha (a)
-b.uRevision<-a.uRevision*(1-mn.uRevision)/mn.uRevision ## beta(b)
+r.lngamma<-x[1,1] 
 
-# Discount factor matrices
+r.cons<-x[2,1]
+r.ageC<-x[3,1]
+r.maleC<-x[4,1]
+r.NP1<-x[5,1]
+
+gamma <- exp(r.lngamma)  ##Ancilliary parameter in Weibull distribution
+lambda <- exp(r.cons+age*r.ageC+male*r.maleC) ##Lambda parameter survival analysis
+RR.NP1 <- exp(r.NP1) ##Relative risk of revision for new prosthesis 1 compared to standard
+
+##### LIFE TABLES #####
+life.table <- read.csv("life-table.csv", header=TRUE) ## importing the life table 
+
+colnames(life.table) <- c("Age","Index","Males","Female") ## making sure column names are correct
+
 cycle.v <- 1:cycles ## a vector of cycle numbers 1 - 60
-discount.factor.c <- 1/(1+dr.c)^cycle.v ## the discount factor matrix
-discount.factor.o <- 1/(1+dr.o)^cycle.v  ## discount factor matrix for utility 
+current.age <- age + cycle.v ## a vector of cohort age throughout the model
+current.age
+
+## Creating a table that has every age of the cohort plus death risks associated with that age
+# This finds the position of age, within the life table 
+interval <- findInterval(current.age, life.table$Index)
+# These positions can then be used to subset the appropriate values from life.table
+death.risk <- data.frame(age = current.age, 
+                         males = life.table[interval,3],
+                         females = life.table[interval,4])
+
 
 ####***** THR MODEL FUNCTION ****#####
 
 model.THR <- function(age=60, male=0) {
   ### A function running the THR model, setting age and sex
+  
+  ### !!! need to add in here everything that is used pre-specified
+  ## then clean up the above so that's clear what is in and out of the model function
+  ## then we can run through that in the text
+  
   ### INPUTS: age = a numeric value, male = 0 for female and 1 for male 
   ### OUTPUTS: A numeric, named vector with variable labels of length = 6 variables
   
@@ -283,21 +365,21 @@ model.THR <- function(age=60, male=0) {
 ## testing the function:
 model.THR(age=60, male=0) 
 
-#### RUNNING THE SIMULATION ####
-sim.runs <-    ## the number of simulation runs
+#### RUNNING THE SIMULATIONS ########
+sim.runs <- 1000 ## the number of simulation runs
 
 ## creating an empty data.frame for simulation results to fill:
-simulation.results <- data.frame("cost.SP0" =     , ## use the rep() function to create sim.runs rows of values
-                                 "qalys.SP0"=     ,
-                                 "cost.NP1" =     ,
-                                 "qalys.NP1" =    ,
-                                 "inc.cost" =     ,
-                                 "inc.qalys"=     )
+simulation.results <- data.frame("cost.SP0" = rep(as.numeric(NA), sim.runs), ## use the rep() function to create sim.runs rows of values
+                                 "qalys.SP0"= rep(as.numeric(NA),sim.runs),
+                                 "cost.NP1" = rep(as.numeric(NA),sim.runs),
+                                 "qalys.NP1" = rep(as.numeric(NA), sim.runs),
+                                 "inc.cost" = rep(as.numeric(NA),sim.runs),
+                                 "inc.qalys"=  rep(as.numeric(NA),sim.runs))
 
 ## running the simulations and filling the simulation.results data.frame:
 for(i in 1:sim.runs){
-  ## define each row as a result from each run  
-
+  simulation.results[i,] <- model.THR(age=60, male=0) ## running the model 1,000 times
+  
 }
 
 ## have a look at what you've created so far:
@@ -306,23 +388,23 @@ head(simulation.results)
 #### PLOTTING THE COST-EFFECTIVENESS PLANE #####
 
 # simple base plot of incremental QALYs and costs
-plot(   ,    ) ## try ?plot() if not used before
+plot(simulation.results$inc.qalys,simulation.results$inc.cost)
 
 ## using pre-created ggplot2 functions for nicer cost-effectiveness plane graphs
 source("ggplot_CEA_functions.R")
 plot.ce.plane(simulation.results) 
 
-## Estimating average ICER from the simulation:
-# note you don't have to do this all in one calculation/variable definition
-PSA.inc.cost <- 
-PSA.inc.qalys <- 
-PSA.icer <- 
+## Estimating average ICER from the simulation
+
+PSA.inc.cost <- mean(simulation.results$cost.NP1)-mean(simulation.results$cost.SP0)
+PSA.inc.qalys <- mean(simulation.results$qalys.NP1)-mean(simulation.results$qalys.SP0)
+PSA.icer <- PSA.inc.cost/PSA.inc.qalys
 
 #### PLOTTING THE COST-EFFECTIVENESS ACCEPTABILITY CURVE #####
 
 # Estimating the average net monetary benefit of the new treatment
-WTP <-    ## the ceiling ratio / willingness-to-pay
-av.nmb <-   ## average net monetary benefit based on mean incremental costs and qalys from the simulation
+WTP <- 100000 ## the ceiling ratio / willingness-to-pay
+av.nmb <- PSA.inc.qalys*WTP - PSA.inc.cost  ## average net monetary benefit based on mean incremental costs and qalys from the simulation
 
 # Estimate the probability of cost-effectiveness for a given willingness-to-pay ceiling ratio
 
@@ -334,23 +416,23 @@ p.CE<-function(WTP, simulation.results) {
   #         columns names "inc.qalys" and "inc.cost"   
   # OUTPUTS: A numeric value specifying the probability of cost-effectiveness given the inputs
   
-  ## write the function here that returns the probability of cost-effectiveness vector
   
-  nmb <-       ## vector of NMB estimates for each simulation length 1:sim.runs
-  CE <-         ## vector of TRUE/FALSE for each simulation length 1:sim.runs
-  probCE<-       ## the mean value of TRUE (=1) and FALSE (=0) [which equates to probability of cost-effectiveness]
+  nmb <- simulation.results[,"inc.qalys"]*WTP - simulation.results[,"inc.cost"] ## vector of NMB estimates for each simulation length 1:sim.runs
+  CE <- nmb>0   ## vector of TRUE/FALSE for each simulation length 1:sim.runs
+  probCE<- mean(CE) ## the mean value of TRUE (=1) and FALSE (=0)
   
   return(probCE)
   
 }
 
+
 # Generate CEAC table
-WTP.values <-   ## use the seq() function to get a vector of numeric values in the specified range and increments
+WTP.values <- seq(from = 0, to = 50000, by = 10) ## use the seq() function to get a vector of specified numeric values
 CEAC <- data.frame(WTP = WTP.values, 
-                   pCE =   ) ## for pCE; use the rep() function to fill with missing numeric values
+                   pCE = rep(as.numeric(NA),length(WTP.values)))
 
 for (i in 1:length(WTP.values)) {
-  CEAC[i,"pCE"]<-  ## use the p.CE function created above
+  CEAC[i,"pCE"]<- p.CE(CEAC[i,"WTP"], simulation.results)
 }
 
 # Display the top and bottom of the CEAC table
@@ -359,25 +441,31 @@ tail(CEAC)
 
 
 # Plotting the CEAC with a plot function
-plot() ## fill in accordingly 
+plot(CEAC$WTP,CEAC$pCE, type="l")
 
 # Plotting the CEAC with the pre-defined ggplot functions
 plot.ceac(CEAC)
 
 ##### SUBGROUP ANALYSES ######
-
 # CREATE ARRAY TO STORE THE RESULTS OF THE MODEL IN EACH SUBGROUP
+
 subgroups.names <- c("Male 40", "Male 60", "Male 80", "Female 40", "Female 60", "Female 80")
 subgroups.n <- length(subgroups.names)
 
-simulation.subgroups <-  ## use array() and specify dimensions and dimension names using dimnames=
+simulation.subgroups <- array(data = 0, dim = c(sim.runs, length(colnames(simulation.results)), subgroups.n),
+                              dimnames = list(1:sim.runs, colnames(simulation.results),subgroups.names))
 
 # Run model for each subgroup, inputting the age and sex into the function, and record results within the array
 for(i in 1:sim.runs){
   simulation.subgroups[i,,1] <- model.THR(age = 40, male = 1)
-  ### do the same for the other subgroups here
-  
+  simulation.subgroups[i,,2] <- model.THR(age = 60, male = 1)
+  simulation.subgroups[i,,3] <- model.THR(age = 80, male = 1)
+  simulation.subgroups[i,,4] <- model.THR(age = 40, male = 0)
+  simulation.subgroups[i,,5] <- model.THR(age = 60, male = 0)
+  simulation.subgroups[i,,6] <- model.THR(age = 80, male = 0)
 }
+
+
 
 # Create a CEAC table with lambda value sequence
 WTP.values <- seq(from = 0, to = 50000, by = 50)
@@ -390,11 +478,14 @@ colnames(CEAC.subgroups) <- c("WTP", subgroups.names)
 # Estimate probability cost-effective for all subgroups
 for (i in 1:length(WTP.values)) {
   
-  CEAC.subgroups[i,1] <- WTP.values[i]
-  ### by using CEAC.subgroups[i,2]<-p.CE( )  define the reat of CEAC.subgroups values for i here
-  ### for the remainging 7 columns (i.e. the 6 subgroups):
+  CEAC.subgroups[i,1]<-WTP.values[i]
+  CEAC.subgroups[i,2]<-p.CE(WTP.values[i], simulation.subgroups[,,1])
+  CEAC.subgroups[i,3]<-p.CE(WTP.values[i], simulation.subgroups[,,2])
+  CEAC.subgroups[i,4]<-p.CE(WTP.values[i], simulation.subgroups[,,3])
+  CEAC.subgroups[i,5]<-p.CE(WTP.values[i], simulation.subgroups[,,4])
+  CEAC.subgroups[i,6]<-p.CE(WTP.values[i], simulation.subgroups[,,5])
+  CEAC.subgroups[i,7]<-p.CE(WTP.values[i], simulation.subgroups[,,6])
   
- 
 }
 
 # Show the structure of the subgroup results 
@@ -407,15 +498,14 @@ lines(CEAC.subgroups$WTP, CEAC.subgroups$`Male 60`, col = "blue", lty = 2)
 lines(CEAC.subgroups$WTP, CEAC.subgroups$`Male 80`, col = "green", lty = 2)
 lines(CEAC.subgroups$WTP, CEAC.subgroups$`Female 40`, col = "red", lty = 1)
 lines(CEAC.subgroups$WTP, CEAC.subgroups$`Female 60`, col = "blue", lty = 1)
-lines(CEAC.subgroups$WTP, CEAC.subgroups$`Female 80`, col = "green", lty = 1) ## use the lines() function with plot() to generate 
+lines(CEAC.subgroups$WTP, CEAC.subgroups$`Female 80`, col = "green", lty = 1)
 
 ## Alternative ggplot function for CEAC  
 
 ## We need to reshape the data from wide to long to use in ggplot 
-CEAC.subgroups.long <- melt(  )  ## use the melt function 
+CEAC.subgroups.long <- melt(CEAC.subgroups, id.vars = c("WTP"))
 colnames(CEAC.subgroups.long) <- c("WTP", "group", "pCE")
-
-head(CEAC.subgroups.long) ## have a check of your long-format data
+head(CEAC.subgroups.long)
 
 # Plots of results using pre-defined ggplot functions
 plot.ceac.all(CEAC.subgroups.long)
