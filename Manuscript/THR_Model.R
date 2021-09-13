@@ -236,11 +236,20 @@ simulation.results <- data.frame("cost.SP0" = rep(as.numeric(NA), sim.runs), ## 
                                  "inc.cost" = rep(as.numeric(NA),sim.runs),
                                  "inc.qalys"=  rep(as.numeric(NA),sim.runs))
 
+RR.vec <- sample.output$RR.vec
+omr.df <- sample.output$omr.df
+tp.rrr.vec <- sample.output$tp.rrr.vec
+survival.df <- sample.output$survival.df
+c.revision.vec <- sample.output$c.revision.vec 
+state.utilities.df <- sample.output$state.utilities.df 
+mortality.vec <- sample.output$mortality.vec
+
 ## running the simulations and filling the simulation.results data.frame:
 for(i in 1:sim.runs){
-  simulation.results[i,] <-model.THR(sample.output$RR.vec[i], sample.output$omr.df[i,],  sample.output$tp.rrr.vec[i], 
-                                     sample.output$survival.df[i,],sample.output$c.revision.vec[i], 
-                                     sample.output$state.utilities.df[i,], mortality.vec = sample.output$mortality.vec) 
+  simulation.results[i,] <-model.THR(RR.vec[i], omr.df[i,],  
+                                     tp.rrr.vec[i], survival.df[i,],
+                                      c.revision.vec[i], 
+                                     state.utilities.df[i,], mortality.vec) 
   
 }
 
