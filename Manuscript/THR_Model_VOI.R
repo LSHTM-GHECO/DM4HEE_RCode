@@ -13,14 +13,13 @@ require("rstudioapi")
 setwd(dirname(getActiveDocumentContext()$path)) # Set working directory to source file
 
 
-
 #  Reading the data needed from csv files
 hazards <- read.csv("hazardfunction.csv", header=TRUE) ## importing the hazard inputs from the regression analysis
 cov.55 <- read.csv("cov55.csv",row.names=1,header=TRUE) ## importing the covariance matrix
 life.table <- read.csv("life-table.csv", header=TRUE)
 
 # Setting sampling numbers
-sim.runs <- 10000 ## the number of simulation runs 
+sim.runs <- 100 ## the number of simulation runs 
 ## ! note - this needs to be more than or equal to 1
 ## the number of inner and outer runs in VoI scripts
 ## see "A4.3.3b_Value_of_Information_Part 2_Solution.R" to see their definitions
@@ -300,10 +299,12 @@ model.THR.voi(RR.vec[i], omr.df[i,],  tp.rrr.vec[i],
 # this will load all of the parameter samples of interest, and will load the 
 # model function within the script. 
 # Make sure you have a look at the script, following the exercise instructions as a guide.
-source("THR_Model_VOI.R")
+
+#source("THR_Model_VOI.R")
 
 # Source functions for plots
-source("ggplot_CEA_functions.R")
+
+#source("ggplot_CEA_functions.R")
 
 #### EVPPI example walkthrough #### 
 evppi.results.SP0.test <- matrix(0, ncol = 1, nrow = 10) ## creating an empty matrix
