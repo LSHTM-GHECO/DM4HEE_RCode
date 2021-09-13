@@ -69,7 +69,8 @@ cholm <- t(chol(t(cov.55))) ## lower triangle of the Cholesky decomposition
 
 #####**** SAMPLE FUNCTION ******#####
 sim.runs <- 1000 
-psa.sampling <- function(age = 60, male = 0, sim.runs = 10000){
+
+psa.sampling <- function(age = 60, male = 0, sim.runs = 1000){
 #### FUNCTION: sample probablistic parameters according to age and sex
 #### INPUTS: age (numeric), male (0 for female, 1 for male), though 
   #### other variables which are defined above are called within the function
