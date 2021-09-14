@@ -4,14 +4,12 @@ source("Manuscript/THR_Model.R")
 ## View the PSA results 
 simulation.results
 
-
 #### SETTING VALUE OF INFORMATION POPULATION PARAMETERS ####
 population <- 40000 
 years <- 10
 evpi.disc <- 0.06
 population.seq <- population * (1/(1+evpi.disc) ^ c(0:(years-1)))
 effective.population <- sum(population.seq)
-
 
 
 ## EXPECTED VALUE OF PERFECT INFORMATION (EVPI)
@@ -78,8 +76,8 @@ outer.loops <- 100
 
 
 # Create a matrix to store the inner loop results
-inner.results <- matrix(0, inner.loops, 4)
-colnames(inner.results) <- c("Cost SP0", "QALY SP0", "Cost NP1", "QALY NP1", "Incr Cost", "Incr QALY")
+inner.results <- matrix(0, inner.loops, 6)
+colnames(inner.results) <- c("Cost SP0", "QALY SP0", "Cost NP1", "QALY NP1", "Inc Cost", "Inc QALY")
 
 evppi.results.SP0 <- matrix(0, nrow = outer.loops, ncol = length(WTP.values))
 colnames(evppi.results.SP0) <- as.character(WTP.values)
@@ -147,159 +145,48 @@ gen.evppi.results <- function(evppi.results1 = evppi.results.SP0, evppi.results2
 ## Now the EVPPI loops will be run - each selected different values for inner and outer loops
 
 
-#### EVPPI loops - NP1 parameter  ####
+
+evppi.wide.patient <- data.frame(wtp = WTP.values, RR = NA, OMR = NA,  surv = NA, r.cost = NA, RRR = NA, util = NA)
+colnames(evppi.wide.patient) <- c("WTP", "NP1 Relative risk",  "Operative mortality ratios", "Survival parameters", "Revision cost", "Re-revision risk", "Utilities")
+
 
 pb = txtProgressBar(min = 0, max = outer.loops, initial = 0, style = 3)
 
-for(a in 1:outer.loops){
+for(j in 1:6){
   
-  for(b in 1:inner.loops){
+  for(a in 1:outer.loops){
     
-    # The 'partial' parameter will be included in the outer loop - so we can select that using 'a' in the outer loop
-    # The parameters included in the inner loop remain are selected using 'b'
+    for(b in 1:inner.loops){
+      
+      # The 'partial' parameter will be included in the outer loop - so we can select that using 'a' in the outer loop
+      # The parameters included in the inner loop remain are selected using 'b'
+      
+      if(j==1) rr.n <- a else rr.n <- b
+      if(j==2) omr.n <- a else omr.n <- b 
+      if(j==3) surv.n <- a else surv.n <- b   
+      if(j==4) c.rev.n <- a else c.rev.n <- b      
+      if(j==5) rrr.n <- a else rrr.n <- b
+      if(j==6) util.n <- a else util.n <- b
+      
+      inner.results[b,] <-  model.THR(RR.vec[rr.n], omr.df[omr.n,],  tp.rrr.vec[rrr.n], 
+                                      survival.df[surv.n,],c.revision.vec[c.rev.n], 
+                                      state.utilities.df[util.n,], mortality.vec = mortality.vec) 
+      
+    }
     
-    inner.results[b,] <-  model.THR(RR.vec[a], omr.df[b,],  tp.rrr.vec[b], 
-                                        survival.df[b,],c.revision.vec[b], 
-                                        state.utilities.df[b,], mortality.vec = mortality.vec)[1:4]
+    #after each inner loop PSA, calculate the mean NMB for each treatment compactor and store the results
+    nmb <- nmb.function(WTP.values, inner.results)
     
-  }
-  
-  #after each inner loop PSA, calculate the mean NMB for each treatment comparator and store the results
-  nmb <- nmb.function(WTP.values, inner.results)
-  
-  evppi.results.SP0[a,] <- nmb[[1]]
-  evppi.results.NP1[a,] <- nmb[[2]]
-  setTxtProgressBar(pb,a)
-  
-}
-
-NP1.evppi <- gen.evppi.results()
-
-
-
-#### EVPPI loops - OMR transition parameters  ####
-
-pb = txtProgressBar(min = 0, max = outer.loops, initial = 0, style = 3)
-
-for(a in 1:outer.loops){
-  
-  for(b in 1:inner.loops){
-    inner.results[b,] <-  model.THR(RR.vec[b], omr.df[a,],  tp.rrr.vec[b], 
-                                        survival.df[b,],c.revision.vec[b], 
-                                        state.utilities.df[b,], mortality.vec = mortality.vec)[1:4]
-  }
-  
-  #after each inner loop PSA, calculate the mean NMB for each tx and store the results
-  nmb <- nmb.function(WTP.values, inner.results)
-  evppi.results.SP0[a,] <- nmb[[1]]
-  evppi.results.NP1[a,] <- nmb[[2]]
-  setTxtProgressBar(pb,a)
-}
-
-omr.evppi <- gen.evppi.results()
-
-#### EVPPI loops - Re-revision risk parameter ####
-
-pb = txtProgressBar(min = 0, max = outer.loops, initial = 0, style = 3)
-
-for(a in 1:outer.loops){
-  
-  for(b in 1:inner.loops){
-    
-    inner.results[b,] <-  model.THR(RR.vec[b], omr.df[b,],
-                                        tp.rrr.vec[a], 
-                                        survival.df[b,],c.revision.vec[b], 
-                                        state.utilities.df[b,], mortality.vec = mortality.vec)[1:4]
+    evppi.results.SP0[a,] <- nmb[[1]]
+    evppi.results.NP1[a,] <- nmb[[2]]
+    setTxtProgressBar(pb,a)
     
   }
   
-  #after each inner loop PSA, calculate the mean NMB for each tx and store the results
-  nmb <- nmb.function(WTP.values, inner.results)
-  evppi.results.SP0[a,] <- nmb[[1]]
-  evppi.results.NP1[a,] <- nmb[[2]]
-  setTxtProgressBar(pb,a)
+  evppi.wide.patient[,j+1] <- gen.evppi.results()[,2]
+  
 }
 
-rrr.evppi <- gen.evppi.results()
-
-#### EVPPI loops - Survival parameters  ####
-
-pb = txtProgressBar(min = 0, max = outer.loops, initial = 0, style = 3)
-
-for(a in 1:outer.loops){
-  
-  for(b in 1:inner.loops){
-    
-    inner.results[b,] <-  model.THR(RR.vec[b], omr.df[b,],
-                                        tp.rrr.vec[b], 
-                                        survival.df[a,],c.revision.vec[b], 
-                                        state.utilities.df[b,], mortality.vec = mortality.vec)[1:4]
-  }
-  
-  #after each inner loop PSA, calculate the mean NMB for each tx and store the results
-  nmb <- nmb.function(WTP.values, inner.results)
-  evppi.results.SP0[a,] <- nmb[[1]]
-  evppi.results.NP1[a,] <- nmb[[2]]
-  setTxtProgressBar(pb,a)
-}
-
-surv.evppi <- gen.evppi.results()
-
-#### EVPPI loops - Cost revision  ####
-
-pb = txtProgressBar(min = 0, max = outer.loops, initial = 0, style = 3)
-
-for(a in 1:outer.loops){
-  
-  for(b in 1:inner.loops){
-    inner.results[b,] <-  model.THR(RR.vec[b], omr.df[b,],tp.rrr.vec[b], 
-                                        survival.df[b,],
-                                        c.revision.vec[a], 
-                                        state.utilities.df[b,], mortality.vec = mortality.vec)[1:4]
-  }
-  
-  #after each inner loop PSA, calculate the mean NMB for each tx and store the results
-  nmb <- nmb.function(WTP.values, inner.results)
-  evppi.results.SP0[a,] <- nmb[[1]]
-  evppi.results.NP1[a,] <- nmb[[2]]
-  setTxtProgressBar(pb,a)
-}
-
-cRevision.evppi <- gen.evppi.results()
-
-#### EVPPI loops - Utilities  ####
-
-pb = txtProgressBar(min = 0, max = outer.loops, initial = 0, style = 3)
-
-for(a in 1:outer.loops){
-  
-  for(b in 1:inner.loops){
-    inner.results[b,] <-  model.THR(RR.vec[b], omr.df[b,],tp.rrr.vec[b], 
-                                        survival.df[b,],c.revision.vec[b], 
-                                        state.utilities.df[a,], mortality.vec = mortality.vec)[1:4] 
-  }
-  
-  #after each inner loop PSA, calculate the mean NMB for each tx and store the results
-  nmb <- nmb.function(WTP.values, inner.results)
-  evppi.results.SP0[a,] <- nmb[[1]]
-  evppi.results.NP1[a,] <- nmb[[2]]
-  setTxtProgressBar(pb,a)
-}
-
-utilities.evppi <- gen.evppi.results()
-
-#### Analysis of EVPPI results #### 
-
-# Create a data frame with all EVPPI results
-
-evppi.wide.patient <- data.frame(NP1.evppi,
-                                 surv.evppi[,2],
-                                 utilities.evppi[,2],
-                                 cRevision.evppi[,2],
-                                 omr.evppi[,2],
-                                 rrr.evppi[,2])
-
-colnames(evppi.wide.patient) <- c("WTP", "NP1 Relative risk", "Survival parameters", "Utilities", "Revision cost", "Operative mortality ratios", "Re-revision risk")
 
 # The wide format is because there is a column for each parameter set included in the EVPPI 
 head(evppi.wide.patient)
@@ -315,7 +202,7 @@ evppi.long.pop <- reshape2::melt(evppi.wide.pop, id.vars = c("WTP"))
 head(evppi.long.pop, 10)
 
 
-## Plot
+## Plots
 plot.evppi <- ggplot(evppi.long.pop) + geom_line(aes(x=WTP, y=value, colour = variable), size=0.75) + 
                 labs(x = "Willingness to pay threshold", text = element_text(size=10)) + 
                 labs(y = "EVPPI", text = element_text(size=10)) + theme_classic() +
@@ -352,3 +239,4 @@ plot.sub.evppi <- ggplot(sub.evppi, aes(x=variable, y=value)) +
                     scale_y_continuous(labels = scales::comma, expand = c(0, 0))
 
 plot.sub.evppi
+
