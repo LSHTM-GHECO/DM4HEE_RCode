@@ -4,7 +4,6 @@ source("Manuscript/THR_Model.R")
 ## View the PSA results 
 simulation.results
 
-
 #### SETTING VALUE OF INFORMATION POPULATION PARAMETERS ####
 population <- 40000 
 years <- 10
