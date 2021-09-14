@@ -4,7 +4,6 @@ source("Manuscript/THR_Model.R")
 ## View the PSA results 
 simulation.results
 
-
 #### SETTING VALUE OF INFORMATION POPULATION PARAMETERS ####
 population <- 40000 
 years <- 10
@@ -78,8 +77,8 @@ outer.loops <- 100
 
 
 # Create a matrix to store the inner loop results
-inner.results <- matrix(0, inner.loops, 4)
-colnames(inner.results) <- c("Cost SP0", "QALY SP0", "Cost NP1", "QALY NP1", "Incr Cost", "Incr QALY")
+inner.results <- matrix(0, inner.loops, 6)
+colnames(inner.results) <- c("Cost SP0", "QALY SP0", "Cost NP1", "QALY NP1", "Inc Cost", "Inc QALY")
 
 evppi.results.SP0 <- matrix(0, nrow = outer.loops, ncol = length(WTP.values))
 colnames(evppi.results.SP0) <- as.character(WTP.values)
@@ -160,7 +159,7 @@ for(a in 1:outer.loops){
     
     inner.results[b,] <-  model.THR(RR.vec[a], omr.df[b,],  tp.rrr.vec[b], 
                                         survival.df[b,],c.revision.vec[b], 
-                                        state.utilities.df[b,], mortality.vec = mortality.vec)[1:4]
+                                        state.utilities.df[b,], mortality.vec = mortality.vec) 
     
   }
   
@@ -186,7 +185,7 @@ for(a in 1:outer.loops){
   for(b in 1:inner.loops){
     inner.results[b,] <-  model.THR(RR.vec[b], omr.df[a,],  tp.rrr.vec[b], 
                                         survival.df[b,],c.revision.vec[b], 
-                                        state.utilities.df[b,], mortality.vec = mortality.vec)[1:4]
+                                        state.utilities.df[b,], mortality.vec = mortality.vec) 
   }
   
   #after each inner loop PSA, calculate the mean NMB for each tx and store the results
@@ -209,7 +208,7 @@ for(a in 1:outer.loops){
     inner.results[b,] <-  model.THR(RR.vec[b], omr.df[b,],
                                         tp.rrr.vec[a], 
                                         survival.df[b,],c.revision.vec[b], 
-                                        state.utilities.df[b,], mortality.vec = mortality.vec)[1:4]
+                                        state.utilities.df[b,], mortality.vec = mortality.vec) 
     
   }
   
@@ -233,7 +232,7 @@ for(a in 1:outer.loops){
     inner.results[b,] <-  model.THR(RR.vec[b], omr.df[b,],
                                         tp.rrr.vec[b], 
                                         survival.df[a,],c.revision.vec[b], 
-                                        state.utilities.df[b,], mortality.vec = mortality.vec)[1:4]
+                                        state.utilities.df[b,], mortality.vec = mortality.vec) 
   }
   
   #after each inner loop PSA, calculate the mean NMB for each tx and store the results
@@ -255,7 +254,7 @@ for(a in 1:outer.loops){
     inner.results[b,] <-  model.THR(RR.vec[b], omr.df[b,],tp.rrr.vec[b], 
                                         survival.df[b,],
                                         c.revision.vec[a], 
-                                        state.utilities.df[b,], mortality.vec = mortality.vec)[1:4]
+                                        state.utilities.df[b,], mortality.vec = mortality.vec) 
   }
   
   #after each inner loop PSA, calculate the mean NMB for each tx and store the results
@@ -276,7 +275,7 @@ for(a in 1:outer.loops){
   for(b in 1:inner.loops){
     inner.results[b,] <-  model.THR(RR.vec[b], omr.df[b,],tp.rrr.vec[b], 
                                         survival.df[b,],c.revision.vec[b], 
-                                        state.utilities.df[a,], mortality.vec = mortality.vec)[1:4] 
+                                        state.utilities.df[a,], mortality.vec = mortality.vec)  
   }
   
   #after each inner loop PSA, calculate the mean NMB for each tx and store the results
