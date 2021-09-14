@@ -1,166 +1,29 @@
+# Loading in data and model
+source("Manuscript/THR_Model.R")
 
-## START OF VOI SCRIPT
-
-#### EVPPI EXAMPLE #### 
-
-# 
-# evppi.results.SP0.test <- matrix(0, ncol = 1, nrow = 10) ## creating an empty matrix
-# colnames(evppi.results.SP0.test) <- c("£2,200")
-# evppi.results.NP1.test <- evppi.results.SP0.test 
-# 
-# inner.results <- matrix(0, 100, 4) ## empty matrix to store the results of the inner loop
-# colnames(inner.results) <- c("Cost SP0", "QALY SP0", "Cost NP1", "QALY NP1")
-# 
-# WTP <- 2200
-
-# 
-# 
-# ## The parameter values (10,000 (=sim.runs) of them each) are sampled in the model script 
-# # this is the model script sourced above
-# # parameter groups: (data.frames)
-# head(survival.df)
-# head(state.utilities.df)
-# head(omr.df)
-# 
-# # individual parameter values: (vectors)
-# head(tp.rrr.vec)
-# head(RR.vec)
-# head(c.revision.vec)
-# 
-# # Note that the model function requires that data is selected from the above
-# # parameters, and passed as arguments to the function 
-# # Testing the model:
-# model.THR(RR.vec[1], omr.df[1,],  tp.rrr.vec[1], 
-#               survival.df[1,],c.revision.vec[1], 
-#               state.utilities.df[1,]) 
-# 
-# 
-# model.THR(RR.vec[2], omr.df[2,],  tp.rrr.vec[2], 
-#               survival.df[2,],c.revision.vec[2], 
-#               state.utilities.df[2,]) 
-# 
-# 
-# for(b in 1:100){
-#   
-#   # The 'partial' parameter will be changed only in the outer loop - so we can select that using 'a'
-#   # The parameters included in the inner loop are selected using 'b', so will be sampled 100 times 
-#   # in the inner loop, whilst the relative risk remains constant.
-#   
-#   inner.results[b,] <-  model.THR(RR.vec[a], omr.df[b,],  tp.rrr.vec[b], 
-#                                       survival.df[b,],c.revision.vec[b], 
-#                                       state.utilities.df[b,]) 
-#   
-# }
-# 
-# ## Calculate the NMB (at £2,200 WTP threshold defined above)
-# 
-# # Calculate the results of the inner loop - similar to the PSA calculation - estimating NMB
-# SP0.nmb <- ((inner.results[,"QALY SP0"] * WTP) - inner.results[,"Cost SP0"])  
-# NP1.nmb <- ((inner.results[,"QALY NP1"] * WTP) - inner.results[,"Cost NP1"])
-# 
-# # Use the mean NMB for each treatment and save
-# evppi.results.SP0.test[a,] <- mean(SP0.nmb)
-# evppi.results.NP1.test[a,] <- mean(NP1.nmb)
-# 
-# ## Now return to the above to re-run the code, changing a from 2 to 10, and rerunning each time.   
-# 
-# # After re running the code, check the results here
-# head(evppi.results.SP0.test)
-# head(evppi.results.NP1.test)
-# 
-# # Now calculate the EVPPI, based on the results recorded 
-# 
-# # Convert the results into a data frame (this makes using the apply function easier)
-# evppi.df <- data.frame(evppi.results.SP0.test, evppi.results.NP1.test)
-# 
-# # The current information, given uncertainty in the relative risk parameter
-# current.info <- max(apply(evppi.df, 2, mean)) ## 2 indicates columns 
-# # so we want the maximum value out of the 2 column averages
-# # try looking at apply(evppi.df, 2, mean) and then max(apply(evppi.df, 2, mean))
-# 
-# # The perfect information for the relative risk parameter
-# perfect.info <- mean(apply(evppi.df, 1, max)) ## 1 indicates rows
-# # so we want the average value of maximum NMB selected for each row
-# # try looking at apply(evppi.df, 1, max) and then mean(apply(evppi.df, 1, max))
-# 
-# # The EVPPI result (per individual)
-# evppi <- perfect.info - current.info
-# 
-# ## Make sure that you understand what calculations are being done, and why. 
-# # In the next section, the code will run similar calculations, but will be more complex, 
-# # as the NMB will be evaluated across a range of WTP values, and analyses will be 
-# # performed for all the parameters (or parameter groups) of interest.
-# 
-# 
-# 
+## View the PSA results 
+simulation.results
 
 
-source("THR_Model.R")
-
-
-
-## PROBABILISTIC SENSITIVITY ANALYSIS - EXAMPLE
-
-psa.results <- matrix(0, sim.runs, 4)
-
-sample.output$RR.vec
-sample.output$mortality.vec
-
-for(i in 1:sim.runs){
-  
-  psa.results[i,] <-   model.THR(RR.vec[i], omr.df[i,],  tp.rrr.vec[i], 
-                                 survival.df[i,],c.revision.vec[i], 
-                                 state.utilities.df[i,], mortality.vec = mortality.vec)[1:4] 
-}
-
-
-
-## EVPI EXAMPLE 
-
-
-#### ESTIMATING POPULATION EVPI #####
-
+#### SETTING VALUE OF INFORMATION POPULATION PARAMETERS ####
 population <- 40000 
 years <- 10
 evpi.disc <- 0.06
-
 population.seq <- population * (1/(1+evpi.disc) ^ c(0:(years-1)))
 effective.population <- sum(population.seq)
 
 
 
-#### RUNNING THE SIMULATIONS ########
+## EXPECTED VALUE OF PERFECT INFORMATION (EVPI)
 
-# sim.runs <- 100 ## the number of simulation runs
-
-## creating an empty data.frame for simulation results to fill:
-simulation.results <- data.frame("cost.SP0" = rep(as.numeric(NA), sim.runs), ## use the rep() function to create sim.runs rows of values
-                                 "qalys.SP0"= rep(as.numeric(NA),sim.runs),
-                                 "cost.NP1" = rep(as.numeric(NA),sim.runs),
-                                 "qalys.NP1" = rep(as.numeric(NA), sim.runs))
-
-
-## running the simulations and filling the simulation.results data.frame:
-for(i in 1:sim.runs){
-  simulation.results[i,] <- model.THR(RR.vec[i], omr.df[i,],  tp.rrr.vec[i], 
-                                      survival.df[i,],c.revision.vec[i], 
-                                      state.utilities.df[i,], mortality.vec = mortality.vec)[1:4]  ## running the model 
-}
-
-
-
-
-## EVPI ACROSS A RANGE OF WTP VALUES
-
-## create a vector from 0 to 50,000 in increments of 100 
+## Create a vector of willingness to pay values
 WTP.values <- seq(from = 0, to = 50000, by = 100)
 
-est.EVPI.pop <-function(WTP, effective.population,
-                        simulation.results) {
-  #### FUNCTION: estimating EVPI for effective populations
+# Create a function to estimate EVPI (at a population level)
+est.EVPI.pop <-function(WTP, effective.population, simulation.results) {
   ###  INPUTS: WTP - numeric WTP value
   ###          effective.population - numeric effective population value
-  ###          results - data.table object from simulation.runs with 
+  ###          results - data.frame object from simulation.runs with 
   ###          qalys.SP0 and cost.SP0 columns & equivalents for NP1
   ###  OUTPUTS: A numeric value for population EVPI
   
@@ -185,30 +48,13 @@ est.EVPI.pop <-function(WTP, effective.population,
 EVPI.results <- data.frame(WTP=WTP.values, EVPI=NA)
 
 for (i in 1:length(WTP.values)) {
-  EVPI.results[i,2] <- est.EVPI.pop(WTP.values[i], 
-                                    effective.population,
-                                    simulation.results)
+  EVPI.results[i,2] <- est.EVPI.pop(WTP.values[i], effective.population, simulation.results)
 }
 
-# View start of the results
-head(EVPI.results)
+## Show the highest EVPI value
+EVPI.results[EVPI.results$EVPI == max(EVPI.results$EVPI),] 
 
-
-
-# plot results 
-
-
-## ggplot to observe results (the functions created are from from the ggplot functions script)
-
-# Cost-effectiveness plane 
-#incremental.results <- simulation.results[,c("inc.qalys","inc.cost")]
-#plot.ce.plane(incremental.results)
-
-# Cost-effectiveness acceptability curve 
-#plot.ceac(CEAC)
-
-# EVPI, per population
-
+## Plot results EVPI, per population
 evpi.plot <- ggplot(EVPI.results) + geom_line(aes(x=WTP, y=EVPI), size=1) + 
   labs(x = "Willingness to pay threshold", text = element_text(size=10)) + 
   labs(y = "Expected Value of Perfect Information", text = element_text(size=10)) + theme_classic() +
@@ -224,32 +70,16 @@ evpi.plot <- ggplot(EVPI.results) + geom_line(aes(x=WTP, y=EVPI), size=1) +
 evpi.plot
 
 
-
-## the peak occurs where the EVPI is at it's highest;
-EVPI.results[EVPI.results$EVPI == max(EVPI.results$EVPI),] ## returns the row with the max EVPI value
-## in other words, when the WTP value is around £2,100 per QALY gained (in our test run, the number may be slightly different in your simulations),
-## there is the largest expected value of perfected information
-
-
-
-
-
-
-#### EVPPI Model runs #### 
+#### EXPECTED VALUE OF PARTIAL PERFECT INFORMATION (EVPPI) ANALYSIS #### 
 
 ## Enter inner and outer loop numbers - note these must be higher than sim.runs 
 inner.loops <- 100
 outer.loops <- 100
 
-# Note that these need to be less than or equal to sim.runs since that determines the parameter samples
-sim.runs >= inner.loops
-sim.runs >= outer.loops
 
-# Generate matrices to store EVPPI results 
-WTP.values <- seq(0, 50000, 100)
-
+# Create a matrix to store the inner loop results
 inner.results <- matrix(0, inner.loops, 4)
-colnames(inner.results) <- c("Cost SP0", "QALY SP0", "Cost NP1", "QALY NP1")
+colnames(inner.results) <- c("Cost SP0", "QALY SP0", "Cost NP1", "QALY NP1", "Incr Cost", "Incr QALY")
 
 evppi.results.SP0 <- matrix(0, nrow = outer.loops, ncol = length(WTP.values))
 colnames(evppi.results.SP0) <- as.character(WTP.values)
