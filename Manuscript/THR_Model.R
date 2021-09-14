@@ -120,12 +120,12 @@ col.key <- 3-male
 mortality.vec <- death.risk[,col.key]
 
 ## combine outputs
-sample.output <- list(survival.df = survival.df,
-                       state.utilities.df = state.utilities.df,
-                       omr.df = omr.df,
-                       tp.rrr.vec = tp.rrr.vec,
-                       RR.vec = RR.vec,
+sample.output <- list(RR.vec = RR.vec,
+                      omr.df = omr.df,
+                      tp.rrr.vec = tp.rrr.vec,
+                      survival.df = survival.df,
                       c.revision.vec = c.revision.vec,
+                       state.utilities.df = state.utilities.df,
                       mortality.vec = mortality.vec)
 return(sample.output)
 }
