@@ -13,6 +13,8 @@ c.SP0 <- 394 ## Cost of standard prosthesis
 c.NP1 <- 579 ## Cost of new prosthesis 1
 c.primary <- 0  ## Cost of a primary THR procedure - set to 0 for this model 
 c.success <- 0 ## Cost of success - set to 0 for this model
+
+## Defining shape and scale parameters to be used in probabilistic analyses
 mn.cRevision <- 5294 ## mean cost of revision surgery
 se.cRevision <- 1487 ## standard error of cost of revision surgery
 a.cRevision <- (mn.cRevision/se.cRevision)^2 ## alpha value for cost of revision surgery 
@@ -132,6 +134,16 @@ return(sample.output)
 
 sample.output <- psa.sampling()
 
+RR.vec <- sample.output$RR.vec
+omr.df <- sample.output$omr.df
+tp.rrr.vec <- sample.output$tp.rrr.vec
+survival.df <- sample.output$survival.df
+c.revision.vec <- sample.output$c.revision.vec 
+state.utilities.df <- sample.output$state.utilities.df 
+mortality.vec <- sample.output$mortality.vec
+## take a look at the above vectors and data.frames to see the samples produced
+## these are defined out of the list here for use in the value of information analysis later on
+
 ####***** THR MODEL FUNCTION ****#####
 model.THR <- function(RR.NP1, ## from RR.vec
                       omr,  ## from omr.df
@@ -237,13 +249,6 @@ simulation.results <- data.frame("cost.SP0" = rep(as.numeric(NA), sim.runs), ## 
                                  "inc.cost" = rep(as.numeric(NA),sim.runs),
                                  "inc.qalys"=  rep(as.numeric(NA),sim.runs))
 
-RR.vec <- sample.output$RR.vec
-omr.df <- sample.output$omr.df
-tp.rrr.vec <- sample.output$tp.rrr.vec
-survival.df <- sample.output$survival.df
-c.revision.vec <- sample.output$c.revision.vec 
-state.utilities.df <- sample.output$state.utilities.df 
-mortality.vec <- sample.output$mortality.vec
 
 ## running the simulations and filling the simulation.results data.frame:
 for(i in 1:sim.runs){
@@ -254,22 +259,6 @@ for(i in 1:sim.runs){
   
 }
 
-#### OST-EFFECTIVENESS PLANES & COST-EFFECTIVENESS ACCEPTABILITY CURVES #####
-# Install package and load library
-if(!require(ggplot2)) install.packages('ggplot2')
-library(ggplot2)
-## Plotting:
-  xlabel = "Incremental QALYs"
-  ylabel = "Incremental costs"
-  ggplot(simulation.results) + 
-    geom_point(shape = 21, size = 2, colour = "black", fill = NA, alpha = 0.5, aes(x=inc.qalys, y=inc.cost)) + 
-    labs(x = xlabel, text = element_text(size=10)) + labs (y = ylabel, text = element_text(size=10)) + theme_classic() +
-    theme(legend.title = element_blank(), axis.title=element_text(face="bold"), 
-          axis.title.x = element_text(margin = margin(t = 7, r = 0, b = 3, l = 0)), 
-          axis.title.y = element_text(margin = margin(t = 0, r = 7, b = 0, l = 3)), 
-          panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-          legend.key.width=unit(1.8,"line"), text = element_text(size=12),
-          plot.margin=unit(c(1.2,0.5,0,1.2),"cm"))
 
 # Estimating the average net monetary benefit of the new treatment
 p.CE<-function(WTP, simulation.results) {# Estimate the probability of cost-effectiveness for a given willingness-to-pay ceiling ratio
@@ -293,18 +282,6 @@ CEAC <- data.frame(WTP = WTP.values,
 for (i in 1:length(WTP.values)) {
   CEAC[i,"pCE"]<- p.CE(CEAC[i,"WTP"], simulation.results)
 }
-## plotting:
-  xlabel = "Willingness to pay threshold"
-  ylabel = "Probability cost-effective"
- ggplot(CEAC) + geom_line(aes(x=WTP, y=pCE), size=1) + 
-    labs(x = xlabel, text = element_text(size=10)) + labs(y = ylabel, text = element_text(size=10)) + theme_classic() +
-    theme(legend.title = element_blank(), axis.title=element_text(face="bold"), 
-          axis.title.x = element_text(margin = margin(t = 7, r = 0, b = 3, l = 0)), 
-          axis.title.y = element_text(margin = margin(t = 0, r = 7, b = 0, l = 3)), 
-          panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-          legend.key.width=unit(1.8,"line"), text = element_text(size=12)) + 
-    scale_x_continuous(expand = c(0, 0.1)) + 
-    scale_y_continuous(limits = c(0,1), breaks=seq(0,1,0.1), expand = c(0, 0))
 
 ##### SUBGROUP ANALYSES ######
 # CREATE ARRAY TO STORE THE RESULTS OF THE MODEL IN EACH SUBGROUP
@@ -346,13 +323,50 @@ for (i in 1:length(WTP.values)) {
   CEAC.subgroups[i,7]<-p.CE(WTP.values[i], simulation.subgroups[,,6])
 }
 
-## To plot the CEAC We need to reshape the data from wide to long to use in ggplot 
-# Install package and load library
-if(!require(reshape2)) install.packages('reshape2')
-library(reshape2)
-CEAC.subgroups.long <- melt(CEAC.subgroups, id.vars = c("WTP"))
-colnames(CEAC.subgroups.long) <- c("WTP", "group", "pCE")
-## plotting:
+
+  
+  
+######***PLOTS****#####################
+  
+  #### COST-EFFECTIVENESS PLANES & COST-EFFECTIVENESS ACCEPTABILITY CURVES #####
+  # Install package and load library
+  if(!require(ggplot2)) install.packages('ggplot2')
+  library(ggplot2)
+  ## Plotting:
+  xlabel = "Incremental QALYs"
+  ylabel = "Incremental costs"
+  ggplot(simulation.results) + 
+    geom_point(shape = 21, size = 2, colour = "black", fill = NA, alpha = 0.5, aes(x=inc.qalys, y=inc.cost)) + 
+    labs(x = xlabel, text = element_text(size=10)) + labs (y = ylabel, text = element_text(size=10)) + theme_classic() +
+    theme(legend.title = element_blank(), axis.title=element_text(face="bold"), 
+          axis.title.x = element_text(margin = margin(t = 7, r = 0, b = 3, l = 0)), 
+          axis.title.y = element_text(margin = margin(t = 0, r = 7, b = 0, l = 3)), 
+          panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+          legend.key.width=unit(1.8,"line"), text = element_text(size=12),
+          plot.margin=unit(c(1.2,0.5,0,1.2),"cm"))
+  
+  
+  ## plotting:
+  xlabel = "Willingness to pay threshold"
+  ylabel = "Probability cost-effective"
+  ggplot(CEAC) + geom_line(aes(x=WTP, y=pCE), size=1) + 
+    labs(x = xlabel, text = element_text(size=10)) + labs(y = ylabel, text = element_text(size=10)) + theme_classic() +
+    theme(legend.title = element_blank(), axis.title=element_text(face="bold"), 
+          axis.title.x = element_text(margin = margin(t = 7, r = 0, b = 3, l = 0)), 
+          axis.title.y = element_text(margin = margin(t = 0, r = 7, b = 0, l = 3)), 
+          panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+          legend.key.width=unit(1.8,"line"), text = element_text(size=12)) + 
+    scale_x_continuous(expand = c(0, 0.1)) + 
+    scale_y_continuous(limits = c(0,1), breaks=seq(0,1,0.1), expand = c(0, 0))
+  
+  
+  ## To plot the CEAC for subgroups We need to reshape the data from wide to long to use in ggplot 
+  # Install package and load library
+  if(!require(reshape2)) install.packages('reshape2')
+  library(reshape2)
+  CEAC.subgroups.long <- melt(CEAC.subgroups, id.vars = c("WTP"))
+  colnames(CEAC.subgroups.long) <- c("WTP", "group", "pCE")
+  ## plotting:
   xlabel = "Willingness to pay threshold"
   ylabel = "Probability cost-effective"
   ggplot(CEAC.subgroups.long) + geom_line(aes(x=WTP, y=pCE, color=group), size=1) + 
