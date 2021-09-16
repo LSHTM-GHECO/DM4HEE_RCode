@@ -163,6 +163,8 @@ head(evppi.wide,20)
 # Install package and load library
 if(!require(reshape2)) install.packages('reshape2')
 library(reshape2)
+if(!require(ggplot2)) install.packages('ggplot2')
+library(ggplot2)
 
 ## Plot results EVPI, per population
 ggplot(EVPI.results) + geom_line(aes(x=WTP, y=EVPI), size=1) + 
