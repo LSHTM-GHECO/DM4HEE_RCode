@@ -1,19 +1,16 @@
 # Loading in data and model
 source("Manuscript/THR_Model.R")
 
-
 #### SETTING VALUE OF INFORMATION POPULATION PARAMETERS ####
 population <- 40000 
 years <- 10
 evpi.disc <- 0.06
 population.seq <- population * (1/(1+evpi.disc) ^ c(0:(years-1)))
 effective.population <- sum(population.seq)
-
-
-#### EXPECTED VALUE OF PERFECT INFORMATION (EVPI) ####
-
 ## Create a vector of willingness to pay values
 WTP.values <- seq(from = 0, to = 50000, by = 100)
+
+#### EXPECTED VALUE OF PERFECT INFORMATION (EVPI) ####
 
 # Create a function to estimate EVPI (at a population level)
 est.EVPI.pop <-function(WTP, effective.population, simulation.results) {
@@ -49,23 +46,6 @@ for (i in 1:length(WTP.values)) {
 
 ## Show the highest EVPI value
 EVPI.results[EVPI.results$EVPI == max(EVPI.results$EVPI),] 
-
-## Plot results EVPI, per population
-evpi.plot <- ggplot(EVPI.results) + geom_line(aes(x=WTP, y=EVPI), size=1) + 
-  labs(x = "Willingness to pay threshold", text = element_text(size=10)) + 
-  labs(y = "Expected Value of Perfect Information", text = element_text(size=10)) + theme_classic() +
-  theme(legend.title = element_blank(), axis.title=element_text(face="bold"),
-        panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-        legend.key.width=unit(1.8,"line"), text = element_text(size=12),
-        axis.title.x = element_text(margin = margin(t = 7, r = 0, b = 3, l = 0)), 
-        axis.title.y = element_text(margin = margin(t = 0, r = 7, b = 0, l = 3)), 
-        plot.margin=unit(c(0.5,0.5,0,0.5),"cm")) + 
-  scale_x_continuous(labels = scales::comma, expand = c(0, 0.1)) + 
-  scale_y_continuous(labels = scales::comma, expand = c(0, 0))
-
-evpi.plot
-
-
 
 #### EXPECTED VALUE OF PARTIAL PERFECT INFORMATION (EVPPI) ANALYSIS #### 
 
@@ -179,48 +159,54 @@ for(j in 1:parameter.groups){
 # Preview of results 
 head(evppi.wide,20)
 
+#####**** PLOTS *****#####
+# Install package and load library
+if(!require(reshape2)) install.packages('reshape2')
+library(reshape2)
 
-
+## Plot results EVPI, per population
+ggplot(EVPI.results) + geom_line(aes(x=WTP, y=EVPI), size=1) + 
+  labs(x = "Willingness to pay threshold", text = element_text(size=10)) + 
+  labs(y = "Expected Value of Perfect Information", text = element_text(size=10)) + theme_classic() +
+  theme(legend.title = element_blank(), axis.title=element_text(face="bold"),
+        panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+        legend.key.width=unit(1.8,"line"), text = element_text(size=12),
+        axis.title.x = element_text(margin = margin(t = 7, r = 0, b = 3, l = 0)), 
+        axis.title.y = element_text(margin = margin(t = 0, r = 7, b = 0, l = 3)), 
+        plot.margin=unit(c(0.5,0.5,0,0.5),"cm")) + 
+  scale_x_continuous(labels = scales::comma, expand = c(0, 0.1)) + 
+  scale_y_continuous(labels = scales::comma, expand = c(0, 0))
 
 #### PLOTTING EVPPI RESULTS ####
 
 # Convert from wide to long format
-evppi.long <- reshape2::melt(evppi.wide.pop, id.vars = c("WTP"))
+evppi.long <- reshape2::melt(evppi.wide, id.vars = c("WTP"))
 
-plot.evppi <- ggplot(evppi.long) + geom_line(aes(x=WTP, y=value, colour = variable), size=0.75) + 
-                labs(x = "Willingness to pay threshold", text = element_text(size=10)) + 
-                labs(y = "EVPPI", text = element_text(size=10)) + theme_classic() +
-                theme(legend.title = element_blank(), axis.title=element_text(face="bold"), 
-                      axis.title.x = element_text(margin = margin(t = 7, r = 0, b = 3, l = 0)), 
-                      axis.title.y = element_text(margin = margin(t = 0, r = 7, b = 0, l = 3)), 
-                      panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-                      legend.key.width=unit(1.8,"line"), text = element_text(size=12),
-                      plot.margin=unit(c(0.5,0,0,0.5),"cm")) + 
-                scale_x_continuous(labels = scales::comma, limits = c(0, 10000), expand = c(0, 0.1)) + 
-                scale_y_continuous(labels = scales::comma, expand = c(0, 0))
-
-plot.evppi
+ggplot(evppi.long) + geom_line(aes(x=WTP, y=value, colour = variable), size=0.75) + 
+  labs(x = "Willingness to pay threshold", text = element_text(size=10)) + 
+  labs(y = "EVPPI", text = element_text(size=10)) + theme_classic() +
+  theme(legend.title = element_blank(), axis.title=element_text(face="bold"), 
+        axis.title.x = element_text(margin = margin(t = 7, r = 0, b = 3, l = 0)), 
+        axis.title.y = element_text(margin = margin(t = 0, r = 7, b = 0, l = 3)), 
+        panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+        legend.key.width=unit(1.8,"line"), text = element_text(size=12),
+        plot.margin=unit(c(0.5,0,0,0.5),"cm")) + 
+  scale_x_continuous(labels = scales::comma, limits = c(0, 10000), expand = c(0, 0.1)) + 
+  scale_y_continuous(labels = scales::comma, expand = c(0, 0))
 # Note you will get a warning here that the plot does not show all the data in the data.frame
 
 
-
-# If you want to retrieve the EVPPI at a specific point
-subset(evppi.long, WTP==2200)
-
-# and we can plot this:
+# Plotting EVPPI at a particular WTP
 sub.evppi <- subset(evppi.long, WTP==2200)
 
-plot.sub.evppi <- ggplot(sub.evppi, aes(x=variable, y=value)) +
-                    geom_bar(stat="identity", fill="steelblue")+
-                    labs(x = "Parameter Group", text = element_text(size=4)) + 
-                    labs(y = "EVPPI", text = element_text(size=4)) + theme_classic() +
-                    theme(legend.title = element_blank(), axis.title=element_text(face="bold"), 
-                          axis.title.x = element_text(margin = margin(t = 7, r = 0, b = 3, l = 0)), 
-                          axis.title.y = element_text(margin = margin(t = 0, r = 7, b = 0, l = 3)),
-                          axis.text.x=element_text(angle=45,hjust=1), 
-                          panel.grid.major = element_line(), panel.grid.minor = element_line(), 
-                          legend.key.width=unit(1.8,"line"), text = element_text(size=12)) + 
-                    scale_y_continuous(labels = scales::comma, expand = c(0, 0))
-
-plot.sub.evppi
-
+ggplot(sub.evppi, aes(x=variable, y=value)) +
+  geom_bar(stat="identity", fill="steelblue")+
+  labs(x = "Parameter Group", text = element_text(size=4)) + 
+  labs(y = "EVPPI", text = element_text(size=4)) + theme_classic() +
+  theme(legend.title = element_blank(), axis.title=element_text(face="bold"), 
+        axis.title.x = element_text(margin = margin(t = 7, r = 0, b = 3, l = 0)), 
+        axis.title.y = element_text(margin = margin(t = 0, r = 7, b = 0, l = 3)),
+        axis.text.x=element_text(angle=45,hjust=1), 
+        panel.grid.major = element_line(), panel.grid.minor = element_line(), 
+        legend.key.width=unit(1.8,"line"), text = element_text(size=12)) + 
+  scale_y_continuous(labels = scales::comma, expand = c(0, 0))

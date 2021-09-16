@@ -322,8 +322,6 @@ for (i in 1:length(WTP.values)) {
   CEAC.subgroups[i,6]<-p.CE(WTP.values[i], simulation.subgroups[,,5])
   CEAC.subgroups[i,7]<-p.CE(WTP.values[i], simulation.subgroups[,,6])
 }
-
-
   
   
 ######***PLOTS****#####################
