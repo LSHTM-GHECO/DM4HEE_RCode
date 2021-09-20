@@ -147,9 +147,9 @@ mortality.vec <- sample.output$mortality.vec
 ####***** THR MODEL FUNCTION ****#####
 model.THR <- function(RR.NP1, ## from RR.vec
                       omr,  ## from omr.df
-                      tp.rrr, ## from tp.rrr.vector
+                      tp.rrr, ## from tp.rrr.vec
                       survival, ## from survival.df
-                      c.revision, ## from c.revision.vector
+                      c.revision, ## from c.revision.vec
                       state.util,## from state.utilities.df
                       mortality.vec) { ## background mortality based on life tables for age/sex combination
   ### FUNCTION: Run the THR model on the deterministic and probablistic parameters
