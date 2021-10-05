@@ -1,7 +1,6 @@
 # Decision Modelling for Health Economic Evaluation R Code
 
-[![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip) 
-
+[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 ## About
 
 This repository was originally created to write R code that was complementary to the "Decision Modelling for Health Economic Evaluation" course. See this website for further information about the course: https://modelling.he-evalcourses.com/
