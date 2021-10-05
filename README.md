@@ -7,7 +7,6 @@ This repository was originally created to write R code that was complementary to
 
 Excel versions of the models used throughout the course are available here (versions aligned with the corresponding book chapters): https://www.herc.ox.ac.uk/downloads/decision-modelling-for-health-economic-evaluation 
 
-We then used this code to aid in writing our tutorial paper entitled "Extensions of Health Economic Evaluation in R for Microsoft Excel Users: A Tutorial for incorporating heterogeneity and conducting value of information analyses". 
 
 ## Repo Layout
 
@@ -20,7 +19,6 @@ This directory has the following structure:
                             
             Advanced_Course ├── which has all Advanced Course code & data
          
-                Manuscript  ├── which has all manuscript code & data
 ```
 
 ### Course Workflow
@@ -57,23 +55,10 @@ Each Module (excluding the Reader) has the following:
 Note: For Modules A3 and A4, the Template and Solution files are split into ‘Part 1’ and ‘Part 2’. The Instructions PDF walks you through when to use which.
 
 
-### Manuscript Workflow
-
-The manuscript folder contains:
-
-* The original THR model R script: THR_Model.R
-
-* An R script providing code to perform Value of Information analyses on the THR model: THR_Model_VOI.R
-
-* All necessary data files to run the relevant R scripts: life-table.csv, hazardfunction.csv, cov55.csv.
-
-* The excel version of the model which was downloaded from "https://www.herc.ox.ac.uk/downloads/decision-modelling-for-health-economic-evaluation" written by Andrew Briggs, Mark Sculpher and Karl Claxton [last accessed 25/08/2021]
-
 ### How to Cite this Work
 
-Prior to the release of the corresponding manuscript, please cite any R code used from the course or the repository as per stated within our License: "Jack Williams[1], Nichola R. Naylor[1] and Andew Briggs, 2021, "Decision Making for Health Economic Evaluation R Code. [1]Equal contribution/Joint First Author"
+Please cite any R code used from the course or the repository as per stated within our License: "Jack Williams[1], Nichola R. Naylor[1] and Andew Briggs, 2021, "Decision Making for Health Economic Evaluation R Code. [1]Equal contribution/Joint First Author"
 
-Once the manuscript has been published, please use this citation. [This will be updated once the citation is finalised].
 
 ### Other information
 
