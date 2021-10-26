@@ -65,5 +65,7 @@ Please note that Jack Williams and Nichola Naylor contributed equally and are jo
 ### Other information
 
 Please do not attempt to make changes to the original repo. 
-Please contact chilgithub@lshtm.ac.uk, either Nichola or Jack can then respond to any queries. 
+Please contact 'chilgithub@lshtm.ac.uk', either Nichola or Jack can then respond to any queries. 
+
+
 
