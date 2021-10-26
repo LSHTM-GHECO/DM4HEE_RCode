@@ -1,6 +1,7 @@
 # Decision Modelling for Health Economic Evaluation R Code
 
-[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
+[![DOI](https://zenodo.org/badge/343436706.svg)](https://zenodo.org/badge/latestdoi/343436706)
+
 ## About
 
 This repository was originally created to write R code that was complementary to the "Decision Modelling for Health Economic Evaluation" course. See this website for further information about the course: https://modelling.he-evalcourses.com/
