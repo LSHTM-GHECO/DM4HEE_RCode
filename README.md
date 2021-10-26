@@ -1,5 +1,6 @@
 # Decision Modelling for Health Economic Evaluation R Code
 
+
 [![DOI](https://zenodo.org/badge/343436706.svg)](https://zenodo.org/badge/latestdoi/343436706)
 
 ## About
@@ -58,11 +59,12 @@ Note: For Modules A3 and A4, the Template and Solution files are split into ‘P
 
 ### How to Cite this Work
 
-Please cite any R code used from the course or the repository as per stated within our License: "Jack Williams[1], Nichola R. Naylor[1] and Andew Briggs, 2021, "Decision Making for Health Economic Evaluation R Code. [1]Equal contribution/Joint First Author"
+Please cite any R code used from the course or the repository as per stated within our License. You can export the citation under the 'About' section on the right hand side of this repository, or use the following citation: 
+Jack Williams, Nichola Naylor, & Andy Briggs. (2021). Decision Modelling for Health Economic Evaluation R Code (v1.0). Zenodo. https://doi.org/10.5281/zenodo.5552710
 
+Please note that Jack Williams and Nichola Naylor contributed equally and are joint first authors. 
 
 ### Other information
 
 Please do not attempt to make changes to the original repo. 
-Please contact chilgithub@lshtm.ac.uk, either Nichola or Jack can then respond to any queries. 
-
+Please contact 'chilgithub@lshtm.ac.uk', either Nichola or Jack can then respond to any queries. 
