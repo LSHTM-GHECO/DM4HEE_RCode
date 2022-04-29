@@ -1,7 +1,7 @@
 ---
 title: "Building a decision tree model of antenatal HIV transmission"
 author: "Jack Williams & Nichola Naylor"
-date: "May/June 2021 Course"
+date: "2022 Course"
 output:
   pdf_document: default
   html_document: default
