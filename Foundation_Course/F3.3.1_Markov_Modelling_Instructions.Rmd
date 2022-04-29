@@ -1,7 +1,7 @@
 ---
 title: "Markov Models"
 author: "Nichola Naylor & Jack Williams"
-date: "May/June 2021 Course"
+date: "2022 Course"
 output:
   pdf_document: default
   html_document: default
