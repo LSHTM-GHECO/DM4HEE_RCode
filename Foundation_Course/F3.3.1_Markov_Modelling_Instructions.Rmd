@@ -30,7 +30,7 @@ The basic structure of the model is given in the figure below, which shows that 
 
 The cycle length of the model is one year and the model is evaluated over 20 years (after which more than 95% of patients are expected to have died).
 
-In this exercise you will use the data given below to populate the model and calculate the incremental cost-effectiveness ratio (ICER) for AZT monotherapy. Ultimately, you should be able to calcualte an ICER of £9,791 per LY gained.
+In this exercise you will use the data given below to populate the model and calculate the incremental cost-effectiveness ratio (ICER) for AZT monotherapy. Ultimately, you should be able to calculate an ICER of £9,791 per LY gained.
 
 
 **1. Transition probabilities**
@@ -72,7 +72,7 @@ data.frame(name, a, b, c)
 
 **3. Costs of Drugs**
 
-The yearly cost of AZT monotheray is given as £2,278 and lamivudine is given as £2,086.50. 
+The yearly cost of AZT monotherapy is given as £2,278 and lamivudine is given as £2,086.50. 
 
 **4. Treatment effect**
 
@@ -158,7 +158,7 @@ Once you have done this, you should have calculated total undiscounted LYs of __
 
 Similarly to the life years, we can now calculate the costs. 
 
-i) First, calculate the undiscounted costs for each time period by multiplying the appropriate cost vectror with the trace matrix. Note that there are multiple costs associated with states, including direct medical costs and community costs, in addition to drug costs for AZT, that are given for the whole time period. We've done this for you, but try to go through and understand what `cost.AZT` is doing.
+i) First, calculate the undiscounted costs for each time period by multiplying the appropriate cost vector with the trace matrix. Note that there are multiple costs associated with states, including direct medical costs and community costs, in addition to drug costs for AZT, that are given for the whole time period. We've done this for you, but try to go through and understand what `cost.AZT` is doing.
 
 ii) Similar to the above, create a discount factor matrix for costs and multiply this with the undiscounted costs for AZT. Again, store and print total costs for AZT, both undiscounted and discounted.
 
@@ -180,7 +180,7 @@ i) Start by redefining the transition matrix (through first defining the state t
 
 When creating the transition probability matrix for the combination therapy, use the same approach as earlier, by creating a vector of transitions from each state, and then combining these to create a matrix. 
 
-ii) Now that you have the transition matrix, create the corresponding trace matrix using the same process as for AZT. *Note that AZT is only given for 2 years, after which AZT is assumed to be given (and wherby which the transition probabilities will revert back to those associated with AZT only).*
+ii) Now that you have the transition matrix, create the corresponding trace matrix using the same process as for AZT. *Note that AZT is only given for 2 years, after which AZT is assumed to be given (and whereby which the transition probabilities will revert back to those associated with AZT only).*
 
 iii) Calculate life years and costs as before. For the costs, first utilise the `trace.comb` and the previously defined costs (e.g. `c.dmc`) as done before for AZT. Then, remember to add in the cost of lamivudine for the first two years only, since the drug is assumed to be given for only 2 years. _(Hint: remember to include everyone who is in states A - C in those calculations)._
 
