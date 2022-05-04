@@ -240,6 +240,10 @@ lines(diagnostic.threshold, dis.neg, col = "blue")
 TPR <- 1 - pnorm(diagnostic.threshold, test.char[1], test.char[2])
 FPR <- 1 - pnorm(diagnostic.threshold, test.char[3], test.char[4])
 
+## Note that we use the 'lower.tail=FALSE' option instead of 1-pnorm. The following gives the same results:
+1 - pnorm(diagnostic.threshold, test.char[1], test.char[2])
+pnorm(diagnostic.threshold, test.char[1], test.char[2], lower.tail = FALSE)
+
 # We can view these alongside the diagnostic thresholds 
 positive.rate <- data.frame(diagnostic.threshold, TPR, FPR)
 
