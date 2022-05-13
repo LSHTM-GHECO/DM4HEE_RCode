@@ -254,13 +254,16 @@ result <- people %*% cost
 result
 
 ## results[1,1] = people[1,1]*cost[1]+people[2,1]*cost[2]+people[3,1]*cost[3]
+```
 
-# Note that if we tried "cost %*% people" this would result in: 
-# "Error in cost %*% people : non-conformable arguments"
-# This is because the number of columns/values in cost (n=3) does not equal the number of
-# rows/values in people (n=4). 
-# We also wouldn't want the product of this calculation, even if these dimension lengths 
-# match, as that would multiply the wrong values together - For example ...
+Note that if we tried `cost %*% people` 
+this would result in: 
+`Error in cost %*% people : non-conformable arguments`.
+
+This is because the number of columns/values in cost (n=3) does not equal the number of rows/values in people (n=4). 
+We also wouldn't want the product of this calculation, even if these dimension lengths match, as that would multiply the wrong values together. For example ...
+
+```{r, echo=TRUE}
 
 people_3yr <- matrix(c(100,0,0,
                   90,10,0,
