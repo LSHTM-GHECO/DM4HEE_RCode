@@ -63,7 +63,7 @@ For those of you that completed the Foundations course, everything previously wa
 1. "A2.3.4_Additional_Information_THR_Model_with_simulation.R"
 2. "A4.3.3b_VoI_Model_Script.R"
 3. "ggplot_CEA_functions.R"
-4. "cholesky_decomposition.R" (this final one is not necessary for read ins but useful for understanidng).
+4. "cholesky_decomposition.R" (this final one is not necessary for read ins but useful for understanding).
 
 Throughout the template and solution files csv files will be read in using the `read.csv()` function. For more information on this enter `?read.csv` into the console.For example:
 
@@ -125,7 +125,7 @@ matrix(1:9, nrow = 3, ncol = 3)
 
 ```
 
-**Array (a multi-dimenesional matrix) - the dim (dimensions) aspects indicates rows, columns, matrix numbers**
+**Array (a multi-dimensional matrix) - the dim (dimensions) aspects indicates rows, columns, matrix numbers**
 ```{r, echo=TRUE}
 array(1:18, dim = c(3, 3, 2)) ## dimensions = c(nrow, ncolumns, number of matrices in the 3D space)
 
@@ -293,7 +293,7 @@ rnorm(n = 6, mean = 20, sd = 4)
 # Beta distribution of probability of 0.05 (1 event out of 20 subjects)
 rbeta(n = 6, shape1 = 1, shape2 = 19)
 
-# Gamma gistribution for mean of 1000 and SE of 200 
+# Gamma distribution for mean of 1000 and SE of 200 
 rgamma(n = 6, shape = 25, scale = 40)
 
 ```
@@ -306,9 +306,9 @@ In the course we will use a mixture of base R plots and plots using a package ca
 
 The base R plots are simple to create and provide an easy way to look at the data. 
 
-`ggplot` is a much more flexible package that has many more options within plots. This allows the user to edit every aspects of the plot to get it exaclty how they want it. Whilst this is really helpful for data visualisation and producing great plots, the number of options are extensive and we won't have time to cover them in any detail in this course. 
+`ggplot` is a much more flexible package that has many more options within plots. This allows the user to edit every aspects of the plot to get it exactly how they want it. Whilst this is really helpful for data visualisation and producing great plots, the number of options are extensive and we won't have time to cover them in any detail in this course. 
 
-For those interested in learning more about ggplot, there is an excellent chapter on data visualiation chapter in the 'R for Data Science'  book, available here: 
+For those interested in learning more about ggplot, there is an excellent chapter on data visualisation chapter in the 'R for Data Science'  book, available here: 
 https://r4ds.had.co.nz/data-visualisation.html
 
 For an overview of ggplot codes see the cheat sheet available through the "Data Visualization Cheatsheet" within the RStudio cheat sheet repository:
