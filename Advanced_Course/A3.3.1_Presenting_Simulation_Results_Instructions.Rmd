@@ -327,6 +327,6 @@ As was noted in the presentation, the interpretation of multiple acceptability c
 
 The `CEAF.function()` function has been written for you, which is similar to the function used earlier in the script to estimate the probability of cost-effectiveness, except that rather than selecting the treatment with the highest probability of cost-effectiveness, the function selects the probability of cost-effectiveness for the treatment with the highest net monetary benefit (based on average net monetary benefit across all simulations run). We can also use the same plot function '`plot.ceac.all()`' to create a plot to show the results, this time for the CEAF.  
 
-Congratulations! You have now created a time-dependent, probabilistic Markov model with an additional treatment arm comparator, additionally you've presented results from such analyses graphically. In the next module we'll be building on `model.THR` to explore Value of Information Analyses.
+**Congratulations!** You have now created a time-dependent, probabilistic Markov model with an additional treatment arm comparator, additionally you've presented results from such analyses graphically. In the next module we'll be building on `model.THR` to explore Value of Information Analyses.
 
 
