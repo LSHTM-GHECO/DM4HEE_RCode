@@ -5,7 +5,7 @@ date: "2022 Course"
 output:
   pdf_document: default
   html_document: default
-subtitle: Foundation Course Exercise 2
+subtitle: Foundation Course Module 2
 header-includes:
 - \usepackage{titling}
 - \pretitle{\begin{center}\LARGE\includegraphics[width=7.5cm]{logo.png}\\[\bigskipamount]}

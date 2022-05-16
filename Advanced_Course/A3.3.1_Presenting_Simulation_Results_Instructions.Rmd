@@ -2,7 +2,7 @@
 title: "Presenting Simulation Results"
 subtitle: "Advanced Course Module 3"
 author: "Nichola Naylor & Jack Williams"
-date: "May/June 2021 Course1"
+date: "2022 Course"
 output:
   pdf_document: default
   html_document: default
@@ -69,9 +69,9 @@ All of R packages listed above for Part 1 are also needed for Part 2. Additional
 
 In the template file for this exercise you will find first the same section as in Module 2 ("Deterministic Parameters"), but then a new section labelled 'THR Model Function'. The aim of this function is to wrap the main parts of the Markov model into a function, so that we can repeat and record the results of the probabilistic analysis constructed in Module 2. 
 
-As part of the previous module, we added an additional resource 'THR Model with simulation' (file name  "A2.3.4_Additional_Information_THR_Model_with_simulation.R") which just created a function that re-ran the whole of the R script to run the model 1,000 times. Whilst this is a very easy way to write code to re-run the model many times, many parts of the script will be unnecessarily repeated. For example, the discount rates, and the mean and stadard error inputs for parameters will be assigned the same value in every moodel iteration, which takes time. This becomes a particular issue when the model is very complex, or you need to run a large number of simulations, running through many subgroups, or performing value of information analyses (which you learn about in the next module).
+As part of the previous module, we added an additional resource 'THR Model with simulation' (file name  "A2.3.4_Additional_Information_THR_Model_with_simulation.R") which just created a function that re-ran the whole of the R script to run the model 1,000 times. Whilst this is a very easy way to write code to re-run the model many times, many parts of the script will be unnecessarily repeated. For example, the discount rates, and the mean and standard error inputs for parameters will be assigned the same value in every model iteration, which takes time. This becomes a particular issue when the model is very complex, or you need to run a large number of simulations, running through many subgroups, or performing value of information analyses (which you learn about in the next module).
 
-In this exercise we aimed to structure the model function to be slightly more efficient (i.e. run through the code at a faster speed) by trying to avoid repeating some of the unnecesary (deterministic) parts of the code multiple times. 
+In this exercise we aimed to structure the model function to be slightly more efficient (i.e. run through the code at a faster speed) by trying to avoid repeating some of the unnecessary (deterministic) parts of the code multiple times. 
 
 Since this is the same model structure as you created in Modules 1 and 2, we haven't asked you to re-write the model code, but do read through the `model.THR()` function to check you understand what parts of the model are now within the function, and how "age" and "male" are set/used. Once you have looked through the function, we recommend that you use the arrow next to the the function code to close it (i.e. to stop showing the code), to help view the rest of the script, since the `model.THR()` code is around 200 lines long! You can run the model a few times to see the differences in the results generated across probabilistic runs. This may still take a fair few seconds to run so be patient on first running. You should have similar results to the below (remember actual numbers will differ due to random draws):
 
@@ -109,7 +109,7 @@ Then run the simulations in a loop, and replace the NA values with the results f
 
 Now that we have stored the results of 1000 probabilistic trials of the model, the results can be analysed:  
 
-(i) Using a simple `plot()` function plot incremental QALYs against incremental costs, with incremental qalys on the x-axis and incremental cost on the y-axis. 
+(i) Using a simple `plot()` function plot incremental QALYs against incremental costs, with incremental QALYs on the x-axis and incremental cost on the y-axis. 
 
 Next, we have used the `ggplot2` package to create more readable plots.
 
@@ -152,7 +152,7 @@ Up to this point we have been working with a model where the patient characteris
 
 * Run the function on each of the subgroups, storing the results within the array, by completing the for loop we've started for you. *Note: match the subgroup to the order listed in `subgroups.names`.*
 
-* You may want to have larger increments in the WTP values this time to help with spee (e.g. redefine `WTP.values` with larger increments than 10) 
+* You may want to have larger increments in the WTP values this time to help with speed (e.g. redefine `WTP.values` with larger increments than 10) 
 
 * Next, create a data.frame called 'CEAC.subgroups', with the number of rows equal to the WTP values and the number of columns equal to the number of subgroups + 1, to record the probability of cost-effectiveness results by running the code. *(Note that you can also use a matrix instead of a data.frame, however it is generally easier to generate plots using a data frames, particularly if using ggplot).*
 
@@ -242,7 +242,7 @@ Once you have assigned values to the  parameters outside of the model function b
 
 * Estimate the discounted cost (`disc.cost.NP2`) and QALY (`disc.QALYs.NP2`) outcomes from NP2, using the code provided for NP1 as a guide.
 
-* Finally, you need to make sure the function returns the results for all three comparators now.  Update the `output` matrix to ensure that this includes estimated discounted cost and qalys for NP2. 
+* Finally, you need to make sure the function returns the results for all three comparators now.  Update the `output` matrix to ensure that this includes estimated discounted cost and QALYs for NP2. 
 
 *Hint: It might be worth testing each stage of the model by defining `age` ( e.g. `age <- 60`) and `male` (e.g. `male <- 0`) and work through each section of the function before running the whole thing. If you do this, the first 6 rows of the updated revision.risk.NP2 column in tdtps should look like the following: *
 
@@ -299,7 +299,7 @@ Note that one of the problems of looking at the three clouds of points on the CE
 
 The results from the probabilistic analysis of mutually exclusive options can also be presented as multiple cost-effectiveness acceptability curves.  However, in contrast to the independent sub-group analysis of the first part of this exercise, these multiple curves must sum to one, since they represent the probability of each comparator being cost-effective at any given WTP threshold.  We must therefore calculate the NMB associated with each intervention at each WTP threshold, but this time for three model comparators. 
 
-(i) First, calculate the average net monetary benefit for each option by first defining a vector of WTP values from £0 to £50,000 per QALY gained, by increments of your chosing (`WTP.values`). Then create a data.frame (`CEAC`) which has the WTP values and empty columns for standard, NP1 and NP2 columns.   
+(i) First, calculate the average net monetary benefit for each option by first defining a vector of WTP values from £0 to £50,000 per QALY gained, by increments of your choosing (`WTP.values`). Then create a data.frame (`CEAC`) which has the WTP values and empty columns for standard, NP1 and NP2 columns.   
 
 (ii) Next, create a function (`pCE.3b`), to estimate net monetary benefit for each intervention, and specify WTP as an argument in the function. We've started the function, but left a few definitions blank for you to complete. The aim of the function is to estimates the probability of the new intervention being cost-effective. You will need to use the `apply()` function to first select the maximum 'nmb' value by row (call this `max.nmb`) and then again to calculate the mean number of times that each treatment pathway was found to be the most cost-effective (i.e. the mean times each column within the `CE` data.frame was found to be the strategy with the maximum NMB) - defining `probCE`.
 
@@ -327,6 +327,6 @@ As was noted in the presentation, the interpretation of multiple acceptability c
 
 The `CEAF.function()` function has been written for you, which is similar to the function used earlier in the script to estimate the probability of cost-effectiveness, except that rather than selecting the treatment with the highest probability of cost-effectiveness, the function selects the probability of cost-effectiveness for the treatment with the highest net monetary benefit (based on average net monetary benefit across all simulations run). We can also use the same plot function '`plot.ceac.all()`' to create a plot to show the results, this time for the CEAF.  
 
-Congratulations! You have now created a time-dependent, probabilistic Markov model with an additional treatment arm comparator, additionally you've presented results from such analyses graphically. In the next module we'll be building on `model.THR` to explore Value of Information Analyses.
+**Congratulations!** You have now created a time-dependent, probabilistic Markov model with an additional treatment arm comparator, additionally you've presented results from such analyses graphically. In the next module we'll be building on `model.THR` to explore Value of Information Analyses.
 
 

@@ -5,7 +5,7 @@ date: "2022 Course"
 output:
   pdf_document: default
   html_document: default
-subtitle: Foundation Course Exercise 3
+subtitle: Foundation Course Module 3
 header-includes:
 - \usepackage{titling}
 - \pretitle{\begin{center}\LARGE\includegraphics[width=7.5cm]{logo.png}\\[\bigskipamount]}
@@ -169,6 +169,9 @@ Once you have done this, you should have calculated total undiscounted costs of 
 Now that you have completed the calculations for the AZT therapy, you now need to repeat the steps above but this time for combination therapy.  Go to the "COMBINATION THERAPY ARM" section.
 
 i) Start by redefining the transition matrix (through first defining the state transition vectors) for combination therapy, incorporating the treatment effect. In the original article, the relative risk parameter was applied to all transitions.  The corresponding transition matrix for combination therapy is given below. Note the different transition probabilities need to be applied in the first two years only (since the drug is assumed to be given for only 2 years).
+
+\newpage
+
 
 | Transition matrix | A  | B | C | D |
 |:------|:-----|:--------|:------|:-----| 

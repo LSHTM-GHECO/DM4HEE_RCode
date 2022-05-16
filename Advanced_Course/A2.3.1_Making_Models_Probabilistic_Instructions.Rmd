@@ -2,7 +2,7 @@
 title: "Making Models Probabilistic"
 subtitle: Advanced Course Module 2
 author: "Nichola Naylor & Jack Williams"
-date: "May/June 2021 Course"
+date: "2022 Course"
 output:
   pdf_document: default
   html_document: default
@@ -36,7 +36,7 @@ The step-by-step guide below will take you through a number of stages of making 
 5. Correlating parameters by Cholesky decomposition
 6. Application to the regression model for prosthesis survival
 
-A template for the exercise, ‘A2.3.2_Making_Models_Probablistic_Template.R’, is available, and builds upon the deterministic model developed in Module 1.   
+A template for the exercise, ‘A2.3.2_Making_Models_Probabilistic_Template.R’, is available, and builds upon the deterministic model developed in Module 1.   
 
 To work through this exercise, you will need to have the following csv files available within the same working-directory folder as the template and solution files:
 
