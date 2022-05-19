@@ -118,7 +118,7 @@ trace.AZT
 rowSums(trace.AZT) ## check that they sum to 1, if not something has gone wrong in your calculations
 
 
-## Half-cycle correction
+####**** Half-cycle correction****####
 
 # First, we can add the seed (i.e. starting distribution) to the top of the trace.AZT matrix
 trace.AZT.seed <- rbind(seed, trace.AZT) 
@@ -209,7 +209,7 @@ trace.comb
 
 
 
-## Half-cycle correction
+####**** Half-cycle correction ****####
 
 # Similar to the approach taken above, we add the seed to the top of the trace, then take the average of the two
 trace.comb.seed <- rbind(seed, trace.comb) 
