@@ -2,7 +2,7 @@
 title: "Model Efficiency: Vectorised approach example"
 subtitle: "Supplementary file for Advanced Course"
 author: "Jack Williams & Nichola Naylor"
-date: "May/June 2021 Course"
+date: "2022 Course"
 output:
   pdf_document: default
   html_document: default
@@ -23,7 +23,7 @@ source("A1.3.3_Advanced_Markov_Modelling_Solutions.R", local = knitr::knit_globa
 
 ## Simple example of vectorisation 
 
-Let us start by describing two functions - one which uses a loop, and appends to existing data, and the other which performs a function once using vectorisation. The purpose of the code is to compare two alternatives and check their speed. *Note the process used here, involving the function `system.time()` to highlight running time of functions, can also be used to compare different model running times in general, which can be handy for figuring out run times of certain sections of code to see where optimisation would be most beneficial!.*
+Let us start by describing two functions - one which uses a loop, and appends to existing data, and the other which performs a function once using vectorisation. The purpose of the code is to compare two alternatives and check their speed. *Note the process used here, involving the function `system.time()` to highlight running time of functions, can also be used to compare different model running times in general, which can be handy for figuring out run times of certain sections of code to see where optimisation would be most beneficial!*
 
 Both functions involve taking random draws from a beta distribution. The functions requires three arguments: the number of samples to be drawn from the distribution, and the alpha and beta parameters that provide the shape of the underlying beta distribution.  
 
